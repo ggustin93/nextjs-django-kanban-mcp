@@ -1,0 +1,72 @@
+"""
+Root Query for GraphQL API - combines all read operations.
+
+Inherits: kanban.schema.Query (allTasks)
+Returns: All tasks ordered by creation date (newest first)
+
+Future: Add new app Query classes to inheritance list
+"""
+type Query {
+  allTasks: [TaskType]
+}
+
+type TaskType {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  description: String!
+  status: KanbanTaskStatusChoices!
+}
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+"""An enumeration."""
+enum KanbanTaskStatusChoices {
+  """To Do"""
+  TODO
+
+  """In Progress"""
+  DOING
+
+  """Done"""
+  DONE
+}
+
+"""
+Root Mutation for GraphQL API - combines all write operations.
+
+Inherits: kanban.schema.Mutation (createTask)
+
+Security: All mutations must validate inputs and check permissions
+Future: Add new app Mutation classes to inheritance list
+"""
+type Mutation {
+  createTask(status: TaskStatusEnum, title: String!): CreateTask
+  updateTask(description: String, id: ID!, status: TaskStatusEnum, title: String): UpdateTask
+  deleteTask(id: ID!): DeleteTask
+}
+
+type CreateTask {
+  task: TaskType
+}
+
+"""GraphQL enum for Task.Status choices with validation."""
+enum TaskStatusEnum {
+  TODO
+  DOING
+  DONE
+}
+
+type UpdateTask {
+  task: TaskType
+}
+
+type DeleteTask {
+  success: Boolean
+}

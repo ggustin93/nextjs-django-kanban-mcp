@@ -1,0 +1,130 @@
+# Python & Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+db.sqlite3
+db.sqlite3-journal
+
+# Django migrations
+# Uncomment if you want to track migrations
+# !*/migrations/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env
+.env.local
+.env.*.local
+.env.*.vault
+
+# Node.js & Next.js
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm/
+.node-gyp/
+.next/
+out/
+build/
+.vercel/
+dist/
+
+# IDE & Editors
+.vscode/
+.idea/
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.editorconfig
+.vim/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS-specific
+Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+*.tmp
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment-specific
+.DS_Store
+.env.production.local
+.env.test.local
+
+# IDE cache
+.cache/
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# SSL/TLS certificates (security sensitive)
+*.pem
+*.key
+*.cert
+*.crt
+
+# Package managers
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Testing
+.nyc_output/
+coverage/
+*.lcov
+
+# Build
+.tsbuildinfo
+
+# Misc
+.cache
+.parcel-cache
+.turbo/
+
+# AI
+.claude/
+.serena/

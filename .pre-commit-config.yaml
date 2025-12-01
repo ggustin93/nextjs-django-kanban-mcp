@@ -1,0 +1,84 @@
+# Pre-commit hooks configuration for Next.js + Django Kanban project
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+# Bypass: git commit --no-verify
+
+repos:
+  # General file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        exclude: \.(md|svg)$
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: check-yaml
+        name: Check YAML syntax
+      - id: check-json
+        name: Check JSON syntax
+      - id: check-toml
+        name: Check TOML syntax
+      - id: check-added-large-files
+        name: Check for large files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: detect-private-key
+        name: Detect private keys
+
+  # Python (Backend) - Ruff for fast linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      # Ruff linter (replaces flake8, isort, pyupgrade)
+      - id: ruff
+        name: Ruff linter (Python)
+        args:
+          - --fix
+          - --config=backend/pyproject.toml
+        files: ^backend/.*\.py$
+
+      # Ruff formatter (replaces black)
+      - id: ruff-format
+        name: Ruff formatter (Python)
+        args:
+          - --config=backend/pyproject.toml
+        files: ^backend/.*\.py$
+
+  # TypeScript/JavaScript (Frontend) - ESLint (disabled until eslint.config.js is configured)
+  # - repo: https://github.com/pre-commit/mirrors-eslint
+  #   rev: v9.0.0-beta.2
+  #   hooks:
+  #     - id: eslint
+  #       name: ESLint (TypeScript/React)
+  #       files: ^frontend/.*\.(ts|tsx|js|jsx)$
+  #       args:
+  #         - --fix
+  #         - --max-warnings=0
+  #       additional_dependencies:
+  #         - eslint@^9
+  #         - eslint-config-next@15.2.3
+  #         - typescript@^5
+
+  # Prettier for consistent formatting (Frontend)
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        name: Prettier formatter (Frontend)
+        files: ^frontend/.*\.(ts|tsx|js|jsx|json|css|md)$
+        args:
+          - --write
+          - --config=frontend/.prettierrc.json
+          - --ignore-path=frontend/.prettierignore
+
+  # TypeScript type checking (Frontend)
+  - repo: local
+    hooks:
+      - id: typescript-check
+        name: TypeScript type check
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
