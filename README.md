@@ -1,6 +1,31 @@
 # Kanban Board - Next.js + Django GraphQL
 
-Modern full-stack kanban board with drag-and-drop, built with Next.js 15, Django 4.2, and GraphQL.
+Modern full-stack kanban board with drag-and-drop, built with Next.js 15, Django 4.2, and GraphQL. Features MCP server integration for AI agent task management.
+
+## Table of Contents
+
+- [Kanban Board - Next.js + Django GraphQL](#kanban-board---nextjs--django-graphql)
+  - [Table of Contents](#table-of-contents)
+  - [🚀 Quick Start](#-quick-start)
+    - [Docker (Recommended)](#docker-recommended)
+    - [Local Development](#local-development)
+  - [🎯 Features](#-features)
+  - [🏗️ Tech Stack](#️-tech-stack)
+  - [📁 Project Structure](#-project-structure)
+  - [🧪 Testing](#-testing)
+  - [🔧 Pre-commit Hooks](#-pre-commit-hooks)
+  - [🚦 Continuous Integration](#-continuous-integration)
+    - [Branch Protection (Recommended)](#branch-protection-recommended)
+  - [📊 Development Commands](#-development-commands)
+    - [Makefile Shortcuts](#makefile-shortcuts)
+    - [GraphQL Operations](#graphql-operations)
+  - [🎨 Architecture Highlights](#-architecture-highlights)
+    - [System Architecture](#system-architecture)
+    - [Backend: Modular Monolith Pattern](#backend-modular-monolith-pattern)
+    - [Frontend: SOLID Principles](#frontend-solid-principles)
+  - [🤖 AI Agent Integration (MCP Server)](#-ai-agent-integration-mcp-server)
+    - [Try It Locally](#try-it-locally)
+  - [📄 License](#-license)
 
 ## 🚀 Quick Start
 
@@ -300,7 +325,7 @@ graph TB
         end
 
         subgraph "Kanban App"
-            KanbanSchema[GraphQL Schema<br/>types | queries | mutations]
+            KanbanSchema[GraphQL Schema<br/>types, queries, mutations]
             KanbanModels[Task Model]
             KanbanLogic[Business Logic]
         end
