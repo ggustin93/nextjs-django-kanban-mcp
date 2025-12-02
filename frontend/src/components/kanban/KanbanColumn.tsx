@@ -6,6 +6,7 @@
 
 import { Box, Typography, Stack, Chip } from '@mui/material';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
 import { TaskCard } from './TaskCard';
 import { Task, Column } from './types';
 
@@ -17,6 +18,10 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: column.status,
+  });
+
   return (
     <Box sx={{ flex: '1 1 0', minWidth: 320, maxWidth: 400 }}>
       {/* Column Header */}
@@ -46,12 +51,18 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
       </Stack>
 
       {/* Droppable Zone */}
-      <SortableContext
-        items={tasks.map((t) => t.id)}
-        strategy={verticalListSortingStrategy}
-        id={column.status}
-      >
-        <Stack spacing={2}>
+      <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+        <Stack
+          ref={setNodeRef}
+          spacing={2}
+          sx={{
+            minHeight: 200,
+            transition: 'background-color 0.2s',
+            bgcolor: isOver ? 'action.hover' : 'transparent',
+            borderRadius: 2,
+            p: 1,
+          }}
+        >
           {tasks.map((task) => (
             <TaskCard
               key={task.id}
@@ -70,7 +81,8 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
                 bgcolor: 'background.paper',
                 borderRadius: 2,
                 border: '2px dashed',
-                borderColor: 'divider',
+                borderColor: isOver ? column.color : 'divider',
+                transition: 'border-color 0.2s',
               }}
             >
               <Typography variant="body2" color="text.secondary">
