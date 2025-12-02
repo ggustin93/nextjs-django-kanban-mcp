@@ -1,7 +1,7 @@
 # Makefile for Next.js + Django Kanban Board
 # Provides convenient shortcuts for common Docker and development commands
 
-.PHONY: help up down test migrate clean logs shell hooks-install lint
+.PHONY: help up down rebuild test migrate clean logs shell hooks-install lint
 
 # Default target
 help:
@@ -9,6 +9,7 @@ help:
 	@echo ""
 	@echo "  make up              - Start all services"
 	@echo "  make down            - Stop all services"
+	@echo "  make rebuild         - Rebuild and restart services"
 	@echo "  make test            - Run all tests"
 	@echo "  make migrate         - Run migrations"
 	@echo "  make clean           - Remove containers/volumes"
@@ -24,6 +25,13 @@ up:
 
 down:
 	docker-compose down
+
+rebuild:
+	@echo "Rebuilding Docker containers..."
+	docker-compose build
+	docker-compose up -d
+	@echo "✅ Services rebuilt and restarted"
+	@echo "Backend: http://localhost:8000, Frontend: http://localhost:3000"
 
 test:
 	@echo "Running backend tests..."
