@@ -232,6 +232,171 @@ mutation { deleteTask(id: "1") { success } }
 
 ## 🎨 Architecture Highlights
 
+### System Architecture
+
+The following diagram illustrates the complete system architecture, showing how the Next.js frontend communicates with the Django backend through a GraphQL API layer, and how the modular backend structure enables scalability.
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        UI[Next.js 15 App]
+        Apollo[Apollo Client]
+        DnD[@dnd-kit]
+        MUI[Material UI v7]
+
+        UI --> Apollo
+        UI --> DnD
+        UI --> MUI
+    end
+
+    subgraph "API Layer"
+        GraphQL[GraphQL API<br/>Graphene-Django]
+        Schema[Schema Composition<br/>Root ← Apps]
+    end
+
+    subgraph "Backend Layer - Modular Monolith"
+        subgraph "Core App"
+            CoreModels[TimeStampedModel<br/>Shared Base Classes]
+        end
+
+        subgraph "Kanban App"
+            KanbanSchema[GraphQL Schema<br/>types | queries | mutations]
+            KanbanModels[Task Model]
+            KanbanLogic[Business Logic]
+        end
+
+        subgraph "Integration Layer"
+            MCP[MCP Server<br/>External Integrations]
+        end
+
+        ORM[Django ORM]
+    end
+
+    subgraph "Data Layer"
+        DB[(SQLite Dev<br/>PostgreSQL Prod)]
+    end
+
+    subgraph "Infrastructure"
+        Docker[Docker Compose<br/>Hot Reload]
+    end
+
+    %% Data Flow
+    Apollo -->|GraphQL Queries/Mutations| GraphQL
+    GraphQL --> Schema
+    Schema -.inherits.-> KanbanSchema
+    KanbanSchema --> KanbanLogic
+    KanbanLogic --> KanbanModels
+    KanbanModels -.extends.-> CoreModels
+    KanbanModels --> ORM
+    ORM --> DB
+
+    %% Integration Flow
+    KanbanLogic -.uses.-> MCP
+
+    %% Infrastructure
+    Docker -.orchestrates.-> UI
+    Docker -.orchestrates.-> GraphQL
+    Docker -.orchestrates.-> DB
+
+    %% Styling
+    classDef frontend fill:#61dafb,stroke:#333,stroke-width:2px,color:#000
+    classDef api fill:#e535ab,stroke:#333,stroke-width:2px,color:#fff
+    classDef backend fill:#092e20,stroke:#333,stroke-width:2px,color:#fff
+    classDef data fill:#336791,stroke:#333,stroke-width:2px,color:#fff
+    classDef infra fill:#2496ed,stroke:#333,stroke-width:2px,color:#fff
+
+    class UI,Apollo,DnD,MUI frontend
+    class GraphQL,Schema api
+    class CoreModels,KanbanSchema,KanbanModels,KanbanLogic,MCP,ORM backend
+    class DB data
+    class Docker infra
+```
+
+**Key Architectural Highlights**:
+- **Type-Safe Communication**: GraphQL schema ensures frontend-backend contract
+- **Schema Composition**: Root schema inherits from feature-specific app schemas
+- **Clean Separation**: Integration layer (MCP) isolated from core business logic
+- **Infrastructure Automation**: Docker Compose orchestrates services with hot-reload
+
+### Backend Module Organization
+
+This project follows the **OpenHEXA architectural pattern** used at Bluesquare, enabling easy feature addition without modifying existing code. Each Django app is self-contained with its own models, schemas, and business logic.
+
+```mermaid
+graph LR
+    subgraph "Backend Architecture - Modular Monolith Pattern"
+        subgraph "Root Configuration"
+            RootSchema[config/schema.py<br/>Composes App Schemas]
+            Settings[config/settings.py]
+            URLs[config/urls.py]
+        end
+
+        subgraph "apps/core/"
+            CoreBase[models.py<br/>TimeStampedModel<br/>Abstract Base Classes]
+            CoreUtils[utils/<br/>Shared Utilities]
+        end
+
+        subgraph "apps/kanban/"
+            direction TB
+            KModels[models.py<br/>Task Model]
+            KSchema[schema/<br/>├── types.py<br/>├── queries.py<br/>└── mutations.py]
+            KMgmt[management/<br/>commands/<br/>seed_tasks.py]
+        end
+
+        subgraph "apps/users/ [Future]"
+            UModels[models.py]
+            USchema[schema/]
+        end
+
+        subgraph "apps/analytics/ [Future]"
+            AModels[models.py]
+            ASchema[schema/]
+        end
+
+        subgraph "integrations/"
+            MCP[mcp/<br/>External Services<br/>Isolated Boundary]
+        end
+
+        %% Inheritance & Composition
+        KModels -.inherits.-> CoreBase
+        UModels -.inherits.-> CoreBase
+        AModels -.inherits.-> CoreBase
+
+        RootSchema -.composes.-> KSchema
+        RootSchema -.composes.-> USchema
+        RootSchema -.composes.-> ASchema
+
+        KSchema -.uses.-> MCP
+
+        %% Styling
+        classDef implemented fill:#092e20,stroke:#44b78b,stroke-width:3px,color:#fff
+        classDef future fill:#333,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5,color:#999
+        classDef root fill:#0c4b33,stroke:#44b78b,stroke-width:3px,color:#fff
+        classDef integration fill:#e535ab,stroke:#333,stroke-width:2px,color:#fff
+
+        class RootSchema,Settings,URLs root
+        class CoreBase,CoreUtils,KModels,KSchema,KMgmt implemented
+        class UModels,USchema,AModels,ASchema future
+        class MCP integration
+    end
+```
+
+**Scalability Benefits**:
+- ✅ **Add New Features**: Create new app → Add schemas → Compose in root (zero changes to existing apps)
+- ✅ **Team Collaboration**: Clear ownership boundaries for parallel development
+- ✅ **Maintainability**: Changes isolated to specific apps, reducing regression risk
+- ✅ **Testability**: Apps can be tested independently with clear boundaries
+
+**Example - Adding a "users" app**:
+```python
+# config/schema.py
+import kanban.schema
+import users.schema  # New app
+
+class Query(kanban.schema.Query, users.schema.Query, graphene.ObjectType):
+    pass  # Automatic composition, no logic changes needed
+```
+
 ### Backend: Modular Monolith (OpenHEXA Pattern)
 **Inspired by [Bluesquare's OpenHEXA](https://github.com/BLSQ/openhexa)** - modular Django architecture for maintainability at scale
 
