@@ -1,10 +1,6 @@
 # Kanban Board - Next.js + Django GraphQL
 
-[![CI](https://github.com/USERNAME/REPOSITORY/workflows/CI/badge.svg)](https://github.com/USERNAME/REPOSITORY/actions)
-
 Modern full-stack kanban board with drag-and-drop, built with Next.js 15, Django 4.2, and GraphQL.
-
-> **Note**: Replace `USERNAME/REPOSITORY` in the CI badge URL with your GitHub username and repository name.
 
 ## 🚀 Quick Start
 
