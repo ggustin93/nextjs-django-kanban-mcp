@@ -285,7 +285,7 @@ graph TB
     subgraph "Frontend Layer"
         UI[Next.js 15 App]
         Apollo[Apollo Client]
-        DnD[@dnd-kit]
+        DnD["@dnd-kit"]
         MUI[Material UI v7]
 
         UI --> Apollo
@@ -361,79 +361,6 @@ graph TB
 - **Schema Composition**: Root schema inherits from feature-specific app schemas
 - **Clean Separation**: Integration layer (MCP) isolated from core business logic
 - **Infrastructure Automation**: Docker Compose orchestrates services with hot-reload
-
-### Backend Module Organization
-
-This project uses a modular monolith pattern, enabling feature addition without modifying existing code. Each Django app is self-contained with its own models, schemas, and business logic.
-
-```mermaid
-graph LR
-    subgraph "Backend Architecture - Modular Monolith Pattern"
-        subgraph "Root Configuration"
-            RootSchema[config/schema.py<br/>Composes App Schemas]
-            Settings[config/settings.py]
-            URLs[config/urls.py]
-        end
-
-        subgraph "apps/core/"
-            CoreBase[models.py<br/>TimeStampedModel<br/>Abstract Base Classes]
-            CoreUtils[utils/<br/>Shared Utilities]
-        end
-
-        subgraph "apps/kanban/"
-            direction TB
-            KModels[models.py<br/>Task Model]
-            KSchema[schema/<br/>├── types.py<br/>├── queries.py<br/>└── mutations.py]
-            KMgmt[management/<br/>commands/<br/>seed_tasks.py]
-        end
-
-        subgraph "apps/users/ [Future]"
-            UModels[models.py]
-            USchema[schema/]
-        end
-
-        subgraph "apps/analytics/ [Future]"
-            AModels[models.py]
-            ASchema[schema/]
-        end
-
-        subgraph "integrations/"
-            MCP[mcp/<br/>External Services<br/>Isolated Boundary]
-        end
-
-        %% Inheritance & Composition
-        KModels -.inherits.-> CoreBase
-        UModels -.inherits.-> CoreBase
-        AModels -.inherits.-> CoreBase
-
-        RootSchema -.composes.-> KSchema
-        RootSchema -.composes.-> USchema
-        RootSchema -.composes.-> ASchema
-
-        KSchema -.uses.-> MCP
-
-        %% Styling
-        classDef implemented fill:#092e20,stroke:#44b78b,stroke-width:3px,color:#fff
-        classDef future fill:#333,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5,color:#999
-        classDef root fill:#0c4b33,stroke:#44b78b,stroke-width:3px,color:#fff
-        classDef integration fill:#e535ab,stroke:#333,stroke-width:2px,color:#fff
-
-        class RootSchema,Settings,URLs root
-        class CoreBase,CoreUtils,KModels,KSchema,KMgmt implemented
-        class UModels,USchema,AModels,ASchema future
-        class MCP integration
-    end
-```
-
-**Example - Adding a "users" app**:
-```python
-# config/schema.py
-import kanban.schema
-import users.schema  # New app
-
-class Query(kanban.schema.Query, users.schema.Query, graphene.ObjectType):
-    pass  # Automatic composition, no logic changes needed
-```
 
 ### Backend: Modular Monolith Pattern
 
