@@ -1,7 +1,7 @@
 """Create sample tasks for development."""
 from django.core.management.base import BaseCommand
 
-from kanban.models import Task
+from apps.kanban.models import Task
 
 
 class Command(BaseCommand):

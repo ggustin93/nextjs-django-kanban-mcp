@@ -6,8 +6,8 @@ Purpose:
     Defines Django ORM models for the kanban task management system.
 
 Models:
-    - TimeStampedModel: Abstract base model with automatic timestamps
     - Task: Kanban task with title, description, and status
+      (inherits TimeStampedModel from apps.core)
 
 Status Choices:
     - TODO: Task not yet started
@@ -16,15 +16,7 @@ Status Choices:
 """
 from django.db import models
 
-
-class TimeStampedModel(models.Model):
-    """Abstract base model with timestamps."""
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
+from apps.core.models import TimeStampedModel
 
 
 class Task(TimeStampedModel):

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "kanban": {
+      "command": "/ABSOLUTE/PATH/TO/backend/venv/bin/python",
+      "args": [
+        "-c",
+        "import sys; sys.path.insert(0, '/ABSOLUTE/PATH/TO/backend'); exec(open('/ABSOLUTE/PATH/TO/backend/integrations/mcp/server.py').read())"
+      ],
+      "env": {
+        "PYTHONPATH": "/ABSOLUTE/PATH/TO/backend"
+      }
+    }
+  }
+}

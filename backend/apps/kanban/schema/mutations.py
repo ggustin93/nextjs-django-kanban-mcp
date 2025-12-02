@@ -26,7 +26,7 @@ Note:
 """
 import graphene
 
-from kanban.models import Task
+from apps.kanban.models import Task
 
 from .types import TaskStatusEnum, TaskType
 

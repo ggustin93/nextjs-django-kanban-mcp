@@ -17,9 +17,9 @@ from django.test import TestCase
 import graphene
 from graphene.test import Client
 
-from kanban.models import Task
-from kanban.schema.mutations import Mutation
-from kanban.schema.queries import Query
+from apps.kanban.models import Task
+from apps.kanban.schema.mutations import Mutation
+from apps.kanban.schema.queries import Query
 
 
 class GraphQLSchemaTests(TestCase):

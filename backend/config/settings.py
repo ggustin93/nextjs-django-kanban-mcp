@@ -15,7 +15,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',  # Required for GraphiQL assets
     'graphene_django',
     'corsheaders',
-    'kanban',
+    # Project apps
+    'apps.core',
+    'apps.kanban',
 ]
 
 # Minimal middleware
@@ -59,7 +61,7 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'data' / 'db.sqlite3',
     }
 }
 

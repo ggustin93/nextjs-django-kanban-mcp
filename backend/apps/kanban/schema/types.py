@@ -21,7 +21,7 @@ Usage:
 import graphene
 from graphene_django import DjangoObjectType
 
-from kanban.models import Task
+from apps.kanban.models import Task
 
 
 class TaskStatusEnum(graphene.Enum):

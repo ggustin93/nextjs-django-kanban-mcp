@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
-from kanban.models import Task
+from apps.kanban.models import Task
 
 
 class TaskModelTests(TestCase):

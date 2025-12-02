@@ -13,8 +13,8 @@ from graphql import print_schema  # noqa: E402
 
 from config.schema import schema  # noqa: E402
 
-# Output path: argument or default to root
-output_path = sys.argv[1] if len(sys.argv) > 1 else 'schema.graphql'
+# Output path: argument or default to kanban app
+output_path = sys.argv[1] if len(sys.argv) > 1 else 'apps/kanban/graphql/schema.graphql'
 
 # Export schema
 schema_str = print_schema(schema.graphql_schema)

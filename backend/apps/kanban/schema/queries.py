@@ -20,7 +20,7 @@ Usage:
 """
 import graphene
 
-from kanban.models import Task
+from apps.kanban.models import Task
 
 from .types import TaskType
 

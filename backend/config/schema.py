@@ -17,7 +17,7 @@ Example Usage:
 
 Related Files:
     - config/settings.py: GRAPHENE configuration
-    - kanban/schema/: Query/Mutation implementations
+    - apps/kanban/schema/: Query/Mutation implementations
 
 Security:
     - Implement authentication/authorization in resolvers
@@ -26,27 +26,26 @@ Security:
 
 Last Updated: 2025-12-01
 """
+import apps.kanban.schema
 import graphene
 
-import kanban.schema
 
-
-class Query(kanban.schema.Query, graphene.ObjectType):
+class Query(apps.kanban.schema.Query, graphene.ObjectType):
     """
     Root Query for GraphQL API - combines all read operations.
 
-    Inherits: kanban.schema.Query (allTasks)
+    Inherits: apps.kanban.schema.Query (allTasks)
     Returns: All tasks ordered by creation date (newest first)
 
     Future: Add new app Query classes to inheritance list
     """
 
 
-class Mutation(kanban.schema.Mutation, graphene.ObjectType):
+class Mutation(apps.kanban.schema.Mutation, graphene.ObjectType):
     """
     Root Mutation for GraphQL API - combines all write operations.
 
-    Inherits: kanban.schema.Mutation (createTask)
+    Inherits: apps.kanban.schema.Mutation (createTask)
 
     Security: All mutations must validate inputs and check permissions
     Future: Add new app Mutation classes to inheritance list
