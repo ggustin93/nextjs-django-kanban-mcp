@@ -1,33 +1,32 @@
 # Kanban Board - Next.js + Django GraphQL
 
-Modern full-stack kanban board with drag-and-drop, built with Next.js 15, Django 4.2, and GraphQL. Features MCP server integration for AI agent task management.
+A full-stack kanban board built with Next.js 15, Django 4.2, and GraphQL. Features drag-and-drop task management and MCP server integration.
+
+**Tech Stack:** TypeScript, Material UI, Apollo Client, Graphene-Django, Docker
 
 ## Table of Contents
 
-- [Kanban Board - Next.js + Django GraphQL](#kanban-board---nextjs--django-graphql)
-  - [Table of Contents](#table-of-contents)
-  - [🚀 Quick Start](#-quick-start)
-    - [Docker (Recommended)](#docker-recommended)
-    - [Local Development](#local-development)
-  - [🎯 Features](#-features)
-  - [🏗️ Tech Stack](#️-tech-stack)
-  - [📁 Project Structure](#-project-structure)
-  - [🧪 Testing](#-testing)
-  - [🔧 Pre-commit Hooks](#-pre-commit-hooks)
-  - [🚦 Continuous Integration](#-continuous-integration)
-    - [Branch Protection (Recommended)](#branch-protection-recommended)
-  - [📊 Development Commands](#-development-commands)
-    - [Makefile Shortcuts](#makefile-shortcuts)
-    - [GraphQL Operations](#graphql-operations)
-  - [🎨 Architecture Highlights](#-architecture-highlights)
-    - [System Architecture](#system-architecture)
-    - [Backend: Modular Monolith Pattern](#backend-modular-monolith-pattern)
-    - [Frontend: SOLID Principles](#frontend-solid-principles)
-  - [🤖 AI Agent Integration (MCP Server)](#-ai-agent-integration-mcp-server)
-    - [Try It Locally](#try-it-locally)
-  - [📄 License](#-license)
+1. [Quick Start](#1-quick-start)
+   - [Docker (Recommended)](#docker-recommended)
+   - [Local Development](#local-development)
+2. [Features](#2-features)
+3. [Tech Stack](#3-tech-stack)
+4. [Project Structure](#4-project-structure)
+5. [Testing](#5-testing)
+6. [Pre-commit Hooks](#6-pre-commit-hooks)
+7. [Continuous Integration](#7-continuous-integration)
+8. [Development Commands](#8-development-commands)
+   - [Makefile Shortcuts](#makefile-shortcuts)
+   - [GraphQL Operations](#graphql-operations)
+9. [Architecture](#9-architecture)
+   - [System Architecture](#system-architecture)
+   - [Backend: Modular Monolith](#backend-modular-monolith)
+   - [Frontend: Component Design](#frontend-component-design)
+10. [MCP Server Integration](#10-mcp-server-integration)
+    - [Local Setup](#local-setup)
+11. [License](#11-license)
 
-## 🚀 Quick Start
+## 1. Quick Start
 
 ### Docker (Recommended)
 
@@ -63,19 +62,19 @@ npm install
 npm run dev
 ```
 
-## 🎯 Features
+## 2. Features
 
-- ✅ Full CRUD operations (Create, Read, Update, Delete)
-- ✅ Drag-and-drop between columns (TODO → DOING → DONE)
-- ✅ GraphQL API with type-safe schema
-- ✅ Real-time updates with Apollo Client
-- ✅ Material UI responsive design
-- ✅ TypeScript end-to-end
-- ✅ Docker hot-reload for both services
-- ✅ Pre-commit hooks (Ruff, ESLint, Prettier)
-- ✅ Comprehensive test coverage
+- Full CRUD operations (Create, Read, Update, Delete)
+- Drag-and-drop between columns (TODO → DOING → DONE)
+- GraphQL API with type-safe schema
+- Real-time updates with Apollo Client
+- Material UI responsive design
+- TypeScript end-to-end
+- Docker hot-reload for both services
+- Pre-commit hooks (Ruff, ESLint, Prettier)
+- Test coverage for critical paths
 
-## 🏗️ Tech Stack
+## 3. Tech Stack
 
 **Backend:**
 - Django 4.2 + Graphene-Django
@@ -94,7 +93,7 @@ npm run dev
 - Hot reload for development
 - Multi-stage builds for production
 
-## 📁 Project Structure
+## 4. Project Structure
 
 ```
 .
@@ -177,7 +176,7 @@ npm run dev
 └── .env                            # Environment variables (ports, URLs)
 ```
 
-## 🧪 Testing
+## 5. Testing
 
 ```bash
 # All tests
@@ -202,7 +201,7 @@ npm test
 - Frontend: 12 tests (components + integration)
 - Focus: Critical paths + enum validation + async wrappers
 
-## 🔧 Pre-commit Hooks
+## 6. Pre-commit Hooks
 
 Install and use code quality hooks:
 
@@ -223,47 +222,19 @@ git commit --no-verify
 - TypeScript: ESLint + Prettier + type checking
 - General: Trailing whitespace, YAML validation, large files
 
-## 🚦 Continuous Integration
+## 7. Continuous Integration
 
-**GitHub Actions CI/CD** - Automated quality checks on every push and pull request:
+GitHub Actions runs automated checks on push and pull requests:
 
-- ✅ **Backend Linting**: Ruff (code quality + formatting)
-- ✅ **Frontend Linting**: ESLint + TypeScript type checking
-- ✅ **Backend Tests**: Django test suite (20 tests)
-- ✅ **Frontend Tests**: Jest test suite (12 tests)
-- ✅ **Docker Builds**: Multi-stage build validation
+- Backend Linting: Ruff (code quality + formatting)
+- Frontend Linting: ESLint + TypeScript type checking
+- Backend Tests: Django test suite (20 tests)
+- Frontend Tests: Jest test suite (12 tests)
+- Docker Builds: Multi-stage build validation
 
-**Features**:
-- **Parallel Execution**: All 5 jobs run simultaneously (~3 min with cache)
-- **Smart Path Filters**: Only run relevant jobs when files change
-- **Caching**: pip, npm, and Docker layer caching for speed
-- **Quality Gates**: All checks must pass before PR merge
+All 5 jobs run in parallel with pip, npm, and Docker layer caching.
 
-**View workflow details**: [`.github/workflows/README.md`](.github/workflows/README.md)
-
-### Branch Protection (Recommended)
-
-Configure `main` branch protection in GitHub Settings:
-
-1. **Settings → Branches → Add branch protection rule**
-2. Branch name pattern: `main`
-3. Enable:
-   - ☑️ Require status checks to pass before merging
-   - ☑️ Require branches to be up to date before merging
-   - ☑️ Select required checks:
-     - `lint-backend`
-     - `lint-frontend`
-     - `test-backend`
-     - `test-frontend`
-     - `build-docker`
-   - ☑️ Require linear history
-   - ☑️ Do not allow bypassing the above settings
-
-**Optional**:
-- ☑️ Require pull request reviews (1 approval)
-- ☑️ Require conversation resolution before merging
-
-## 📊 Development Commands
+## 8. Development Commands
 
 ### Makefile Shortcuts
 
@@ -295,11 +266,9 @@ mutation { updateTask(id: "1", status: DOING) { task { id status } } }
 mutation { deleteTask(id: "1") { success } }
 ```
 
-## 🎨 Architecture Highlights
+## 9. Architecture
 
 ### System Architecture
-
-The following diagram illustrates the complete system architecture, showing how the Next.js frontend communicates with the Django backend through a GraphQL API layer, and how the modular backend structure enables scalability.
 
 ```mermaid
 graph TB
@@ -377,46 +346,33 @@ graph TB
     class Docker infra
 ```
 
-**Key Architectural Highlights**:
-- **Type-Safe Communication**: GraphQL schema ensures frontend-backend contract
-- **Schema Composition**: Root schema inherits from feature-specific app schemas
-- **Clean Separation**: Integration layer (MCP) isolated from core business logic
-- **Infrastructure Automation**: Docker Compose orchestrates services with hot-reload
+### Backend: Modular Monolith
 
-### Backend: Modular Monolith Pattern
+- Feature-based apps (`apps/kanban/`, `apps/core/`) with clear boundaries
+- Split GraphQL schemas (separate files for types, queries, mutations)
+- Shared base models (`apps/core/models.py`) to reduce duplication
+- External integrations isolated in `integrations/` directory
+- Schema composition pattern in `config/schema.py`
 
-**Key Patterns:**
-- **Feature-Based Apps** (`apps/kanban/`, `apps/core/`) - Clear boundaries for parallel development
-- **Split GraphQL Schemas** - Separate files for types, queries, mutations
-- **DRY Base Models** (`apps/core/models.py`) - Shared `TimeStampedModel` prevents duplication
-- **Organized Integrations** (`integrations/mcp/`) - External services isolated from core apps
-- **Schema Composition** (`config/schema.py`) - Root schema inherits from app schemas
+### Frontend: Component Design
 
-**Benefits:**
-- Apps can be developed independently
-- Changes isolated to specific apps (low coupling)
-- New features added without touching existing code
-- Clear testing boundaries
+- Single-purpose components with clear responsibilities
+- Custom hooks for reusable state management (`useTaskDialog`)
+- TypeScript enums for type safety (`TaskStatus`)
+- Organized directory structure (graphql, theme, components)
 
-### Frontend: SOLID Principles
-- **Single Responsibility** - Each component does one thing well
-- **Custom Hooks** - Reusable state management (`useTaskDialog`)
-- **Type Safety** - TypeScript enums (`TaskStatus`) prevent runtime errors
-- **Component Isolation** - `kanban/` directory groups related components
-- **Separation of Concerns** - GraphQL, theme, and components in separate directories
+## 10. MCP Server Integration
 
-## 🤖 AI Agent Integration (MCP Server)
+[Model Context Protocol](https://modelcontextprotocol.io/) server for managing tasks through Claude AI using natural language.
 
-**Bonus Feature**: [Model Context Protocol](https://modelcontextprotocol.io/) server that lets Claude AI manage tasks through natural language—*"Create a task for code review"* or *"Move task 3 to done"*.
+**Implementation:**
 
-**Technical Highlights:**
+- `@sync_to_async` wrappers bridge Django ORM with MCP's async protocol
+- Supports stdio (local) and HTTP/SSE (remote) transport
+- Type hints auto-generate JSON schemas
+- Isolated in `integrations/mcp/` directory
 
-- **Async/Sync Bridge**: `@sync_to_async` wrappers connect Django's ORM to MCP's async protocol
-- **Dual Transport**: Single codebase supports stdio (local) and HTTP/SSE (remote/mobile)
-- **Type-Safe Tools**: Python type hints auto-generate JSON schemas for Claude
-- **Modular Design**: Isolated in `integrations/mcp/` following clean architecture
-
-### Try It Locally
+### Local Setup
 
 ```bash
 # 1. Install dependencies
@@ -439,9 +395,9 @@ pip install -r requirements.txt
 
 **Available commands**: list tasks, create task, update status, delete task
 
-> **For deployment**: Server supports Railway/Render with HTTP/SSE transport for Claude Mobile. See `backend/integrations/mcp/README.md` for production setup
+> **Deployment**: Supports Railway/Render with HTTP/SSE transport. See `backend/integrations/mcp/README.md` for details.
 
-## 📄 License
+## 11. License
 
 MIT License - See LICENSE file for details
 
