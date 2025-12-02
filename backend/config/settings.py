@@ -1,13 +1,16 @@
 """Django settings for minimal GraphQL API."""
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-0pg7s9l-l6mi^-l0+lbfxa^26mp4uddbk%s@==xt*e6bqdf^e8'
+# SECURITY: Secret key from environment variable
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-only-change-in-production')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# SECURITY: Allowed hosts from environment (production requires explicit hosts)
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Minimal apps for GraphQL API
 INSTALLED_APPS = [

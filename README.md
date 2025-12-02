@@ -1,6 +1,10 @@
 # Kanban Board - Next.js + Django GraphQL
 
+[![CI](https://github.com/USERNAME/REPOSITORY/workflows/CI/badge.svg)](https://github.com/USERNAME/REPOSITORY/actions)
+
 Modern full-stack kanban board with drag-and-drop, built with Next.js 15, Django 4.2, and GraphQL.
+
+> **Note**: Replace `USERNAME/REPOSITORY` in the CI badge URL with your GitHub username and repository name.
 
 ## 🚀 Quick Start
 
@@ -198,6 +202,46 @@ git commit --no-verify
 - TypeScript: ESLint + Prettier + type checking
 - General: Trailing whitespace, YAML validation, large files
 
+## 🚦 Continuous Integration
+
+**GitHub Actions CI/CD** - Automated quality checks on every push and pull request:
+
+- ✅ **Backend Linting**: Ruff (code quality + formatting)
+- ✅ **Frontend Linting**: ESLint + TypeScript type checking
+- ✅ **Backend Tests**: Django test suite (20 tests)
+- ✅ **Frontend Tests**: Jest test suite (12 tests)
+- ✅ **Docker Builds**: Multi-stage build validation
+
+**Features**:
+- **Parallel Execution**: All 5 jobs run simultaneously (~3 min with cache)
+- **Smart Path Filters**: Only run relevant jobs when files change
+- **Caching**: pip, npm, and Docker layer caching for speed
+- **Quality Gates**: All checks must pass before PR merge
+
+**View workflow details**: [`.github/workflows/README.md`](.github/workflows/README.md)
+
+### Branch Protection (Recommended)
+
+Configure `main` branch protection in GitHub Settings:
+
+1. **Settings → Branches → Add branch protection rule**
+2. Branch name pattern: `main`
+3. Enable:
+   - ☑️ Require status checks to pass before merging
+   - ☑️ Require branches to be up to date before merging
+   - ☑️ Select required checks:
+     - `lint-backend`
+     - `lint-frontend`
+     - `test-backend`
+     - `test-frontend`
+     - `build-docker`
+   - ☑️ Require linear history
+   - ☑️ Do not allow bypassing the above settings
+
+**Optional**:
+- ☑️ Require pull request reviews (1 approval)
+- ☑️ Require conversation resolution before merging
+
 ## 📊 Development Commands
 
 ### Makefile Shortcuts
@@ -320,7 +364,7 @@ graph TB
 
 ### Backend Module Organization
 
-This project follows the **OpenHEXA architectural pattern** used at Bluesquare, enabling easy feature addition without modifying existing code. Each Django app is self-contained with its own models, schemas, and business logic.
+This project uses a modular monolith pattern, enabling feature addition without modifying existing code. Each Django app is self-contained with its own models, schemas, and business logic.
 
 ```mermaid
 graph LR
@@ -381,11 +425,11 @@ graph LR
     end
 ```
 
-**Scalability Benefits**:
-- ✅ **Add New Features**: Create new app → Add schemas → Compose in root (zero changes to existing apps)
-- ✅ **Team Collaboration**: Clear ownership boundaries for parallel development
-- ✅ **Maintainability**: Changes isolated to specific apps, reducing regression risk
-- ✅ **Testability**: Apps can be tested independently with clear boundaries
+**Benefits**:
+- New apps integrate without modifying existing code
+- Clear boundaries for parallel development
+- Changes isolated to specific apps
+- Independent testing per app
 
 **Example - Adding a "users" app**:
 ```python
@@ -397,22 +441,20 @@ class Query(kanban.schema.Query, users.schema.Query, graphene.ObjectType):
     pass  # Automatic composition, no logic changes needed
 ```
 
-### Backend: Modular Monolith (OpenHEXA Pattern)
-**Inspired by [Bluesquare's OpenHEXA](https://github.com/BLSQ/openhexa)** - modular Django architecture for maintainability at scale
+### Backend: Modular Monolith Pattern
 
 **Key Patterns:**
-- **Feature-Based Apps** (`apps/kanban/`, `apps/core/`) - Clear boundaries for team collaboration
-- **Split GraphQL Schemas** - Separate files for types, queries, mutations (easier to navigate)
+- **Feature-Based Apps** (`apps/kanban/`, `apps/core/`) - Clear boundaries for parallel development
+- **Split GraphQL Schemas** - Separate files for types, queries, mutations
 - **DRY Base Models** (`apps/core/models.py`) - Shared `TimeStampedModel` prevents duplication
 - **Organized Integrations** (`integrations/mcp/`) - External services isolated from core apps
 - **Schema Composition** (`config/schema.py`) - Root schema inherits from app schemas
-- **Easy Scaling** - Add new apps (users, analytics) without touching existing code
 
-**Why This Matters:**
-- ✅ Multiple devs can work on different apps simultaneously
-- ✅ Changes in one app don't affect others (low coupling)
-- ✅ Easy to add features without creating technical debt
-- ✅ Clear ownership and testing boundaries
+**Benefits:**
+- Apps can be developed independently
+- Changes isolated to specific apps (low coupling)
+- New features added without touching existing code
+- Clear testing boundaries
 
 ### Frontend: SOLID Principles
 - **Single Responsibility** - Each component does one thing well
