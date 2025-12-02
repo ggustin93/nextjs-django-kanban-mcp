@@ -73,26 +73,83 @@ npm run dev
 
 ```
 .
-├── backend/                  # Django backend
-│   ├── config/              # Project settings
-│   ├── kanban/              # Kanban app
-│   │   ├── models.py        # Task model
-│   │   ├── schema/          # GraphQL (types, queries, mutations)
-│   │   └── tests/           # Unit + integration tests
-│   └── requirements.txt
+├── backend/                         # Django backend (modular monolith)
+│   ├── apps/                       # Django apps (OpenHEXA pattern)
+│   │   ├── core/                   # Shared base models and utilities
+│   │   │   ├── models.py           # TimeStampedModel (DRY principle)
+│   │   │   └── apps.py             # Core app configuration
+│   │   └── kanban/                 # Kanban feature app
+│   │       ├── models.py           # Task model (inherits TimeStampedModel)
+│   │       ├── apps.py             # Kanban app configuration
+│   │       ├── schema/             # GraphQL split by concern
+│   │       │   ├── types.py        # TaskType, TaskStatusEnum
+│   │       │   ├── queries.py      # Query resolvers (allTasks)
+│   │       │   └── mutations.py    # Mutation resolvers (CRUD)
+│   │       ├── graphql/            # Exported GraphQL schema
+│   │       │   └── schema.graphql  # For frontend consumption
+│   │       ├── tests/              # App-specific tests
+│   │       │   ├── test_models.py  # Model validation tests
+│   │       │   └── test_schema.py  # GraphQL API tests
+│   │       ├── management/         # Django management commands
+│   │       │   └── commands/
+│   │       │       └── seed_tasks.py  # Sample data generator
+│   │       └── migrations/         # Database migrations
+│   ├── config/                     # Django configuration
+│   │   ├── settings.py             # Single settings file
+│   │   ├── urls.py                 # URL routing
+│   │   └── schema.py               # Root GraphQL schema (composition)
+│   ├── integrations/               # External service integrations
+│   │   └── mcp/                    # Model Context Protocol server
+│   │       ├── server.py           # FastMCP implementation
+│   │       ├── fastmcp.json        # Server configuration
+│   │       ├── mcp_config.example.json  # Claude Desktop config template
+│   │       └── README.md           # MCP setup instructions
+│   ├── scripts/                    # Utility scripts
+│   │   ├── export_schema.py        # GraphQL schema export
+│   │   └── README.md               # Scripts documentation
+│   ├── tests/                      # Project-wide integration tests
+│   │   ├── integration/
+│   │   │   └── test_mcp_server.py  # MCP server async tests
+│   │   └── conftest.py             # Pytest configuration
+│   ├── data/                       # SQLite database directory
+│   │   └── db.sqlite3
+│   ├── requirements.txt            # Python dependencies
+│   ├── Dockerfile                  # Multi-stage Docker build
+│   └── manage.py                   # Django management script
 │
-├── frontend/                # Next.js frontend
+├── frontend/                       # Next.js frontend
 │   ├── src/
-│   │   ├── app/            # Next.js App Router
-│   │   ├── components/     # React components
-│   │   │   └── Board.tsx   # Main Kanban board
-│   │   ├── graphql/        # GraphQL operations
-│   │   └── __tests__/      # Component tests
-│   └── package.json
+│   │   ├── app/                    # Next.js App Router
+│   │   │   ├── layout.tsx          # Root layout
+│   │   │   ├── page.tsx            # Home page (redirects to /tasks)
+│   │   │   ├── providers.tsx       # App providers (Theme, Apollo)
+│   │   │   └── tasks/
+│   │   │       └── page.tsx        # Kanban board page
+│   │   ├── components/             # React components
+│   │   │   ├── Board.tsx           # Main board orchestrator
+│   │   │   ├── ApolloWrapper.tsx   # Apollo Client provider
+│   │   │   └── kanban/             # Kanban-specific components
+│   │   │       ├── types.ts        # TypeScript types
+│   │   │       ├── TaskCard.tsx    # Draggable task card
+│   │   │       ├── KanbanColumn.tsx  # Column with drop zone
+│   │   │       ├── TaskDialog.tsx  # Create/edit dialog
+│   │   │       └── useTaskDialog.ts  # Dialog state hook
+│   │   ├── graphql/                # GraphQL operations
+│   │   │   ├── client.ts           # Apollo Client config
+│   │   │   ├── queries.ts          # GET_TASKS query
+│   │   │   └── mutations.ts        # CREATE/UPDATE/DELETE mutations
+│   │   ├── theme/                  # Material UI theme
+│   │   │   └── theme.ts            # Custom theme configuration
+│   │   └── __tests__/              # Frontend tests
+│   ├── package.json                # Node dependencies
+│   ├── next.config.ts              # Next.js configuration
+│   ├── Dockerfile                  # Multi-stage Docker build
+│   └── tsconfig.json               # TypeScript configuration
 │
-├── docker-compose.yml       # Services orchestration
-├── Makefile                 # Development shortcuts
-└── .pre-commit-config.yaml  # Code quality hooks
+├── docker-compose.yml              # Services orchestration
+├── Makefile                        # Development shortcuts
+├── .pre-commit-config.yaml         # Code quality hooks (Ruff, ESLint)
+└── .env                            # Environment variables (ports, URLs)
 ```
 
 ## 🧪 Testing
@@ -101,9 +158,11 @@ npm run dev
 # All tests
 make test
 
-# Backend only (Django)
-cd backend
-python manage.py test kanban.tests
+# Backend only (Django) - Run in Docker
+docker-compose exec backend python manage.py test apps.kanban.tests
+
+# Or run all backend tests including integration
+docker-compose exec backend python manage.py test
 
 # Frontend only (Jest)
 cd frontend
@@ -112,8 +171,11 @@ npm test
 
 **Test Coverage:**
 - Backend: 20 tests (models + GraphQL API)
+  - `apps/kanban/tests/test_models.py` - Task model validation
+  - `apps/kanban/tests/test_schema.py` - GraphQL API operations
+  - `tests/integration/test_mcp_server.py` - MCP server async functions
 - Frontend: 12 tests (components + integration)
-- Focus: Critical paths + enum validation
+- Focus: Critical paths + enum validation + async wrappers
 
 ## 🔧 Pre-commit Hooks
 
@@ -141,21 +203,15 @@ git commit --no-verify
 ### Makefile Shortcuts
 
 ```bash
-make up                 # Start services
-make down               # Stop services
-make logs               # View all logs
-make logs-backend       # Backend logs only
-make logs-frontend      # Frontend logs only
-make test               # Run all tests
-make test-backend       # Backend tests only
-make test-frontend      # Frontend tests only
-make shell-backend      # Django shell
-make shell-frontend     # Node shell
-make migrate            # Run migrations
-make hooks-install      # Install pre-commit
-make lint               # Run linters
-make format             # Format code
-make clean              # Remove containers/volumes
+make up              # Start services
+make down            # Stop services
+make test            # Run all tests
+make migrate         # Run migrations
+make clean           # Remove containers/volumes
+make logs            # View logs
+make shell           # Django shell
+make lint            # Lint and format code
+make hooks-install   # Install pre-commit hooks
 ```
 
 ### GraphQL Operations
@@ -176,34 +232,65 @@ mutation { deleteTask(id: "1") { success } }
 
 ## 🎨 Architecture Highlights
 
-### Backend: Modular Monolith
-- Django apps with clear boundaries
-- Split GraphQL schemas (types, queries, mutations)
-- Abstract base models for shared patterns
-- Easy to add new modules
+### Backend: Modular Monolith (OpenHEXA Pattern)
+**Inspired by [Bluesquare's OpenHEXA](https://github.com/BLSQ/openhexa)** - modular Django architecture for maintainability at scale
+
+**Key Patterns:**
+- **Feature-Based Apps** (`apps/kanban/`, `apps/core/`) - Clear boundaries for team collaboration
+- **Split GraphQL Schemas** - Separate files for types, queries, mutations (easier to navigate)
+- **DRY Base Models** (`apps/core/models.py`) - Shared `TimeStampedModel` prevents duplication
+- **Organized Integrations** (`integrations/mcp/`) - External services isolated from core apps
+- **Schema Composition** (`config/schema.py`) - Root schema inherits from app schemas
+- **Easy Scaling** - Add new apps (users, analytics) without touching existing code
+
+**Why This Matters:**
+- ✅ Multiple devs can work on different apps simultaneously
+- ✅ Changes in one app don't affect others (low coupling)
+- ✅ Easy to add features without creating technical debt
+- ✅ Clear ownership and testing boundaries
 
 ### Frontend: SOLID Principles
-- Single responsibility components
-- Custom hooks for state management
-- TypeScript enums for type safety
-- Modular, testable architecture
+- **Single Responsibility** - Each component does one thing well
+- **Custom Hooks** - Reusable state management (`useTaskDialog`)
+- **Type Safety** - TypeScript enums (`TaskStatus`) prevent runtime errors
+- **Component Isolation** - `kanban/` directory groups related components
+- **Separation of Concerns** - GraphQL, theme, and components in separate directories
 
-## 📖 Documentation
+## 🤖 AI Agent Integration (MCP Server)
 
-- `DEPLOYMENT.md` - Production deployment guide
-- `INFRASTRUCTURE.md` - DevOps setup details
-- `TESTING.md` - Test implementation guide
-- `TEST_SUMMARY.md` - Test coverage summary
+**Bonus Feature**: [Model Context Protocol](https://modelcontextprotocol.io/) server that lets Claude AI manage tasks through natural language—*"Create a task for code review"* or *"Move task 3 to done"*.
 
-## 🚢 Production Deployment
+**Technical Highlights:**
 
-See `DEPLOYMENT.md` for comprehensive production deployment guide including:
-- Environment configuration
-- Database setup (PostgreSQL)
-- HTTPS/SSL configuration
-- Monitoring and logging
-- Backup strategies
-- Security checklist
+- **Async/Sync Bridge**: `@sync_to_async` wrappers connect Django's ORM to MCP's async protocol
+- **Dual Transport**: Single codebase supports stdio (local) and HTTP/SSE (remote/mobile)
+- **Type-Safe Tools**: Python type hints auto-generate JSON schemas for Claude
+- **Modular Design**: Isolated in `integrations/mcp/` following clean architecture
+
+### Try It Locally
+
+```bash
+# 1. Install dependencies
+cd backend && python3.12 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Configure Claude Desktop (~/Library/Application Support/Claude/claude_desktop_config.json)
+{
+  "mcpServers": {
+    "kanban": {
+      "command": "/FULL/PATH/TO/backend/venv/bin/python",
+      "args": ["/FULL/PATH/TO/backend/integrations/mcp/server.py"],
+      "env": {"DJANGO_SETTINGS_MODULE": "config.settings"}
+    }
+  }
+}
+
+# 3. Restart Claude Desktop and try: "Show me all TODO tasks"
+```
+
+**Available commands**: list tasks, create task, update status, delete task
+
+> **For deployment**: Server supports Railway/Render with HTTP/SSE transport for Claude Mobile. See `backend/integrations/mcp/README.md` for production setup
 
 ## 📄 License
 

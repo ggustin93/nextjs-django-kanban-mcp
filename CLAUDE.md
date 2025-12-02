@@ -32,6 +32,34 @@ This project uses a `.claude/` directory for organized documentation:
 
 **When working on this project**: Check `.claude/plans/` for implementation roadmaps and `.claude/knowledge/` for background context.
 
+## Port Configuration
+
+**Flexible Port Setup**: Ports are configurable via `.env` file to avoid conflicts.
+
+**Default Ports**:
+- Frontend: `3000` (configurable via `FRONTEND_PORT`)
+- Backend: `8000` (configurable via `BACKEND_PORT`)
+
+**To change ports**:
+1. Copy `.env.example` to `.env` if not exists
+2. Modify port values in `.env`:
+   ```bash
+   FRONTEND_PORT=3001
+   BACKEND_PORT=8001
+   ```
+3. Restart Docker Compose
+
+**Port conflict resolution**:
+```bash
+# Check what's using a port
+lsof -i :3000
+
+# Kill process if needed
+kill <PID>
+
+# Or use alternate port in .env
+```
+
 ## Development Commands
 
 ### Backend (Django)
@@ -52,7 +80,7 @@ python manage.py seed_tasks           # Create 10 sample tasks
 python manage.py seed_tasks --clear   # Clear existing tasks first
 
 # Export GraphQL schema
-python export_schema.py backend/kanban/graphql/schema.graphql
+python scripts/export_schema.py
 
 # Run development server
 python manage.py runserver

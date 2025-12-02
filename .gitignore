@@ -126,5 +126,8 @@ coverage/
 .turbo/
 
 # AI
-.claude/
 .serena/
+TODO.md
+
+.ruff_cache/
+.claude/
