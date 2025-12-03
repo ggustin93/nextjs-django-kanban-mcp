@@ -4,6 +4,25 @@ A modern task management app featuring drag-and-drop Kanban boards, Eisenhower p
 
 **Stack:** Next.js 15, Django 4.2, TypeScript, Material UI, Apollo Client, Graphene-Django
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><strong>Kanban Board</strong></td>
+    <td align="center"><strong>Eisenhower Matrix</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screenshots/kanban.png"><img src="docs/screenshots/kanban.png" alt="Kanban Board" width="400"/></a><br/><sub><a href="docs/screenshots/kanban.png">🔍 View full size</a></sub></td>
+    <td align="center"><a href="docs/screenshots/eisenhower.png"><img src="docs/screenshots/eisenhower.png" alt="Eisenhower Matrix" width="400"/></a><br/><sub><a href="docs/screenshots/eisenhower.png">🔍 View full size</a></sub></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><strong>Claude Desktop (MCP Client)</strong></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><a href="docs/screenshots/claude.png"><img src="docs/screenshots/claude.png" alt="Claude Desktop" width="600"/></a><br/><sub><a href="docs/screenshots/claude.png">🔍 View full size</a></sub></td>
+  </tr>
+</table>
+
 ## Table of Contents
 
 1. [Quick Start](#1-quick-start)
