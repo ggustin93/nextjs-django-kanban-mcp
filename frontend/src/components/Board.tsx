@@ -34,7 +34,7 @@ import { useState } from 'react';
 import { KanbanColumn } from './kanban/KanbanColumn';
 import { TaskDialog } from './kanban/TaskDialog';
 import { useTaskDialog } from './kanban/useTaskDialog';
-import { Task, TaskStatus, COLUMNS } from './kanban/types';
+import { Task, TaskStatus, COLUMNS, PRIORITY_ORDER } from './kanban/types';
 
 const REFETCH_QUERIES = [{ query: GET_TASKS }];
 
@@ -124,6 +124,8 @@ export function Board() {
           title: dialog.formData.title,
           description: dialog.formData.description,
           status: dialog.formData.status,
+          priority: dialog.formData.priority,
+          category: dialog.formData.category,
         },
       });
     } else {
@@ -131,6 +133,8 @@ export function Board() {
         variables: {
           title: dialog.formData.title,
           status: dialog.formData.status,
+          priority: dialog.formData.priority,
+          category: dialog.formData.category,
         },
       });
     }
@@ -163,9 +167,9 @@ export function Board() {
 
   const tasksByStatus = COLUMNS.reduce(
     (acc, column) => {
-      acc[column.status] = (data?.allTasks || []).filter(
-        (task: Task) => task.status === column.status
-      );
+      acc[column.status] = (data?.allTasks || [])
+        .filter((task: Task) => task.status === column.status)
+        .sort((a: Task, b: Task) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
       return acc;
     },
     {} as Record<TaskStatus, Task[]>

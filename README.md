@@ -18,13 +18,14 @@ A full-stack kanban board built with Next.js 15, Django 4.2, and GraphQL. Featur
 8. [Development Commands](#8-development-commands)
    - [Makefile Shortcuts](#makefile-shortcuts)
    - [GraphQL Operations](#graphql-operations)
-9. [Architecture](#9-architecture)
-   - [System Architecture](#system-architecture)
-   - [Backend: Modular Monolith](#backend-modular-monolith)
-   - [Frontend: Component Design](#frontend-component-design)
-10. [MCP Server Integration](#10-mcp-server-integration)
+9. [🚀 Deployment Roadmap](#9--deployment-roadmap)
+10. [Architecture](#10-architecture)
+    - [System Architecture](#system-architecture)
+    - [Backend: Modular Monolith](#backend-modular-monolith)
+    - [Frontend: Component Design](#frontend-component-design)
+11. [MCP Server Integration](#11-mcp-server-integration)
     - [Local Setup](#local-setup)
-11. [License](#11-license)
+12. [License](#12-license)
 
 ## 1. Quick Start
 
@@ -65,10 +66,13 @@ npm run dev
 ## 2. Features
 
 - Full CRUD operations (Create, Read, Update, Delete)
-- Drag-and-drop between columns (TODO → DOING → DONE)
+- Drag-and-drop between columns (TODO → DOING → WAITING → DONE)
+- **Priority system** (P1-P4): Do First, Schedule, Quick Win, Backlog
+- **Category tagging** with '#' prefix (e.g., #work, #personal)
+- Tasks auto-sorted by priority within columns
 - GraphQL API with type-safe schema
 - Real-time updates with Apollo Client
-- Material UI responsive design
+- Material UI responsive design with priority badges
 - TypeScript end-to-end
 - Docker hot-reload for both services
 - Pre-commit hooks (Ruff, ESLint, Prettier)
@@ -106,9 +110,9 @@ npm run dev
 │   │       ├── models.py           # Task model (inherits TimeStampedModel)
 │   │       ├── apps.py             # Kanban app configuration
 │   │       ├── schema/             # GraphQL split by concern
-│   │       │   ├── types.py        # TaskType, TaskStatusEnum
+│   │       │   ├── types.py        # TaskType, TaskStatusEnum, TaskPriorityEnum
 │   │       │   ├── queries.py      # Query resolvers (allTasks)
-│   │       │   └── mutations.py    # Mutation resolvers (CRUD)
+│   │       │   └── mutations.py    # Mutation resolvers (CRUD with priority/category)
 │   │       ├── graphql/            # Exported GraphQL schema
 │   │       │   └── schema.graphql  # For frontend consumption
 │   │       ├── tests/              # App-specific tests
@@ -153,10 +157,10 @@ npm run dev
 │   │   │   ├── Board.tsx           # Main board orchestrator
 │   │   │   ├── ApolloWrapper.tsx   # Apollo Client provider
 │   │   │   └── kanban/             # Kanban-specific components
-│   │   │       ├── types.ts        # TypeScript types
-│   │   │       ├── TaskCard.tsx    # Draggable task card
-│   │   │       ├── KanbanColumn.tsx  # Column with drop zone
-│   │   │       ├── TaskDialog.tsx  # Create/edit dialog
+│   │   │       ├── types.ts        # TypeScript types (TaskStatus, TaskPriority)
+│   │   │       ├── TaskCard.tsx    # Draggable task card with priority badge
+│   │   │       ├── KanbanColumn.tsx  # Column with drop zone + sorting
+│   │   │       ├── TaskDialog.tsx  # Create/edit dialog with priority/category
 │   │   │       └── useTaskDialog.ts  # Dialog state hook
 │   │   ├── graphql/                # GraphQL operations
 │   │   │   ├── client.ts           # Apollo Client config
@@ -253,20 +257,81 @@ make hooks-install   # Install pre-commit hooks
 ### GraphQL Operations
 
 ```graphql
-# Query tasks
-query { allTasks { id title status createdAt } }
+# Query tasks with priority and category
+query { allTasks { id title status priority category createdAt } }
 
-# Create task
-mutation { createTask(title: "New Task", status: TODO) { task { id } } }
+# Create task with priority and category
+mutation {
+  createTask(
+    title: "New Task"
+    status: TODO
+    priority: P1
+    category: "#work"
+  ) {
+    task { id title priority category }
+  }
+}
 
-# Update task (drag-and-drop)
-mutation { updateTask(id: "1", status: DOING) { task { id status } } }
+# Update task (drag-and-drop or edit)
+mutation {
+  updateTask(
+    id: "1"
+    status: DOING
+    priority: P2
+  ) {
+    task { id status priority }
+  }
+}
 
 # Delete task
 mutation { deleteTask(id: "1") { success } }
 ```
 
-## 9. Architecture
+## 9. 🚀 Deployment Roadmap
+
+### Current Status
+✅ Fully functional local development with Docker Compose
+⏳ Production deployment (roadmap below)
+
+### Recommended Architecture (100% Free Tier)
+
+**Phase 1: Single-User Deployment**
+- **Frontend**: [Vercel](https://vercel.com) - Zero-config Next.js deployment
+- **Backend**: [Render.com](https://render.com) - Free tier Django hosting (sleeps after 15min inactivity)
+- **Database**: [Supabase](https://supabase.com) - Free PostgreSQL (500MB, built-in auth for future)
+
+**Phase 2: Multi-User (Future)**
+- Add Supabase Auth for user authentication
+- Update Task model with user relationships
+- Deploy MCP server for Claude Code mobile integration
+
+### Key Changes Needed for Production
+
+1. **Database Migration**: SQLite → PostgreSQL
+   - Install: `psycopg2-binary`, `dj-database-url`
+   - Update `settings.py` to use `DATABASE_URL` environment variable
+
+2. **Backend Configuration**:
+   - Replace `runserver` with Gunicorn in Dockerfile
+   - Add production dependencies: `whitenoise`, `gunicorn`
+   - Configure CORS for Vercel domain
+
+3. **Environment Variables**:
+   - `DJANGO_SECRET_KEY` (generate new for production)
+   - `DATABASE_URL` (from Supabase)
+   - `ALLOWED_HOSTS` (Render domain)
+   - `CORS_ALLOWED_ORIGINS` (Vercel domain)
+   - `NEXT_PUBLIC_GRAPHQL_URL` (Render API endpoint)
+
+### Cost Analysis
+- **Current free tier**: Sufficient for personal use (thousands of tasks)
+- **Limitation**: Backend cold starts after 15min inactivity (~30-60s)
+- **Upgrade path**: $7/month for no-sleep backend
+
+### Alternative: DigitalOcean Droplet
+For full control and no cold starts, deploy both services on a $6/month droplet with Docker Compose. Requires manual setup (Nginx, SSL, monitoring).
+
+## 10. Architecture
 
 ### System Architecture
 
@@ -361,7 +426,7 @@ graph TB
 - TypeScript enums for type safety (`TaskStatus`)
 - Organized directory structure (graphql, theme, components)
 
-## 10. MCP Server Integration
+## 11. MCP Server Integration
 
 [Model Context Protocol](https://modelcontextprotocol.io/) server for managing tasks through Claude AI using natural language.
 
@@ -397,7 +462,7 @@ pip install -r requirements.txt
 
 > **Deployment**: Supports Railway/Render with HTTP/SSE transport. See `backend/integrations/mcp/README.md` for details.
 
-## 11. License
+## 12. License
 
 MIT License - See LICENSE file for details
 

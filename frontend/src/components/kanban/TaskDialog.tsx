@@ -16,8 +16,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  InputAdornment,
 } from '@mui/material';
-import { TaskFormData, TaskStatus, COLUMNS } from './types';
+import { TaskFormData, TaskStatus, TaskPriority, COLUMNS, PRIORITY_CONFIG } from './types';
 
 interface TaskDialogProps {
   open: boolean;
@@ -40,6 +41,12 @@ export function TaskDialog({
 }: TaskDialogProps) {
   const isSubmitDisabled = loading || !formData.title.trim();
 
+  // Handle category input - strip # prefix for display, add it back on change
+  const handleCategoryChange = (value: string) => {
+    const cleaned = value.replace(/^#+/, '');
+    onFormChange({ category: cleaned ? `#${cleaned}` : '' });
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{isEditMode ? 'Edit Task' : 'Add New Task'}</DialogTitle>
@@ -61,6 +68,37 @@ export function TaskDialog({
             value={formData.description}
             onChange={(e) => onFormChange({ description: e.target.value })}
           />
+
+          {/* Priority & Category row */}
+          <Stack direction="row" spacing={2}>
+            <FormControl fullWidth>
+              <InputLabel>Priority</InputLabel>
+              <Select
+                value={formData.priority}
+                label="Priority"
+                onChange={(e) => onFormChange({ priority: e.target.value as TaskPriority })}
+              >
+                {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
+                  <MenuItem key={key} value={key}>
+                    {config.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Category"
+              fullWidth
+              placeholder="work, personal..."
+              value={formData.category.replace(/^#/, '')}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              InputProps={{
+                startAdornment: formData.category ? (
+                  <InputAdornment position="start">#</InputAdornment>
+                ) : null,
+              }}
+            />
+          </Stack>
+
           <FormControl fullWidth>
             <InputLabel>Status</InputLabel>
             <Select

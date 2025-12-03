@@ -1,7 +1,7 @@
 """
 Root Query for GraphQL API - combines all read operations.
 
-Inherits: kanban.schema.Query (allTasks)
+Inherits: apps.kanban.schema.Query (allTasks)
 Returns: All tasks ordered by creation date (newest first)
 
 Future: Add new app Query classes to inheritance list
@@ -17,6 +17,8 @@ type TaskType {
   title: String!
   description: String!
   status: KanbanTaskStatusChoices!
+  category: String!
+  priority: KanbanTaskPriorityChoices!
 }
 
 """
@@ -34,21 +36,39 @@ enum KanbanTaskStatusChoices {
   """In Progress"""
   DOING
 
+  """Waiting"""
+  WAITING
+
   """Done"""
   DONE
+}
+
+"""An enumeration."""
+enum KanbanTaskPriorityChoices {
+  """P1 - Do First"""
+  P1
+
+  """P2 - Schedule"""
+  P2
+
+  """P3 - Quick Win"""
+  P3
+
+  """P4 - Backlog"""
+  P4
 }
 
 """
 Root Mutation for GraphQL API - combines all write operations.
 
-Inherits: kanban.schema.Mutation (createTask)
+Inherits: apps.kanban.schema.Mutation (createTask)
 
 Security: All mutations must validate inputs and check permissions
 Future: Add new app Mutation classes to inheritance list
 """
 type Mutation {
-  createTask(status: TaskStatusEnum, title: String!): CreateTask
-  updateTask(description: String, id: ID!, status: TaskStatusEnum, title: String): UpdateTask
+  createTask(category: String, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String!): CreateTask
+  updateTask(category: String, description: String, id: ID!, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String): UpdateTask
   deleteTask(id: ID!): DeleteTask
 }
 
@@ -56,10 +76,19 @@ type CreateTask {
   task: TaskType
 }
 
+"""GraphQL enum for Task.Priority choices."""
+enum TaskPriorityEnum {
+  P1
+  P2
+  P3
+  P4
+}
+
 """GraphQL enum for Task.Status choices with validation."""
 enum TaskStatusEnum {
   TODO
   DOING
+  WAITING
   DONE
 }
 

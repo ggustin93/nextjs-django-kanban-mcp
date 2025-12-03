@@ -14,7 +14,7 @@
 import { render, screen } from '@testing-library/react';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { KanbanColumn } from '@/components/kanban/KanbanColumn';
-import { Column, Task, TaskStatus } from '@/components/kanban/types';
+import { Column, Task, TaskStatus, TaskPriority } from '@/components/kanban/types';
 
 // Mock task data
 const mockTasks: Task[] = [
@@ -23,6 +23,8 @@ const mockTasks: Task[] = [
     title: 'Test Task',
     description: 'Test Description',
     status: 'TODO' as TaskStatus,
+    priority: TaskPriority.P2,
+    category: '#work',
     createdAt: '2024-01-01T00:00:00Z',
   },
 ];
@@ -180,6 +182,8 @@ describe('KanbanColumn Component', () => {
           title: 'Task 2',
           description: '',
           status: 'TODO' as TaskStatus,
+          priority: TaskPriority.P3,
+          category: '#personal',
           createdAt: '2024-01-02T00:00:00Z',
         },
         {
@@ -187,6 +191,8 @@ describe('KanbanColumn Component', () => {
           title: 'Task 3',
           description: '',
           status: 'TODO' as TaskStatus,
+          priority: TaskPriority.P4,
+          category: '',
           createdAt: '2024-01-03T00:00:00Z',
         },
       ];

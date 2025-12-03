@@ -4,12 +4,12 @@
  */
 'use client';
 
-import { Card, CardContent, Typography, Stack, IconButton } from '@mui/material';
+import { Card, CardContent, Typography, Stack, IconButton, Chip, Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task, Column } from './types';
+import { Task, Column, PRIORITY_CONFIG } from './types';
 
 interface TaskCardProps {
   task: Task;
@@ -65,6 +65,24 @@ export function TaskCard({ task, column, onEdit, onDelete }: TaskCardProps) {
       {...attributes}
     >
       <CardContent>
+        {/* Priority & Category chips */}
+        <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }} {...listeners}>
+          <Chip
+            label={PRIORITY_CONFIG[task.priority].shortLabel}
+            color={PRIORITY_CONFIG[task.priority].color}
+            size="small"
+            sx={{ fontWeight: 'bold', minWidth: 32, height: 20, fontSize: '0.7rem' }}
+          />
+          {task.category && (
+            <Chip
+              label={task.category}
+              variant="outlined"
+              size="small"
+              sx={{ height: 20, fontSize: '0.7rem' }}
+            />
+          )}
+        </Box>
+
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
           <Typography
             variant="subtitle1"

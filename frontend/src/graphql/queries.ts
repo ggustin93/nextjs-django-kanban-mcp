@@ -10,6 +10,8 @@ export const GET_TASKS = gql`
       title
       description
       status
+      priority
+      category
       createdAt
       updatedAt
     }

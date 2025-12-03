@@ -3,12 +3,14 @@
  * Single Responsibility: Handle dialog open/close and form state management
  */
 import { useState } from 'react';
-import { Task, TaskFormData, TaskStatus } from './types';
+import { Task, TaskFormData, TaskStatus, TaskPriority } from './types';
 
 const INITIAL_FORM_DATA: TaskFormData = {
   title: '',
   description: '',
   status: TaskStatus.TODO,
+  priority: TaskPriority.P4,
+  category: '',
 };
 
 export function useTaskDialog() {
@@ -28,6 +30,8 @@ export function useTaskDialog() {
       title: task.title,
       description: task.description || '',
       status: task.status,
+      priority: task.priority,
+      category: task.category || '',
     });
     setIsOpen(true);
   };
