@@ -55,28 +55,27 @@ function EisenhowerQuadrant({
         flexDirection: 'column',
       }}
     >
-      {/* Dark Compact Header */}
+      {/* Refined Minimal Header */}
       <Box
         sx={{
           mb: 2,
-          p: 1.25,
-          borderRadius: 1.5,
+          px: 1.5,
+          py: 0.875,
           bgcolor: quadrantConfig.color,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}
       >
         <Box>
           <Typography
-            variant="h6"
+            variant="subtitle1"
             sx={{
               color: 'white',
               fontWeight: 700,
-              mb: 0.25,
               lineHeight: 1.3,
-              fontSize: '1rem',
+              fontSize: '0.95rem',
+              mb: 0.125,
             }}
           >
             {quadrantConfig.title}
@@ -84,32 +83,31 @@ function EisenhowerQuadrant({
           <Typography
             variant="caption"
             sx={{
-              color: 'rgba(255, 255, 255, 0.85)',
+              color: 'rgba(255, 255, 255, 0.8)',
               textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              letterSpacing: '0.08em',
               fontWeight: 600,
-              fontSize: '0.65rem',
+              fontSize: '0.625rem',
             }}
           >
             {quadrantConfig.subtitle}
           </Typography>
         </Box>
-        <Typography
-          variant="body2"
+        <Box
           sx={{
             color: quadrantConfig.color,
-            fontWeight: 700,
+            fontWeight: 800,
             bgcolor: 'white',
-            px: 1.25,
-            py: 0.4,
-            borderRadius: 1,
-            fontSize: '0.8rem',
-            minWidth: 28,
+            px: 1,
+            py: 0.25,
+            fontSize: '0.75rem',
+            minWidth: 24,
             textAlign: 'center',
+            lineHeight: 1.4,
           }}
         >
           {tasks.length}
-        </Typography>
+        </Box>
       </Box>
 
       {/* Droppable Zone */}
