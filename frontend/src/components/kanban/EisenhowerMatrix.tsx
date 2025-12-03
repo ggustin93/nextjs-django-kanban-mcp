@@ -227,33 +227,6 @@ export function EisenhowerMatrix({
 
   return (
     <Box>
-      {/* Refined Matrix Label */}
-      <Box
-        sx={{
-          mb: 4,
-          textAlign: 'center',
-          pb: 3,
-          borderBottom: '2px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 800,
-            mb: 1,
-            background: 'linear-gradient(135deg, #0f172a 0%, #64748b 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          Eisenhower Decision Matrix
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-          Prioritize by urgency and importance • Drag to change priority
-        </Typography>
-      </Box>
 
       {/* Matrix Grid with Drag-and-Drop */}
       <DndContext

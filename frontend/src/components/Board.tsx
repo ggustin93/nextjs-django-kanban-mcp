@@ -260,7 +260,7 @@ export function Board() {
 
   return (
     <Box sx={{ p: { xs: 1.5, md: 3 }, maxWidth: 1600, mx: 'auto' }}>
-      {/* Refined Header */}
+      {/* Refined Header - Contextual Title */}
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={3}>
         <Box>
           <Typography
@@ -273,10 +273,12 @@ export function Board() {
               mb: 0.5,
             }}
           >
-            Priority Matrix
+            {viewType === 'eisenhower' ? 'Eisenhower Decision Matrix' : 'Priority Matrix'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-            Focus on what matters • Eisenhower decision framework
+            {viewType === 'eisenhower'
+              ? 'Prioritize by urgency and importance • Drag to change priority'
+              : 'Focus on what matters • Smart task prioritization'}
           </Typography>
         </Box>
         <Button
