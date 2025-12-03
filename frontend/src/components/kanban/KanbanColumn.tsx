@@ -4,10 +4,10 @@
  */
 'use client';
 
-import { Box, Typography, Stack, Chip } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
-import { TaskCard } from './TaskCard';
+import { TaskCard } from './Task/TaskCard';
 import { Task, Column } from './types';
 
 interface KanbanColumnProps {

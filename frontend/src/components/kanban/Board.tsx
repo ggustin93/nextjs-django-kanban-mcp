@@ -31,11 +31,11 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useState, useMemo } from 'react';
-import { KanbanColumn } from './kanban/KanbanColumn';
-import { TaskDialog } from './kanban/TaskDialog';
-import { useTaskDialog } from './kanban/useTaskDialog';
-import { FilterBar } from './kanban/FilterBar';
-import { EisenhowerMatrix } from './kanban/EisenhowerMatrix';
+import { KanbanColumn } from './KanbanColumn';
+import { TaskDialog } from './Task/TaskDialog';
+import { FilterBar } from './FilterBar';
+import { EisenhowerMatrix } from './EisenhowerMatrix';
+import { useTaskDialog } from './useTaskDialog';
 import {
   Task,
   TaskStatus,
@@ -44,7 +44,7 @@ import {
   ViewType,
   FilterState,
   TaskPriority,
-} from './kanban/types';
+} from './types';
 
 const REFETCH_QUERIES = [{ query: GET_TASKS }];
 

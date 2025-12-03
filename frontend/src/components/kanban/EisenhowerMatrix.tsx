@@ -20,9 +20,14 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
-import { Task, EISENHOWER_QUADRANTS, EisenhowerQuadrantConfig, TaskPriority } from './types';
-import { TaskCard } from './TaskCard';
-import { COLUMNS } from './types';
+import {
+  Task,
+  EISENHOWER_QUADRANTS,
+  EisenhowerQuadrantConfig,
+  TaskPriority,
+  COLUMNS,
+} from './types';
+import { TaskCard } from './Task/TaskCard';
 
 interface EisenhowerMatrixProps {
   tasks: Task[];

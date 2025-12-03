@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task, Column, PRIORITY_CONFIG } from './types';
+import { Task, Column, PRIORITY_CONFIG } from '../types';
 
 interface TaskCardProps {
   task: Task;
@@ -19,7 +19,13 @@ interface TaskCardProps {
   showStatusBadge?: boolean; // NEW: Show status instead of priority
 }
 
-export function TaskCard({ task, column, onEdit, onDelete, showStatusBadge = false }: TaskCardProps) {
+export function TaskCard({
+  task,
+  column,
+  onEdit,
+  onDelete,
+  showStatusBadge = false,
+}: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     transition: {
