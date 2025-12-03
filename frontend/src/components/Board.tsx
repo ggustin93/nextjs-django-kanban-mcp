@@ -285,21 +285,20 @@ export function Board() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={dialog.openForCreate}
-          size="large"
           sx={{
-            borderRadius: 3,
-            px: 3,
-            py: 1.5,
-            fontSize: '1rem',
+            borderRadius: 2,
+            px: 2.5,
+            py: 1,
+            fontSize: '0.95rem',
             fontWeight: 600,
             textTransform: 'none',
             background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-            boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.4)',
+            boxShadow: '0 2px 8px 0 rgba(59, 130, 246, 0.35)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              boxShadow: '0 6px 20px 0 rgba(59, 130, 246, 0.5)',
-              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px 0 rgba(59, 130, 246, 0.45)',
+              transform: 'translateY(-1px)',
             },
             '&:active': {
               transform: 'translateY(0)',

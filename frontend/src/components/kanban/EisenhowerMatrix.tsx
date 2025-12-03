@@ -55,28 +55,28 @@ function EisenhowerQuadrant({
         flexDirection: 'column',
       }}
     >
-      {/* Compact Quadrant Header */}
+      {/* Dark Compact Header */}
       <Box
         sx={{
           mb: 2,
-          p: 1.5,
-          borderRadius: 1,
-          bgcolor: quadrantConfig.bgColor,
-          borderLeft: 3,
-          borderColor: quadrantConfig.color,
+          p: 1.25,
+          borderRadius: 1.5,
+          bgcolor: quadrantConfig.color,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}
       >
         <Box>
           <Typography
             variant="h6"
             sx={{
-              color: quadrantConfig.color,
+              color: 'white',
               fontWeight: 700,
               mb: 0.25,
               lineHeight: 1.3,
+              fontSize: '1rem',
             }}
           >
             {quadrantConfig.title}
@@ -84,11 +84,11 @@ function EisenhowerQuadrant({
           <Typography
             variant="caption"
             sx={{
-              color: 'text.secondary',
+              color: 'rgba(255, 255, 255, 0.85)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               fontWeight: 600,
-              fontSize: '0.7rem',
+              fontSize: '0.65rem',
             }}
           >
             {quadrantConfig.subtitle}
@@ -99,11 +99,13 @@ function EisenhowerQuadrant({
           sx={{
             color: quadrantConfig.color,
             fontWeight: 700,
-            bgcolor: 'background.paper',
-            px: 1.5,
-            py: 0.5,
+            bgcolor: 'white',
+            px: 1.25,
+            py: 0.4,
             borderRadius: 1,
-            fontSize: '0.875rem',
+            fontSize: '0.8rem',
+            minWidth: 28,
+            textAlign: 'center',
           }}
         >
           {tasks.length}
