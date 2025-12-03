@@ -55,13 +55,13 @@ function EisenhowerQuadrant({
         flexDirection: 'column',
       }}
     >
-      {/* Refined Minimal Header */}
+      {/* Modern Gradient Header */}
       <Box
         sx={{
           mb: 2,
           px: 1.5,
           py: 0.875,
-          bgcolor: quadrantConfig.color,
+          background: quadrantConfig.color,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -71,7 +71,7 @@ function EisenhowerQuadrant({
           <Typography
             variant="subtitle1"
             sx={{
-              color: 'white',
+              color: '#1e293b',
               fontWeight: 700,
               lineHeight: 1.3,
               fontSize: '0.95rem',
@@ -83,7 +83,7 @@ function EisenhowerQuadrant({
           <Typography
             variant="caption"
             sx={{
-              color: 'rgba(255, 255, 255, 0.8)',
+              color: '#475569',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               fontWeight: 600,
@@ -95,7 +95,7 @@ function EisenhowerQuadrant({
         </Box>
         <Box
           sx={{
-            color: quadrantConfig.color,
+            color: '#1e293b',
             fontWeight: 800,
             bgcolor: 'white',
             px: 1,
@@ -104,6 +104,8 @@ function EisenhowerQuadrant({
             minWidth: 24,
             textAlign: 'center',
             lineHeight: 1.4,
+            borderRadius: 0.5,
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
           }}
         >
           {tasks.length}
