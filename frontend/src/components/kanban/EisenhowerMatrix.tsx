@@ -55,67 +55,59 @@ function EisenhowerQuadrant({
         flexDirection: 'column',
       }}
     >
-      {/* Bold Quadrant Header */}
+      {/* Compact Quadrant Header */}
       <Box
         sx={{
-          mb: 2.5,
-          pb: 2,
-          borderBottom: '3px solid',
+          mb: 2,
+          p: 1.5,
+          borderRadius: 1,
+          bgcolor: quadrantConfig.bgColor,
+          borderLeft: 3,
           borderColor: quadrantConfig.color,
-          position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 4,
-            bgcolor: quadrantConfig.color,
-            borderRadius: 1,
-          },
-          pl: 2.5,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            color: quadrantConfig.color,
-            mb: 0.5,
-            lineHeight: 1.2,
-          }}
-        >
-          {quadrantConfig.title}
-        </Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Box>
           <Typography
-            variant="subtitle2"
+            variant="h6"
+            sx={{
+              color: quadrantConfig.color,
+              fontWeight: 700,
+              mb: 0.25,
+              lineHeight: 1.3,
+            }}
+          >
+            {quadrantConfig.title}
+          </Typography>
+          <Typography
+            variant="caption"
             sx={{
               color: 'text.secondary',
+              textTransform: 'uppercase',
               letterSpacing: '0.05em',
+              fontWeight: 600,
+              fontSize: '0.7rem',
             }}
           >
             {quadrantConfig.subtitle}
           </Typography>
-          <Box
-            component="span"
-            sx={{
-              width: 4,
-              height: 4,
-              borderRadius: '50%',
-              bgcolor: 'text.secondary',
-              opacity: 0.5,
-            }}
-          />
-          <Typography
-            variant="subtitle2"
-            sx={{
-              color: quadrantConfig.color,
-              fontWeight: 700,
-            }}
-          >
-            {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
-          </Typography>
-        </Stack>
+        </Box>
+        <Typography
+          variant="body2"
+          sx={{
+            color: quadrantConfig.color,
+            fontWeight: 700,
+            bgcolor: 'background.paper',
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 1,
+            fontSize: '0.875rem',
+          }}
+        >
+          {tasks.length}
+        </Typography>
       </Box>
 
       {/* Droppable Zone */}
