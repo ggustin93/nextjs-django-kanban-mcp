@@ -30,11 +30,21 @@ import {
   DragStartEvent,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { KanbanColumn } from './kanban/KanbanColumn';
 import { TaskDialog } from './kanban/TaskDialog';
 import { useTaskDialog } from './kanban/useTaskDialog';
-import { Task, TaskStatus, COLUMNS, PRIORITY_ORDER } from './kanban/types';
+import { FilterBar } from './kanban/FilterBar';
+import { EisenhowerMatrix } from './kanban/EisenhowerMatrix';
+import {
+  Task,
+  TaskStatus,
+  COLUMNS,
+  PRIORITY_ORDER,
+  ViewType,
+  FilterState,
+  TaskPriority,
+} from './kanban/types';
 
 const REFETCH_QUERIES = [{ query: GET_TASKS }];
 
@@ -42,6 +52,12 @@ export function Board() {
   const dialog = useTaskDialog();
   const { data, loading, error } = useQuery(GET_TASKS);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [viewType, setViewType] = useState<ViewType>('kanban');
+  const [filters, setFilters] = useState<FilterState>({
+    priorities: [],
+    categories: [],
+    searchText: '',
+  });
 
   const [createTask, { loading: creating }] = useMutation(CREATE_TASK, {
     refetchQueries: REFETCH_QUERIES,
@@ -147,6 +163,83 @@ export function Board() {
     }
   };
 
+  const handleUpdateTaskPriority = async (id: string, priority: TaskPriority) => {
+    const allTasks = data?.allTasks || [];
+    const task = allTasks.find((t: Task) => t.id === id);
+    if (!task) return;
+
+    await updateTask({
+      variables: { id, priority },
+      optimisticResponse: {
+        updateTask: {
+          __typename: 'UpdateTask',
+          task: {
+            ...task,
+            priority,
+            __typename: 'TaskType',
+          },
+        },
+      },
+    });
+  };
+
+  // Extract unique categories from all tasks (MUST be before conditional returns)
+  const availableCategories = useMemo(() => {
+    const categories = new Set<string>();
+    (data?.allTasks || []).forEach((task: Task) => {
+      if (task.category) categories.add(task.category);
+    });
+    return Array.from(categories).sort();
+  }, [data]);
+
+  // Filter tasks based on filter state (MUST be before conditional returns)
+  const filteredTasks = useMemo(() => {
+    let tasks = data?.allTasks || [];
+
+    // Priority filter
+    if (filters.priorities.length > 0) {
+      tasks = tasks.filter((task: Task) => filters.priorities.includes(task.priority));
+    }
+
+    // Category filter
+    if (filters.categories.length > 0) {
+      tasks = tasks.filter((task: Task) =>
+        task.category ? filters.categories.includes(task.category) : false
+      );
+    }
+
+    // Search filter
+    if (filters.searchText.trim()) {
+      const search = filters.searchText.toLowerCase();
+      tasks = tasks.filter(
+        (task: Task) =>
+          task.title.toLowerCase().includes(search) ||
+          task.description?.toLowerCase().includes(search) ||
+          task.category?.toLowerCase().includes(search)
+      );
+    }
+
+    return tasks;
+  }, [data, filters]);
+
+  const tasksByStatus = useMemo(
+    () =>
+      COLUMNS.reduce(
+        (acc, column) => {
+          acc[column.status] = filteredTasks
+            .filter((task: Task) => task.status === column.status)
+            .sort((a: Task, b: Task) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+          return acc;
+        },
+        {} as Record<TaskStatus, Task[]>
+      ),
+    [filteredTasks]
+  );
+
+  const handleClearFilters = () => {
+    setFilters({ priorities: [], categories: [], searchText: '' });
+  };
+
   if (loading) {
     return (
       <Box
@@ -165,81 +258,128 @@ export function Board() {
     );
   }
 
-  const tasksByStatus = COLUMNS.reduce(
-    (acc, column) => {
-      acc[column.status] = (data?.allTasks || [])
-        .filter((task: Task) => task.status === column.status)
-        .sort((a: Task, b: Task) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
-      return acc;
-    },
-    {} as Record<TaskStatus, Task[]>
-  );
-
   return (
-    <Box sx={{ p: 3, maxWidth: 1400, mx: 'auto' }}>
-      {/* Header */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" fontWeight={600}>
-          Kanban Board
-        </Typography>
+    <Box sx={{ p: { xs: 1.5, md: 3 }, maxWidth: 1600, mx: 'auto' }}>
+      {/* Refined Header */}
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={3}>
+        <Box>
+          <Typography
+            variant="h3"
+            sx={{
+              background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 0.5,
+            }}
+          >
+            Priority Matrix
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+            Focus on what matters • Eisenhower decision framework
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={dialog.openForCreate}
-          sx={{ borderRadius: 2 }}
+          size="large"
+          sx={{
+            borderRadius: 3,
+            px: 3,
+            py: 1.5,
+            fontSize: '1rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.4)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              boxShadow: '0 6px 20px 0 rgba(59, 130, 246, 0.5)',
+              transform: 'translateY(-2px)',
+            },
+            '&:active': {
+              transform: 'translateY(0)',
+            },
+          }}
         >
           Add Task
         </Button>
       </Stack>
 
-      {/* Columns with Drag-and-Drop */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <Box sx={{ display: 'flex', gap: 3, overflowX: 'auto', pb: 2 }}>
-          {COLUMNS.map((column) => (
-            <KanbanColumn
-              key={column.status}
-              column={column}
-              tasks={tasksByStatus[column.status]}
-              onEditTask={dialog.openForEdit}
-              onDeleteTask={handleDelete}
-            />
-          ))}
-        </Box>
-        <DragOverlay
-          dropAnimation={{
-            duration: 300,
-            easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
-          }}
+      {/* Filter Bar */}
+      <FilterBar
+        priorities={filters.priorities}
+        categories={filters.categories}
+        searchText={filters.searchText}
+        availableCategories={availableCategories}
+        viewType={viewType}
+        onPrioritiesChange={(priorities) => setFilters({ ...filters, priorities })}
+        onCategoriesChange={(categories) => setFilters({ ...filters, categories })}
+        onSearchChange={(searchText) => setFilters({ ...filters, searchText })}
+        onViewChange={setViewType}
+        onClearFilters={handleClearFilters}
+      />
+
+      {/* Conditional View Rendering */}
+      {viewType === 'eisenhower' ? (
+        <EisenhowerMatrix
+          tasks={filteredTasks}
+          onEditTask={dialog.openForEdit}
+          onDeleteTask={handleDelete}
+          onUpdateTask={handleUpdateTaskPriority}
+        />
+      ) : (
+        /* Kanban Columns with Drag-and-Drop */
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
         >
-          {activeTask ? (
-            <Card
-              sx={{
-                borderLeft: 3,
-                borderColor: COLUMNS.find((c) => c.status === activeTask.status)?.color,
-                opacity: 0.9,
-                transform: 'rotate(5deg)',
-                boxShadow: 4,
-              }}
-            >
-              <CardContent>
-                <Typography variant="subtitle1" fontWeight={600}>
-                  {activeTask.title}
-                </Typography>
-                {activeTask.description && (
-                  <Typography variant="body2" color="text.secondary" mt={1}>
-                    {activeTask.description}
+          <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
+            {COLUMNS.map((column) => (
+              <KanbanColumn
+                key={column.status}
+                column={column}
+                tasks={tasksByStatus[column.status]}
+                onEditTask={dialog.openForEdit}
+                onDeleteTask={handleDelete}
+              />
+            ))}
+          </Box>
+          <DragOverlay
+            dropAnimation={{
+              duration: 300,
+              easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+            }}
+          >
+            {activeTask ? (
+              <Card
+                sx={{
+                  borderLeft: 3,
+                  borderColor: COLUMNS.find((c) => c.status === activeTask.status)?.color,
+                  opacity: 0.9,
+                  transform: 'rotate(5deg)',
+                  boxShadow: 4,
+                }}
+              >
+                <CardContent sx={{ p: 1.5 }}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {activeTask.title}
                   </Typography>
-                )}
-              </CardContent>
-            </Card>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+                  {activeTask.description && (
+                    <Typography variant="caption" color="text.secondary" mt={0.5}>
+                      {activeTask.description}
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      )}
 
       {/* Create/Edit Dialog */}
       <TaskDialog
