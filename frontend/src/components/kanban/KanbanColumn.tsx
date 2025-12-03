@@ -23,38 +23,42 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
   });
 
   return (
-    <Box sx={{ flex: '1 1 0', minWidth: 320, maxWidth: 400 }}>
+    <Box sx={{ flex: '1 1 0', minWidth: 280, maxWidth: 360 }}>
       {/* Column Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2} px={1}>
         <Stack direction="row" alignItems="center" gap={1}>
           <Box
             sx={{
-              width: 12,
-              height: 12,
+              width: 8,
+              height: 8,
               borderRadius: '50%',
               bgcolor: column.color,
             }}
           />
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="subtitle1" fontWeight={700}>
             {column.title}
           </Typography>
         </Stack>
-        <Chip
-          label={tasks.length}
-          size="small"
+        <Box
           sx={{
+            px: 1,
+            py: 0.25,
+            borderRadius: 1,
             bgcolor: column.bgColor,
             color: column.color,
+            fontSize: '0.75rem',
             fontWeight: 600,
           }}
-        />
+        >
+          {tasks.length}
+        </Box>
       </Stack>
 
       {/* Droppable Zone */}
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <Stack
           ref={setNodeRef}
-          spacing={2}
+          spacing={1.5}
           sx={{
             minHeight: 200,
             transition: 'background-color 0.2s',
@@ -76,7 +80,7 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
           {tasks.length === 0 && (
             <Box
               sx={{
-                p: 4,
+                p: 3,
                 textAlign: 'center',
                 bgcolor: 'background.paper',
                 borderRadius: 2,
@@ -85,8 +89,8 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
                 transition: 'border-color 0.2s',
               }}
             >
-              <Typography variant="body2" color="text.secondary">
-                Drop tasks here
+              <Typography variant="body2" color="text.secondary" fontSize="0.8rem">
+                Drop here
               </Typography>
             </Box>
           )}

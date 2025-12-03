@@ -22,16 +22,18 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useState } from 'react';
-import { TaskPriority, PRIORITY_CONFIG, ViewType } from './types';
+import { TaskPriority, TaskStatus, PRIORITY_CONFIG, COLUMNS, ViewType } from './types';
 
 interface FilterBarProps {
   priorities: TaskPriority[];
   categories: string[];
+  statuses: TaskStatus[];
   searchText: string;
   availableCategories: string[];
   viewType: ViewType;
   onPrioritiesChange: (priorities: TaskPriority[]) => void;
   onCategoriesChange: (categories: string[]) => void;
+  onStatusesChange: (statuses: TaskStatus[]) => void;
   onSearchChange: (search: string) => void;
   onViewChange: (view: ViewType) => void;
   onClearFilters: () => void;
@@ -40,11 +42,13 @@ interface FilterBarProps {
 export function FilterBar({
   priorities,
   categories,
+  statuses,
   searchText,
   availableCategories,
   viewType,
   onPrioritiesChange,
   onCategoriesChange,
+  onStatusesChange,
   onSearchChange,
   onViewChange,
   onClearFilters,
@@ -67,8 +71,18 @@ export function FilterBar({
     }
   };
 
-  const hasActiveFilters = priorities.length > 0 || categories.length > 0 || searchText.length > 0;
-  const activeFilterCount = priorities.length + categories.length + (searchText ? 1 : 0);
+  const toggleStatus = (status: TaskStatus) => {
+    if (statuses.includes(status)) {
+      onStatusesChange(statuses.filter((s) => s !== status));
+    } else {
+      onStatusesChange([...statuses, status]);
+    }
+  };
+
+  const hasActiveFilters =
+    priorities.length > 0 || categories.length > 0 || statuses.length > 0 || searchText.length > 0;
+  const activeFilterCount =
+    priorities.length + categories.length + statuses.length + (searchText ? 1 : 0);
 
   return (
     <Box sx={{ mb: 2 }}>
@@ -145,6 +159,31 @@ export function FilterBar({
             }}
           />
         ))}
+
+        {/* Status Filters - Only in Eisenhower View */}
+        {viewType === 'eisenhower' &&
+          COLUMNS.map((column) => (
+            <Chip
+              key={column.status}
+              label={column.title}
+              onClick={() => toggleStatus(column.status)}
+              variant={statuses.includes(column.status) ? 'filled' : 'outlined'}
+              size="small"
+              sx={{
+                height: 24,
+                fontSize: '0.7rem',
+                fontWeight: statuses.includes(column.status) ? 600 : 400,
+                bgcolor: statuses.includes(column.status) ? column.bgColor : 'transparent',
+                color: statuses.includes(column.status) ? column.color : 'text.secondary',
+                borderColor: column.color,
+                '& .MuiChip-label': { px: 1 },
+                '&:hover': {
+                  bgcolor: statuses.includes(column.status) ? column.bgColor : column.bgColor,
+                  opacity: 0.9,
+                },
+              }}
+            />
+          ))}
 
         {/* Expand Filters Button */}
         {availableCategories.length > 0 && (

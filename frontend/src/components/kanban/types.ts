@@ -126,5 +126,6 @@ export type ViewType = 'kanban' | 'eisenhower';
 export interface FilterState {
   priorities: TaskPriority[];
   categories: string[];
+  statuses: TaskStatus[];
   searchText: string;
 }

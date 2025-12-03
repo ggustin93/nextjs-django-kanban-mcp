@@ -56,6 +56,7 @@ export function Board() {
   const [filters, setFilters] = useState<FilterState>({
     priorities: [],
     categories: [],
+    statuses: [],
     searchText: '',
   });
 
@@ -208,6 +209,11 @@ export function Board() {
       );
     }
 
+    // Status filter (for Eisenhower view)
+    if (filters.statuses.length > 0) {
+      tasks = tasks.filter((task: Task) => filters.statuses.includes(task.status));
+    }
+
     // Search filter
     if (filters.searchText.trim()) {
       const search = filters.searchText.toLowerCase();
@@ -237,7 +243,7 @@ export function Board() {
   );
 
   const handleClearFilters = () => {
-    setFilters({ priorities: [], categories: [], searchText: '' });
+    setFilters({ priorities: [], categories: [], statuses: [], searchText: '' });
   };
 
   if (loading) {
@@ -260,48 +266,58 @@ export function Board() {
 
   return (
     <Box sx={{ p: { xs: 1.5, md: 3 }, maxWidth: 1600, mx: 'auto' }}>
-      {/* Refined Header - Contextual Title */}
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={3}>
+      {/* Elegant Header with Refined Typography */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3.5}>
         <Box>
           <Typography
-            variant="h3"
+            variant="h4"
             sx={{
-              background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 0.5,
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: 'text.primary',
+              mb: 0.75,
+              fontSize: { xs: '1.5rem', md: '2rem' },
             }}
           >
-            {viewType === 'eisenhower' ? 'Eisenhower Decision Matrix' : 'Priority Matrix'}
+            {viewType === 'eisenhower' ? 'Eisenhower Decision Matrix' : 'Kanban Board'}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 400,
+              fontSize: '0.875rem',
+              letterSpacing: '0.01em',
+            }}
+          >
             {viewType === 'eisenhower'
               ? 'Prioritize by urgency and importance • Drag to change priority'
-              : 'Focus on what matters • Smart task prioritization'}
+              : 'Organize tasks by status • Drag to move between columns'}
           </Typography>
         </Box>
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
+          startIcon={<AddIcon sx={{ fontSize: 18 }} />}
           onClick={dialog.openForCreate}
           sx={{
-            borderRadius: 2,
-            px: 2.5,
-            py: 1,
-            fontSize: '0.95rem',
-            fontWeight: 600,
+            borderRadius: '8px',
+            px: 3,
+            py: 1.25,
+            fontSize: '0.9375rem',
+            fontWeight: 500,
             textTransform: 'none',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-            boxShadow: '0 2px 8px 0 rgba(59, 130, 246, 0.35)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            letterSpacing: '0.01em',
+            bgcolor: 'primary.main',
+            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+            transition: 'all 0.2s ease-in-out',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              boxShadow: '0 4px 12px 0 rgba(59, 130, 246, 0.45)',
+              bgcolor: 'primary.dark',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
               transform: 'translateY(-1px)',
             },
             '&:active': {
               transform: 'translateY(0)',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
             },
           }}
         >
@@ -313,11 +329,13 @@ export function Board() {
       <FilterBar
         priorities={filters.priorities}
         categories={filters.categories}
+        statuses={filters.statuses}
         searchText={filters.searchText}
         availableCategories={availableCategories}
         viewType={viewType}
         onPrioritiesChange={(priorities) => setFilters({ ...filters, priorities })}
         onCategoriesChange={(categories) => setFilters({ ...filters, categories })}
+        onStatusesChange={(statuses) => setFilters({ ...filters, statuses })}
         onSearchChange={(searchText) => setFilters({ ...filters, searchText })}
         onViewChange={setViewType}
         onClearFilters={handleClearFilters}
