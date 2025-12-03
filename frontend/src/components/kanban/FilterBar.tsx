@@ -160,30 +160,29 @@ export function FilterBar({
           />
         ))}
 
-        {/* Status Filters - Only in Eisenhower View */}
-        {viewType === 'eisenhower' &&
-          COLUMNS.map((column) => (
-            <Chip
-              key={column.status}
-              label={column.title}
-              onClick={() => toggleStatus(column.status)}
-              variant={statuses.includes(column.status) ? 'filled' : 'outlined'}
-              size="small"
-              sx={{
-                height: 24,
-                fontSize: '0.7rem',
-                fontWeight: statuses.includes(column.status) ? 600 : 400,
-                bgcolor: statuses.includes(column.status) ? column.bgColor : 'transparent',
-                color: statuses.includes(column.status) ? column.color : 'text.secondary',
-                borderColor: column.color,
-                '& .MuiChip-label': { px: 1 },
-                '&:hover': {
-                  bgcolor: statuses.includes(column.status) ? column.bgColor : column.bgColor,
-                  opacity: 0.9,
-                },
-              }}
-            />
-          ))}
+        {/* Status Filters - Available in Both Views */}
+        {COLUMNS.map((column) => (
+          <Chip
+            key={column.status}
+            label={column.title}
+            onClick={() => toggleStatus(column.status)}
+            variant={statuses.includes(column.status) ? 'filled' : 'outlined'}
+            size="small"
+            sx={{
+              height: 24,
+              fontSize: '0.7rem',
+              fontWeight: statuses.includes(column.status) ? 600 : 400,
+              bgcolor: statuses.includes(column.status) ? column.bgColor : 'transparent',
+              color: statuses.includes(column.status) ? column.color : 'text.secondary',
+              borderColor: column.color,
+              '& .MuiChip-label': { px: 1 },
+              '&:hover': {
+                bgcolor: statuses.includes(column.status) ? column.bgColor : column.bgColor,
+                opacity: 0.9,
+              },
+            }}
+          />
+        ))}
 
         {/* Expand Filters Button */}
         {availableCategories.length > 0 && (
