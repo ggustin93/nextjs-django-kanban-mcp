@@ -16,9 +16,10 @@ interface TaskCardProps {
   column: Column;
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
+  showStatusBadge?: boolean; // NEW: Show status instead of priority
 }
 
-export function TaskCard({ task, column, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, column, onEdit, onDelete, showStatusBadge = false }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     transition: {
@@ -54,8 +55,8 @@ export function TaskCard({ task, column, onEdit, onDelete }: TaskCardProps) {
         borderLeft: 3,
         borderColor: column.color,
         '&:hover': {
-          boxShadow: 3,
-          transform: isDragging ? 'none' : 'translateY(-2px)',
+          boxShadow: 2,
+          transform: isDragging ? 'none' : 'translateY(-1px)',
           transition: 'box-shadow 0.2s, transform 0.2s',
         },
         '&:active': {
@@ -64,66 +65,94 @@ export function TaskCard({ task, column, onEdit, onDelete }: TaskCardProps) {
       }}
       {...attributes}
     >
-      <CardContent>
-        {/* Priority & Category chips */}
+      <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
+        {/* Priority/Status & Category chips */}
         <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }} {...listeners}>
-          <Chip
-            label={PRIORITY_CONFIG[task.priority].shortLabel}
-            color={PRIORITY_CONFIG[task.priority].color}
-            size="small"
-            sx={{ fontWeight: 'bold', minWidth: 32, height: 20, fontSize: '0.7rem' }}
-          />
+          {showStatusBadge ? (
+            <Chip
+              label={column.title}
+              size="small"
+              sx={{
+                fontWeight: 'bold',
+                minWidth: 50,
+                height: 18,
+                fontSize: '0.65rem',
+                bgcolor: column.bgColor,
+                color: column.color,
+                border: 1,
+                borderColor: column.color,
+              }}
+            />
+          ) : (
+            <Chip
+              label={PRIORITY_CONFIG[task.priority].shortLabel}
+              color={PRIORITY_CONFIG[task.priority].color}
+              size="small"
+              sx={{ fontWeight: 'bold', minWidth: 28, height: 18, fontSize: '0.65rem' }}
+            />
+          )}
           {task.category && (
             <Chip
               label={task.category}
               variant="outlined"
               size="small"
-              sx={{ height: 20, fontSize: '0.7rem' }}
+              sx={{ height: 18, fontSize: '0.65rem' }}
             />
           )}
         </Box>
 
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
           <Typography
-            variant="subtitle1"
+            variant="body2"
             fontWeight={600}
             flex={1}
             {...listeners}
-            sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+            sx={{
+              cursor: 'grab',
+              '&:active': { cursor: 'grabbing' },
+              lineHeight: 1.4,
+            }}
           >
             {task.title}
           </Typography>
-          <Stack direction="row" spacing={0.5} sx={{ pointerEvents: 'auto' }}>
+          <Stack direction="row" spacing={0.25} sx={{ pointerEvents: 'auto' }}>
             <IconButton
               size="small"
               onClick={handleEdit}
               sx={{
+                p: 0.5,
                 '&:hover': { bgcolor: 'action.hover' },
                 transition: 'background-color 0.2s',
               }}
             >
-              <EditIcon fontSize="small" />
+              <EditIcon sx={{ fontSize: 16 }} />
             </IconButton>
             <IconButton
               size="small"
               onClick={handleDelete}
               sx={{
+                p: 0.5,
                 '&:hover': { bgcolor: 'error.light', color: 'error.contrastText' },
                 transition: 'all 0.2s',
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <DeleteIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Stack>
         </Stack>
 
         {task.description && (
           <Typography
-            variant="body2"
+            variant="caption"
             color="text.secondary"
-            mt={1}
+            mt={0.5}
+            display="block"
             {...listeners}
-            sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+            sx={{
+              cursor: 'grab',
+              '&:active': { cursor: 'grabbing' },
+              lineHeight: 1.4,
+            }}
           >
             {task.description}
           </Typography>
@@ -132,10 +161,14 @@ export function TaskCard({ task, column, onEdit, onDelete }: TaskCardProps) {
         <Typography
           variant="caption"
           color="text.secondary"
-          mt={1}
+          mt={0.5}
           display="block"
           {...listeners}
-          sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+          sx={{
+            cursor: 'grab',
+            '&:active': { cursor: 'grabbing' },
+            fontSize: '0.65rem',
+          }}
         >
           {new Date(task.createdAt).toLocaleDateString()}
         </Typography>
