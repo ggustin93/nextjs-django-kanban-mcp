@@ -245,9 +245,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // Verify the mutation mock is correctly configured
-      const updateMock = mocks.find(
-        (m) => 'request' in m && m.request.query === UPDATE_TASK
-      );
+      const updateMock = mocks.find((m) => 'request' in m && m.request.query === UPDATE_TASK);
       expect(updateMock).toBeDefined();
       if (updateMock && 'request' in updateMock) {
         expect(updateMock.request.variables).toEqual({
@@ -393,9 +391,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // Verify optimistic response configuration in Board.tsx:102-114
-      const updateMock = mocks.find(
-        (m) => 'request' in m && m.request.query === UPDATE_TASK
-      );
+      const updateMock = mocks.find((m) => 'request' in m && m.request.query === UPDATE_TASK);
       expect(updateMock).toBeDefined();
     });
   });
