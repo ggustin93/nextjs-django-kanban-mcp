@@ -43,14 +43,25 @@ cd frontend && npm install && npm run dev
 
 ## 2. Features
 
-- CRUD operations with GraphQL API
-- Drag-and-drop task management (Kanban + Eisenhower matrix views)
-- Priority system (P1-P4) and category tagging
+**Task Management:**
+- Dual view modes: Kanban board + Eisenhower Matrix
+- Priority system (P1-P4): Do First → Schedule → Quick Win → Backlog
 - Status workflow: TODO → DOING → WAITING → DONE
-- Filtering by priority, category, and search
-- TypeScript with Apollo Client
-- Docker development environment
-- Pre-commit hooks and test coverage
+- Category tagging with # prefix (#frontend, #backend, etc.)
+- Drag-and-drop between columns and priority quadrants
+
+**Filtering & Search:**
+- Filter by priority (P1-P4) in both views
+- Filter by status (To Do, Doing, Waiting, Done) in both views
+- Filter by category with multi-select
+- Full-text search across title, description, and category
+
+**Technical Stack:**
+- GraphQL API with type-safe Apollo Client
+- TypeScript end-to-end with Material UI
+- Docker development environment with hot-reload
+- Pre-commit hooks (Ruff, ESLint, Prettier)
+- MCP server for Claude AI integration
 
 ## 3. Tech Stack
 
