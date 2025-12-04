@@ -48,16 +48,22 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 ## 1. Quick Start
 
 ```bash
-# With Docker
+# Recommended: Using Makefile
+make setup      # First-time setup (creates .env, builds containers, runs migrations)
+make up         # Start services
+
+# Or with Docker directly
 docker-compose up --build
 
-# Or separately
+# Or run services separately (without Docker)
 cd backend && pip install -r requirements.txt && python manage.py migrate && python manage.py runserver
 cd frontend && npm install && npm run dev
 ```
 
 - Frontend: http://localhost:3000
 - GraphQL API: http://localhost:8000/graphql
+
+> **Windows**: Requires [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) or `choco install make` for Makefile commands
 
 ## 2. Features
 

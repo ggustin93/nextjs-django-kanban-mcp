@@ -46,7 +46,7 @@ rebuild:
 
 test:
 	@echo "Running all tests..."
-	cd backend && python manage.py test
+	docker-compose exec backend python manage.py test
 	cd frontend && npm test -- --passWithNoTests
 	cd frontend && npm run test:e2e
 
