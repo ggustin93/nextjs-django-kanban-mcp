@@ -1,6 +1,6 @@
 # Kanban MCP — Next.js · Django · GraphQL
 
-A modern task management app featuring drag-and-drop Kanban boards, Eisenhower priority matrix, GraphQL API, and an MCP server for seamless Claude AI integration.
+A task management app featuring drag-and-drop Kanban boards, Eisenhower priority matrix, GraphQL API, and MCP server for Claude AI integration.
 
 **Stack:** Next.js 15, Django 4.2, TypeScript, Material UI, Apollo Client, Graphene-Django
 
@@ -54,30 +54,31 @@ cd frontend && npm install && npm run dev
 
 ## 2. Features
 
-**Task Management:**
+Dual-view task management (Kanban + Eisenhower Matrix) with drag-and-drop, priority system (P1-P4), category tagging, and filtering by priority/status/category.
+
+<details>
+<summary><strong>📋 Task Management</strong></summary>
+
 - Dual view modes: Kanban board + Eisenhower Matrix
 - Priority system (P1-P4): Do First → Schedule → Quick Win → Backlog
 - Status workflow: TODO → DOING → WAITING → DONE
 - Category tagging with # prefix (#frontend, #backend, etc.)
 - Drag-and-drop between columns and priority quadrants
+</details>
 
-**Filtering & Search:**
+<details>
+<summary><strong>🔍 Filtering & Search</strong></summary>
+
 - Filter by priority (P1-P4) in both views
 - Filter by status (To Do, Doing, Waiting, Done) in both views
 - Filter by category with multi-select
 - Full-text search across title, description, and category
-
-**Technical Stack:**
-- GraphQL API with type-safe Apollo Client
-- TypeScript end-to-end with Material UI
-- Docker development environment with hot-reload
-- Pre-commit hooks (Ruff, ESLint, Prettier)
-- MCP server for Claude AI integration
+</details>
 
 ## 3. Tech Stack
 
-**Backend:** Django 4.2, Graphene-Django, SQLite  
-**Frontend:** Next.js 15, TypeScript, Apollo Client, Material UI v7, @dnd-kit  
+**Backend:** Django 4.2, Graphene-Django, SQLite
+**Frontend:** Next.js 15, TypeScript, Apollo Client, Material UI v7, @dnd-kit
 **Infrastructure:** Docker Compose, pre-commit hooks (Ruff, ESLint, Prettier)
 
 ## 4. Project Structure
@@ -258,7 +259,7 @@ make logs/shell      # View logs/Django shell
 
 ## 9. Deployment
 
-**Production-Ready Features:**
+**Deployment Features:**
 - Automated CI/CD pipeline (`.github/workflows/`)
 - Docker multi-stage builds with health checks
 - Environment-based configuration (12-factor app)

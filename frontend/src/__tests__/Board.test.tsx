@@ -32,6 +32,7 @@ const mockTasks = [
     priority: 'P1',
     category: 'Development',
     createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     __typename: 'TaskType',
   },
   {
@@ -42,6 +43,7 @@ const mockTasks = [
     priority: 'P2',
     category: 'Testing',
     createdAt: '2024-01-02T00:00:00Z',
+    updatedAt: '2024-01-02T00:00:00Z',
     __typename: 'TaskType',
   },
   {
@@ -52,6 +54,7 @@ const mockTasks = [
     priority: 'P3',
     category: 'Documentation',
     createdAt: '2024-01-03T00:00:00Z',
+    updatedAt: '2024-01-03T00:00:00Z',
     __typename: 'TaskType',
   },
 ];
@@ -101,10 +104,17 @@ describe('Board Component', () => {
       expect(screen.getByText('Task 3')).toBeInTheDocument();
     });
 
-    // Verify column headers
-    expect(screen.getByText('To Do')).toBeInTheDocument();
-    expect(screen.getByText('Doing')).toBeInTheDocument();
-    expect(screen.getByText('Done')).toBeInTheDocument();
+    // Verify all 4 column headers exist (using getAllByText to handle multiple matches)
+    const todoHeaders = screen.getAllByText('To Do');
+    const doingHeaders = screen.getAllByText('Doing');
+    const waitingHeaders = screen.getAllByText('Waiting');
+    const doneHeaders = screen.getAllByText('Done');
+
+    // At least one of each should exist (column headers)
+    expect(todoHeaders.length).toBeGreaterThanOrEqual(1);
+    expect(doingHeaders.length).toBeGreaterThanOrEqual(1);
+    expect(waitingHeaders.length).toBeGreaterThanOrEqual(1);
+    expect(doneHeaders.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders error state when query fails', async () => {
@@ -150,6 +160,8 @@ describe('Board Component', () => {
           variables: {
             title: 'New Task',
             status: 'TODO',
+            priority: 'P4', // Default priority from INITIAL_FORM_DATA
+            category: '', // Default category from INITIAL_FORM_DATA
           },
         },
         result: {
@@ -158,7 +170,11 @@ describe('Board Component', () => {
               task: {
                 id: '4',
                 title: 'New Task',
+                description: '',
                 status: 'TODO',
+                priority: 'P4',
+                category: '',
+                createdAt: '2024-01-04T00:00:00Z',
                 __typename: 'TaskType',
               },
               __typename: 'CreateTask',
@@ -179,9 +195,10 @@ describe('Board Component', () => {
                 title: 'New Task',
                 description: '',
                 status: 'TODO',
-                priority: 'P1',
+                priority: 'P4',
                 category: '',
                 createdAt: '2024-01-04T00:00:00Z',
+                updatedAt: '2024-01-04T00:00:00Z',
                 __typename: 'TaskType',
               },
             ],
@@ -401,15 +418,15 @@ describe('Board Component', () => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
     });
 
-    // Each column should show its count
-    // Todo: 1 task, Doing: 1 task, Done: 1 task
-    const todoColumn = screen.getByText('To Do').closest('div');
-    const doingColumn = screen.getByText('Doing').closest('div');
-    const doneColumn = screen.getByText('Done').closest('div');
+    // Verify task counts are displayed (1 task in each of TODO, DOING, DONE columns, 0 in WAITING)
+    // The count badges are rendered in each column header
+    const allOnes = screen.getAllByText('1');
+    const allZeros = screen.getAllByText('0');
 
-    expect(todoColumn).toBeInTheDocument();
-    expect(doingColumn).toBeInTheDocument();
-    expect(doneColumn).toBeInTheDocument();
+    // Should have 3 columns with count "1" (TODO, DOING, DONE)
+    expect(allOnes.length).toBeGreaterThanOrEqual(3);
+    // Should have 1 column with count "0" (WAITING)
+    expect(allZeros.length).toBeGreaterThanOrEqual(1);
   });
 
   it('handles GraphQL mutation errors gracefully', async () => {

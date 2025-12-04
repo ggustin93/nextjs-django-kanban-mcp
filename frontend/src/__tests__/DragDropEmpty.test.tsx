@@ -62,9 +62,9 @@ describe('Drag-and-Drop Empty Column Integration', () => {
         expect(screen.getByText('Task in TODO')).toBeInTheDocument();
       });
 
-      // Verify DOING and DONE columns show empty state
+      // Verify DOING, WAITING, and DONE columns show empty state
       const dropMessages = screen.getAllByText('Drop here');
-      expect(dropMessages).toHaveLength(2); // DOING and DONE are empty
+      expect(dropMessages).toHaveLength(3); // DOING, WAITING, and DONE are empty
     });
 
     it('identifies DONE column as empty when no tasks', async () => {
@@ -105,9 +105,9 @@ describe('Drag-and-Drop Empty Column Integration', () => {
         expect(screen.getByText('Task in DOING')).toBeInTheDocument();
       });
 
-      // TODO and DONE should be empty
+      // TODO, WAITING, and DONE should be empty
       const dropMessages = screen.getAllByText('Drop here');
-      expect(dropMessages).toHaveLength(2);
+      expect(dropMessages).toHaveLength(3);
     });
   });
 
@@ -178,8 +178,8 @@ describe('Drag-and-Drop Empty Column Integration', () => {
         expect(screen.getByText('Task in TODO')).toBeInTheDocument();
       });
 
-      // Verify empty columns are present
-      expect(screen.getAllByText('Drop here')).toHaveLength(2);
+      // Verify empty columns are present (DOING, WAITING, DONE)
+      expect(screen.getAllByText('Drop here')).toHaveLength(3);
 
       // Note: Full drag simulation with @dnd-kit requires more complex setup
       // This test verifies the GraphQL mutation is correctly configured
@@ -326,7 +326,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // Verify TaskStatus enum contains only valid values
-      const validStatuses = ['TODO', 'DOING', 'DONE'];
+      const validStatuses = ['TODO', 'DOING', 'WAITING', 'DONE'];
       Object.values(TaskStatus).forEach((status) => {
         expect(validStatuses).toContain(status);
       });
@@ -431,9 +431,9 @@ describe('Drag-and-Drop Empty Column Integration', () => {
         expect(screen.getByText('Kanban Board')).toBeInTheDocument();
       });
 
-      // All three columns should show empty state
+      // All four columns should show empty state
       const dropMessages = screen.getAllByText('Drop here');
-      expect(dropMessages).toHaveLength(3);
+      expect(dropMessages).toHaveLength(4);
     });
 
     it('handles column becoming empty after drag', async () => {
@@ -524,14 +524,17 @@ describe('Drag-and-Drop Empty Column Integration', () => {
 
       // Verify empty columns render with droppable areas
       // KanbanColumn.tsx uses useDroppable({ id: column.status })
-      const doingColumn = screen.getByText('Doing');
-      const doneColumn = screen.getByText('Done');
+      const doingColumns = screen.getAllByText('Doing');
+      const waitingColumns = screen.getAllByText('Waiting');
+      const doneColumns = screen.getAllByText('Done');
 
-      expect(doingColumn).toBeInTheDocument();
-      expect(doneColumn).toBeInTheDocument();
+      // Each column header should exist at least once
+      expect(doingColumns.length).toBeGreaterThan(0);
+      expect(waitingColumns.length).toBeGreaterThan(0);
+      expect(doneColumns.length).toBeGreaterThan(0);
 
-      // Both should have drop zones
-      expect(screen.getAllByText('Drop here')).toHaveLength(2);
+      // All three empty columns should have drop zones
+      expect(screen.getAllByText('Drop here')).toHaveLength(3);
     });
   });
 });
