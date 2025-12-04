@@ -19,10 +19,6 @@ jobs:
   lint-backend:
     name: Lint Backend (Ruff)
     runs-on: ubuntu-latest
-    # Only run if backend files changed
-    if: |
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'backend/')
 
     steps:
       - name: Checkout code
@@ -50,10 +46,6 @@ jobs:
   lint-frontend:
     name: Lint Frontend (ESLint + TypeScript)
     runs-on: ubuntu-latest
-    # Only run if frontend files changed
-    if: |
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'frontend/')
 
     steps:
       - name: Checkout code
@@ -84,10 +76,6 @@ jobs:
   test-backend:
     name: Test Backend (Django)
     runs-on: ubuntu-latest
-    # Only run if backend files changed
-    if: |
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'backend/')
 
     steps:
       - name: Checkout code
@@ -120,10 +108,6 @@ jobs:
   test-frontend:
     name: Test Frontend (Jest)
     runs-on: ubuntu-latest
-    # Only run if frontend files changed
-    if: |
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'frontend/')
 
     steps:
       - name: Checkout code
