@@ -35,6 +35,7 @@ const todoColumn: Column = {
   status: 'TODO' as TaskStatus,
   color: '#1976d2',
   bgColor: '#e3f2fd',
+  chipColor: 'info',
 };
 
 const doingColumn: Column = {
@@ -42,6 +43,7 @@ const doingColumn: Column = {
   status: 'DOING' as TaskStatus,
   color: '#ed6c02',
   bgColor: '#fff4e5',
+  chipColor: 'warning',
 };
 
 const doneColumn: Column = {
@@ -49,6 +51,7 @@ const doneColumn: Column = {
   status: 'DONE' as TaskStatus,
   color: '#2e7d32',
   bgColor: '#f1f8e9',
+  chipColor: 'success',
 };
 
 describe('KanbanColumn Component', () => {

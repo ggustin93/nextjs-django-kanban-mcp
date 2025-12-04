@@ -31,13 +31,38 @@ export interface Column {
   status: TaskStatus;
   color: string;
   bgColor: string;
+  chipColor: 'info' | 'warning' | 'secondary' | 'success'; // MUI semantic color for badges
 }
 
 export const COLUMNS: Column[] = [
-  { title: 'To Do', status: TaskStatus.TODO, color: '#3b82f6', bgColor: '#eff6ff' },
-  { title: 'Doing', status: TaskStatus.DOING, color: '#f59e0b', bgColor: '#fffbeb' },
-  { title: 'Waiting', status: TaskStatus.WAITING, color: '#8b5cf6', bgColor: '#f5f3ff' },
-  { title: 'Done', status: TaskStatus.DONE, color: '#10b981', bgColor: '#f0fdf4' },
+  {
+    title: 'To Do',
+    status: TaskStatus.TODO,
+    color: '#3b82f6',
+    bgColor: '#eff6ff',
+    chipColor: 'info', // Blue - neutral backlog
+  },
+  {
+    title: 'Doing',
+    status: TaskStatus.DOING,
+    color: '#f59e0b',
+    bgColor: '#fffbeb',
+    chipColor: 'warning', // Orange - active work
+  },
+  {
+    title: 'Waiting',
+    status: TaskStatus.WAITING,
+    color: '#d946ef', // Punk magenta (matches theme)
+    bgColor: '#fdf4ff', // Light magenta background
+    chipColor: 'secondary', // Magenta badge
+  },
+  {
+    title: 'Done',
+    status: TaskStatus.DONE,
+    color: '#10b981',
+    bgColor: '#f0fdf4',
+    chipColor: 'success', // Green - completed
+  },
 ];
 
 // Centralized priority configuration (DRY)
@@ -58,6 +83,17 @@ export const PRIORITY_ORDER: Record<TaskPriority, number> = {
   [TaskPriority.P3]: 3,
   [TaskPriority.P4]: 4,
 };
+
+// Priority colors for Eisenhower Matrix (solid colors, no gradients)
+export function getPriorityColor(priority: TaskPriority): string {
+  const colorMap: Record<TaskPriority, string> = {
+    [TaskPriority.P1]: '#dc2626', // Red (Do First)
+    [TaskPriority.P2]: '#fb923c', // Lighter Orange (Schedule)
+    [TaskPriority.P3]: '#0284c7', // Blue (Quick Win)
+    [TaskPriority.P4]: '#475569', // Slate (Backlog)
+  };
+  return colorMap[priority];
+}
 
 export interface TaskFormData {
   title: string;

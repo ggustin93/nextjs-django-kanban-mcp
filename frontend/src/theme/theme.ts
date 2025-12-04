@@ -17,9 +17,9 @@ export const theme = createTheme({
       dark: '#2563eb',
     },
     secondary: {
-      main: '#8b5cf6', // Modern purple
-      light: '#a78bfa',
-      dark: '#7c3aed',
+      main: '#d946ef', // Vibrant pink-purple (punk magenta)
+      light: '#e879f9',
+      dark: '#c026d3',
     },
     background: {
       default: '#f8fafc', // Subtle gray

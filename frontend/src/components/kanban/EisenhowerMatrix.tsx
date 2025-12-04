@@ -26,6 +26,7 @@ import {
   EisenhowerQuadrantConfig,
   TaskPriority,
   COLUMNS,
+  getPriorityColor,
 } from './types';
 import { TaskCard } from './Task/TaskCard';
 
@@ -60,65 +61,64 @@ function EisenhowerQuadrant({
         flexDirection: 'column',
       }}
     >
-      {/* Modern Gradient Header */}
+      {/* Quadrant Header - Clean Kanban Style */}
       <Box
         sx={{
           mb: 2,
-          px: 2,
-          py: 1.25,
-          background: quadrantConfig.color,
-          borderRadius: '8px 8px 0 0',
+          px: 1,
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid',
-          borderColor: 'rgba(0, 0, 0, 0.08)',
+          gap: 1,
         }}
       >
-        <Box>
-          <Typography
-            variant="subtitle1"
-            sx={{
-              color: '#0f172a',
-              fontWeight: 600,
-              lineHeight: 1.3,
-              fontSize: '0.9375rem',
-              letterSpacing: '-0.01em',
-              mb: 0.25,
-            }}
-          >
-            {quadrantConfig.title}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              color: '#475569',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              fontWeight: 500,
-              fontSize: '0.6875rem',
-            }}
-          >
-            {quadrantConfig.subtitle}
-          </Typography>
-        </Box>
+        {/* Colored Dot Indicator */}
         <Box
           sx={{
-            color: '#0f172a',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            bgcolor: getPriorityColor(quadrantConfig.priority),
+            flexShrink: 0,
+          }}
+        />
+
+        {/* Title + Subtitle */}
+        <Typography
+          variant="h6"
+          sx={{
+            flex: 1,
             fontWeight: 600,
-            bgcolor: 'rgba(255, 255, 255, 0.9)',
-            px: 1.25,
-            py: 0.5,
-            borderRadius: '6px',
-            fontSize: '0.8125rem',
-            minWidth: 32,
-            textAlign: 'center',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-            border: '1px solid rgba(0, 0, 0, 0.06)',
+            fontSize: '1rem',
+            color: 'text.primary',
+          }}
+        >
+          {quadrantConfig.title}
+          <Box
+            component="span"
+            sx={{
+              ml: 1,
+              fontSize: '0.75rem',
+              fontWeight: 400,
+              color: 'text.secondary',
+            }}
+          >
+            • {quadrantConfig.subtitle}
+          </Box>
+        </Typography>
+
+        {/* Count */}
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 600,
+            fontSize: '1rem',
+            color: getPriorityColor(quadrantConfig.priority),
+            minWidth: 24,
+            textAlign: 'right',
           }}
         >
           {tasks.length}
-        </Box>
+        </Typography>
       </Box>
 
       {/* Droppable Zone */}
@@ -146,6 +146,7 @@ function EisenhowerQuadrant({
                 onEdit={onEditTask}
                 onDelete={onDeleteTask}
                 showStatusBadge={true}
+                layout="horizontal"
               />
             );
           })}
@@ -241,15 +242,10 @@ export function EisenhowerMatrix({
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-            gap: 4,
+            gap: 2, // Reduced from 4 to 2 for tighter spacing
             '& > *': {
-              minHeight: { xs: 'auto', md: 500 },
+              minHeight: { xs: 'auto', md: 200 }, // Reduced from 500 to 200 for dynamic height
             },
-            p: 2,
-            borderRadius: 2,
-            bgcolor: 'grey.50',
-            border: '1px solid',
-            borderColor: 'divider',
           }}
         >
           {EISENHOWER_QUADRANTS.map((quadrant) => (
