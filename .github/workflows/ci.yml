@@ -166,4 +166,4 @@ jobs:
           tags: kanban-frontend:test
 
       - name: Validate docker-compose configuration
-        run: docker-compose config
+        run: docker compose config
