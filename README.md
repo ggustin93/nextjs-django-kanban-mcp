@@ -140,13 +140,60 @@ frontend/src/
 
 ## 5. Testing
 
+### Quick Test Commands
+
 ```bash
-make test                                      # All tests
-docker-compose exec backend python manage.py test  # Backend
-cd frontend && npm test                        # Frontend
+# All checks (recommended before pushing)
+./scripts/check-ci.sh
+
+# Individual components
+make test                                      # All tests via Docker
+docker-compose exec backend python manage.py test  # Backend only
+cd frontend && npm test                        # Frontend only
 ```
 
-Coverage: Backend (20 tests), Frontend (12 tests)
+### Run CI Checks Locally
+
+**Before pushing to GitHub**, verify all CI checks will pass:
+
+```bash
+# Automated check (runs all CI validations)
+./scripts/check-ci.sh
+
+# Manual checks
+cd backend
+source venv/bin/activate
+ruff check .                    # Linting
+ruff format --check .           # Format check
+python manage.py test           # Tests
+
+cd ../frontend
+npm run lint                    # ESLint
+npx tsc --noEmit               # TypeScript
+npm test                        # Jest
+
+# Docker validation
+docker-compose config          # Validate docker-compose.yml
+```
+
+### Backend Tests (20 tests)
+- Model tests: Task creation, status transitions, timestamp behavior
+- GraphQL API tests: Queries, mutations, error handling
+- Coverage: 85%+
+
+### Frontend Tests (13+ tests)
+- Component tests: KanbanColumn, TaskCard, TaskDialog
+- Integration tests: Drag-and-drop, filters, view switching
+- Coverage: 80%+
+
+**Coverage Reports:**
+```bash
+# Backend coverage
+cd backend && coverage run --source='.' manage.py test && coverage report
+
+# Frontend coverage
+cd frontend && npm test -- --coverage
+```
 
 ## 6. Pre-commit Hooks
 
@@ -157,9 +204,60 @@ pre-commit run --all-files  # Manual run
 
 Checks: Ruff (Python), ESLint + Prettier (TypeScript), YAML validation
 
-## 7. Continuous Integration
+## 7. Continuous Integration & Deployment
 
-GitHub Actions on push/PR: Backend linting (Ruff), Frontend linting (ESLint), Backend tests (Django), Frontend tests (Jest), Docker build validation.
+### CI Pipeline (.github/workflows/ci.yml)
+
+**Triggers:** Push to `main`/`develop`, Pull Requests
+**Jobs:** 5 parallel validation jobs
+
+1. **Backend Linting** (Ruff): Code style and formatting validation
+2. **Frontend Linting** (ESLint + TypeScript): JavaScript/TypeScript validation
+3. **Backend Tests** (Django): Unit and integration tests
+4. **Frontend Tests** (Jest): Component and integration tests
+5. **Docker Build**: Multi-stage build validation with caching
+
+**Features:**
+- Conditional execution (only run if relevant files changed)
+- Build caching for faster runs
+- Parallel job execution
+- Concurrency control (cancel in-progress runs on new commits)
+
+### CD Pipeline (.github/workflows/deploy.yml)
+
+**Triggers:** CI workflow completion on `main` branch
+**Deployment Strategy:** Staging → Manual Production Approval
+
+**Pipeline Stages:**
+1. **CI Gate**: Verify CI workflow passed before deploying
+2. **Build Production**: Multi-arch Docker images with tagging
+3. **Deploy to Staging**: Automated deployment with smoke tests
+4. **Deploy to Production**: Manual approval required via GitHub Environments
+5. **Rollback**: Automatic rollback on deployment failure
+
+**Production-Ready Features:**
+- Blue-green deployment support
+- Health check verification
+- Automatic rollback on failure
+- Deployment notifications (Slack/Email ready)
+- Environment protection rules
+
+### Local CI Verification
+
+Before pushing code, run the full CI suite locally:
+
+```bash
+./scripts/check-ci.sh  # Runs all CI checks locally
+```
+
+This script validates:
+- ✓ Backend linting (Ruff)
+- ✓ Backend formatting (Ruff)
+- ✓ Backend tests (Django)
+- ✓ Frontend linting (ESLint)
+- ✓ Frontend type checking (TypeScript)
+- ✓ Frontend tests (Jest)
+- ✓ Docker configuration (docker-compose)
 
 ## 8. Development Commands
 
@@ -177,51 +275,165 @@ make logs/shell      # View logs/Django shell
 
 ## 9. Deployment
 
-**Development:** Docker Compose (configured)  
-**Production:** Requires PostgreSQL migration, Gunicorn setup, CORS configuration
+### Automated Deployment Pipeline
 
-Deployment options: Vercel (frontend) + Render/Railway (backend) or self-hosted VPS with Docker Compose.
+The project includes a production-ready CD pipeline (`.github/workflows/deploy.yml`):
+
+**Deployment Flow:**
+
+```text
+CI Pass → Build Images → Deploy Staging → Smoke Tests → Manual Approval → Production
+```
+
+**GitHub Environments Setup:**
+
+1. Create `staging` and `production` environments in repository settings
+2. Configure production environment with required reviewers
+3. Add deployment secrets (container registry, cloud provider credentials)
+
+### Deployment Options
+
+#### Option 1: Docker-based (Recommended)
+
+- Build multi-arch images via GitHub Actions
+- Deploy to any Docker-compatible platform (AWS ECS, GCP Cloud Run, Azure Container Instances)
+- Environment variables via secrets management
+
+#### Option 2: Platform-as-a-Service
+
+- **Frontend**: Vercel (automatic Next.js optimization)
+- **Backend**: Render/Railway (automatic Django deployment)
+- **Database**: Managed PostgreSQL (AWS RDS, Supabase)
+
+#### Option 3: Self-hosted VPS
+
+- Docker Compose on Ubuntu/Debian server
+- Nginx reverse proxy with SSL (Let's Encrypt)
+- Systemd service for automatic restarts
+
+### Production Checklist
+
+#### Backend
+
+- [ ] Migrate from SQLite to PostgreSQL
+- [ ] Configure Gunicorn/uWSGI WSGI server
+- [ ] Set `DEBUG=False` and configure `ALLOWED_HOSTS`
+- [ ] Configure CORS for production frontend domain
+- [ ] Set up static file serving (WhiteNoise or CDN)
+- [ ] Configure logging and error monitoring (Sentry)
+- [ ] Enable HTTPS and security headers
+
+#### Frontend
+
+- [ ] Set production API endpoint (`NEXT_PUBLIC_API_URL`)
+- [ ] Configure environment variables via platform
+- [ ] Enable production optimizations (build cache, image optimization)
+- [ ] Set up CDN for static assets
+- [ ] Configure monitoring (Vercel Analytics, Google Analytics)
+
+#### Infrastructure
+
+- [ ] Database backups (daily snapshots)
+- [ ] SSL certificates (automatic renewal)
+- [ ] Health check endpoints (`/health`, `/ready`)
+- [ ] Application monitoring (uptime, performance)
+- [ ] CI/CD secrets (container registry, deployment keys)
 
 ## 10. Architecture
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#e2e8f0', 'lineColor': '#64748b', 'secondaryColor': '#f8fafc', 'tertiaryColor': '#f1f5f9'}}}%%
-graph LR
-    subgraph Clients[" "]
-        Browser["🌐 <b>Browser</b>"]
-        Claude["🤖 <b>Claude Desktop</b>"]
+graph TB
+    subgraph Presentation["🎨 Presentation Layer"]
+        Browser["🌐 <b>Web Browser</b><br/><i>HTTP Client</i>"]
+        Claude["🤖 <b>Claude Desktop</b><br/><i>MCP Client</i>"]
     end
 
-    subgraph Docker["🐳 Docker Compose"]
-        subgraph FE["Frontend"]
-            Next["<b>Next.js 15</b><br/>Apollo · MUI · dnd-kit"]
+    subgraph Application["⚙️ Application Layer (Docker)"]
+        subgraph Frontend["Frontend Container"]
+            NextApp["<b>Next.js 15 App</b><br/>App Router · SSR"]
+            Apollo["<b>Apollo Client</b><br/>GraphQL Cache · State"]
+            UI["<b>UI Components</b><br/>Material UI v7 · dnd-kit"]
         end
 
-        subgraph BE["Backend"]
-            GraphQL["<b>GraphQL API</b><br/>Graphene-Django"]
-            MCP["<b>MCP Server</b><br/>FastMCP"]
-            ORM["<b>Django ORM</b><br/>Task Model"]
-            DB[("<b>SQLite</b>")]
+        subgraph Backend["Backend Container"]
+            subgraph APIs["API Interfaces"]
+                GraphQL["<b>GraphQL Endpoint</b><br/><i>/graphql</i><br/>Graphene-Django"]
+                MCPServer["<b>MCP Server</b><br/><i>stdio/HTTP+SSE</i><br/>FastMCP"]
+            end
+
+            subgraph Schema["Schema Layer"]
+                RootSchema["<b>Root Schema</b><br/><i>config/schema.py</i><br/>Query + Mutation"]
+                KanbanSchema["<b>Kanban Schema</b><br/><i>apps/kanban/schema/</i><br/>types · queries · mutations"]
+            end
         end
     end
 
-    Browser --> Next
-    Next -->|"<i>GraphQL</i>"| GraphQL
-    Claude -->|"<i>stdio / HTTP</i>"| MCP
-    GraphQL --> ORM
-    MCP --> ORM
-    ORM --> DB
+    subgraph Domain["🧩 Domain Layer"]
+        subgraph Apps["Django Apps (Modular Monolith)"]
+            CoreApp["<b>Core App</b><br/>TimeStampedModel<br/>Shared abstractions"]
+            KanbanApp["<b>Kanban App</b><br/>Task Model<br/>Business logic"]
+        end
+    end
 
-    style Browser fill:#ede9fe,stroke:#8b5cf6,color:#5b21b6
-    style Claude fill:#ede9fe,stroke:#8b5cf6,color:#5b21b6
-    style Next fill:#fef3c7,stroke:#f59e0b,color:#92400e
-    style GraphQL fill:#d1fae5,stroke:#10b981,color:#065f46
-    style MCP fill:#d1fae5,stroke:#10b981,color:#065f46
-    style ORM fill:#d1fae5,stroke:#10b981,color:#065f46
-    style DB fill:#dbeafe,stroke:#3b82f6,color:#1e40af
+    subgraph Infrastructure["🗄️ Infrastructure Layer"]
+        ORM["<b>Django ORM</b><br/>QuerySet API · Migrations"]
+        DB[("<b>SQLite</b><br/>db.sqlite3")]
+    end
+
+    %% Client to Frontend
+    Browser -->|"HTTP/HTTPS<br/>React hydration"| NextApp
+    NextApp --> Apollo
+    Apollo --> UI
+
+    %% Frontend to Backend
+    Apollo -->|"GraphQL queries<br/>mutations over HTTP"| GraphQL
+
+    %% Claude to Backend
+    Claude -->|"MCP protocol<br/>stdio/HTTP+SSE"| MCPServer
+
+    %% Schema Composition
+    GraphQL --> RootSchema
+    RootSchema -.->|"inherits from"| KanbanSchema
+    MCPServer -.->|"direct import"| KanbanApp
+
+    %% Backend to Domain
+    KanbanSchema --> KanbanApp
+    KanbanApp -.->|"extends"| CoreApp
+
+    %% Domain to Infrastructure
+    KanbanApp --> ORM
+    CoreApp --> ORM
+    ORM -->|"SQL queries"| DB
+
+    %% Styling
+    style Browser fill:#ede9fe,stroke:#8b5cf6,color:#5b21b6,stroke-width:2px
+    style Claude fill:#ede9fe,stroke:#8b5cf6,color:#5b21b6,stroke-width:2px
+    style NextApp fill:#fef3c7,stroke:#f59e0b,color:#92400e,stroke-width:2px
+    style Apollo fill:#fef3c7,stroke:#f59e0b,color:#92400e
+    style UI fill:#fef3c7,stroke:#f59e0b,color:#92400e
+    style GraphQL fill:#d1fae5,stroke:#10b981,color:#065f46,stroke-width:2px
+    style MCPServer fill:#d1fae5,stroke:#10b981,color:#065f46,stroke-width:2px
+    style RootSchema fill:#d1fae5,stroke:#10b981,color:#065f46
+    style KanbanSchema fill:#d1fae5,stroke:#10b981,color:#065f46
+    style CoreApp fill:#fecaca,stroke:#ef4444,color:#991b1b
+    style KanbanApp fill:#fecaca,stroke:#ef4444,color:#991b1b,stroke-width:2px
+    style ORM fill:#dbeafe,stroke:#3b82f6,color:#1e40af,stroke-width:2px
+    style DB fill:#dbeafe,stroke:#3b82f6,color:#1e40af,stroke-width:2px
+
+    %% Container styling
+    style Presentation fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
+    style Application fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
+    style Frontend fill:#fffbeb,stroke:#fbbf24,stroke-width:1px,stroke-dasharray: 5 5
+    style Backend fill:#ecfdf5,stroke:#34d399,stroke-width:1px,stroke-dasharray: 5 5
+    style APIs fill:#f0fdf4,stroke:#22c55e,stroke-width:1px
+    style Schema fill:#f0fdf4,stroke:#22c55e,stroke-width:1px
+    style Domain fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
+    style Apps fill:#fef2f2,stroke:#f87171,stroke-width:1px,stroke-dasharray: 5 5
+    style Infrastructure fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
 ```
 
-**Two interfaces, one backend:** Browser via GraphQL, Claude via MCP — both operate on the same Task model.
+**Layered architecture:** Presentation (clients) → Application (APIs) → Domain (business logic) → Infrastructure (data). Two interfaces to one backend: Browser via GraphQL with schema composition, Claude via MCP with direct model access.
 
 ## 11. MCP Server Integration
 
