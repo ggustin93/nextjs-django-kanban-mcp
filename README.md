@@ -231,12 +231,15 @@ frontend/src/
 
 | Command | Description |
 |---------|-------------|
+| `make setup` | First-time project setup |
 | `make up` / `make down` | Start/stop Docker services |
 | `make test` | Run all tests (unit + integration + E2E) |
 | `make lint` | Auto-fix linting issues |
 | `make logs` / `make shell` | View logs / Django shell |
 
 **GraphQL Playground**: http://localhost:8000/graphql — Query, create, update, delete tasks.
+
+> **Windows**: Use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) or `choco install make`
 
 ## 7. Testing
 
@@ -298,11 +301,6 @@ graph LR
 
 **Quality Validations:** Backend/Frontend linting, unit tests, E2E tests (Playwright), TypeScript checks, Docker builds
 **Deployment:** Staging auto-deploy → Manual production approval with health checks
-
-**Run CI checks locally:**
-```bash
-./scripts/check-ci.sh  # Validates all quality gates before pushing
-```
 
 ## 10. Deployment
 

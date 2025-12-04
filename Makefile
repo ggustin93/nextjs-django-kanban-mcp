@@ -1,24 +1,33 @@
 # Makefile for Next.js + Django Kanban Board
 # Provides convenient shortcuts for common Docker and development commands
 
-.PHONY: help up down rebuild test migrate clean logs shell lint precommit check
+.PHONY: help setup up down rebuild test migrate clean logs shell lint precommit check
 
 # Default target
 help:
 	@echo "Kanban Board - Development Commands"
 	@echo ""
+	@echo "  make setup      First-time project setup"
 	@echo "  make up         Start services"
 	@echo "  make down       Stop services"
-	@echo "  make rebuild    Rebuild containers"
 	@echo "  make test       Run all tests"
-	@echo "  make lint       Auto-fix linting"
-	@echo "  make precommit  Run pre-commit checks"
 	@echo "  make check      Full CI validation"
 	@echo ""
+	@echo "  make lint       Auto-fix linting"
+	@echo "  make precommit  Run pre-commit hooks"
 	@echo "  make migrate    Run migrations"
 	@echo "  make logs       View logs"
 	@echo "  make shell      Django shell"
 	@echo "  make clean      Remove all containers"
+
+# First-time setup
+setup:
+	@echo "Setting up development environment..."
+	@if [ ! -f .env ]; then cp .env.example .env && echo "Created .env from template"; fi
+	docker-compose build
+	docker-compose run --rm backend python manage.py migrate
+	pip install pre-commit && pre-commit install
+	@echo "✅ Setup complete! Run 'make up' to start."
 
 # Essential commands
 up:
