@@ -12,6 +12,7 @@ Focus Areas:
     - Mutation operations (create, update, delete)
     - Enum validation at GraphQL layer (addresses recent bug)
 """
+
 from django.test import TestCase
 
 import graphene
@@ -32,10 +33,10 @@ class GraphQLSchemaTests(TestCase):
 
         # Create test tasks
         self.task1 = Task.objects.create(
-            title='Test Task 1', description='First test task', status=Task.Status.TODO
+            title="Test Task 1", description="First test task", status=Task.Status.TODO
         )
-        self.task2 = Task.objects.create(title='Test Task 2', status=Task.Status.DOING)
-        self.task3 = Task.objects.create(title='Test Task 3', status=Task.Status.DONE)
+        self.task2 = Task.objects.create(title="Test Task 2", status=Task.Status.DOING)
+        self.task3 = Task.objects.create(title="Test Task 3", status=Task.Status.DONE)
 
     def test_all_tasks_query(self):
         """Test allTasks query returns all tasks."""
@@ -50,16 +51,16 @@ class GraphQLSchemaTests(TestCase):
             }
         """
         result = self.client.execute(query)
-        self.assertIsNone(result.get('errors'))
+        self.assertIsNone(result.get("errors"))
 
-        tasks = result['data']['allTasks']
+        tasks = result["data"]["allTasks"]
         self.assertEqual(len(tasks), 3)
 
         # Verify task data
-        titles = [task['title'] for task in tasks]
-        self.assertIn('Test Task 1', titles)
-        self.assertIn('Test Task 2', titles)
-        self.assertIn('Test Task 3', titles)
+        titles = [task["title"] for task in tasks]
+        self.assertIn("Test Task 1", titles)
+        self.assertIn("Test Task 2", titles)
+        self.assertIn("Test Task 3", titles)
 
     def test_create_task_mutation_with_default_status(self):
         """Test createTask mutation uses default TODO status."""
@@ -75,14 +76,14 @@ class GraphQLSchemaTests(TestCase):
             }
         """
         result = self.client.execute(mutation)
-        self.assertIsNone(result.get('errors'))
+        self.assertIsNone(result.get("errors"))
 
-        task_data = result['data']['createTask']['task']
-        self.assertEqual(task_data['title'], 'New Task')
-        self.assertEqual(task_data['status'], 'TODO')
+        task_data = result["data"]["createTask"]["task"]
+        self.assertEqual(task_data["title"], "New Task")
+        self.assertEqual(task_data["status"], "TODO")
 
         # Verify task was created in DB
-        task = Task.objects.get(title='New Task')
+        task = Task.objects.get(title="New Task")
         self.assertEqual(task.status, Task.Status.TODO)
 
     def test_create_task_mutation_with_valid_statuses(self):
@@ -91,9 +92,9 @@ class GraphQLSchemaTests(TestCase):
         # GraphQL enum serialization can be tricky, but model validation is critical
 
         # Create tasks directly to verify model accepts valid statuses
-        for status in ['TODO', 'DOING', 'DONE']:
+        for status in ["TODO", "DOING", "DONE"]:
             with self.subTest(status=status):
-                task = Task.objects.create(title=f'Task {status}', status=status)
+                task = Task.objects.create(title=f"Task {status}", status=status)
                 self.assertEqual(task.status, status)
                 self.assertIn(task.status, [s.value for s in Task.Status])
                 task.delete()
@@ -116,26 +117,26 @@ class GraphQLSchemaTests(TestCase):
 
         # GraphQL should either return an error or create with default status
         # depending on validation implementation
-        if result.get('errors'):
+        if result.get("errors"):
             # If validation is enforced, should have errors
-            self.assertIsNotNone(result['errors'])
+            self.assertIsNotNone(result["errors"])
         else:
             # If no validation, check the status is invalid
-            task_data = result['data']['createTask']['task']
+            task_data = result["data"]["createTask"]["task"]
             # This should NOT be a valid enum value
-            self.assertNotIn(task_data['status'], ['TODO', 'DOING', 'DONE'])
+            self.assertNotIn(task_data["status"], ["TODO", "DOING", "DONE"])
 
     def test_update_task_mutation(self):
         """Test updateTask mutation updates task fields at model level."""
         # Test model-level updates (most important for data integrity)
-        self.task1.title = 'Updated Title'
-        self.task1.description = 'Updated description'
+        self.task1.title = "Updated Title"
+        self.task1.description = "Updated description"
         self.task1.status = Task.Status.DOING
         self.task1.save()
 
         self.task1.refresh_from_db()
-        self.assertEqual(self.task1.title, 'Updated Title')
-        self.assertEqual(self.task1.description, 'Updated description')
+        self.assertEqual(self.task1.title, "Updated Title")
+        self.assertEqual(self.task1.description, "Updated description")
         self.assertEqual(self.task1.status, Task.Status.DOING)
 
     def test_update_task_status_only(self):
@@ -167,10 +168,10 @@ class GraphQLSchemaTests(TestCase):
             }}
         """
         result = self.client.execute(mutation)
-        self.assertIsNone(result.get('errors'))
+        self.assertIsNone(result.get("errors"))
 
         self.task1.refresh_from_db()
-        self.assertEqual(self.task1.title, 'Only Title Changed')
+        self.assertEqual(self.task1.title, "Only Title Changed")
         self.assertEqual(self.task1.description, original_description)
         self.assertEqual(self.task1.status, original_status)
 
@@ -186,8 +187,8 @@ class GraphQLSchemaTests(TestCase):
             }}
         """
         result = self.client.execute(mutation)
-        self.assertIsNone(result.get('errors'))
-        self.assertTrue(result['data']['deleteTask']['success'])
+        self.assertIsNone(result.get("errors"))
+        self.assertTrue(result["data"]["deleteTask"]["success"])
 
         # Verify task no longer exists
         self.assertFalse(Task.objects.filter(id=task_id).exists())
@@ -202,12 +203,12 @@ class GraphQLSchemaTests(TestCase):
             }
         """
         result = self.client.execute(query)
-        self.assertIsNone(result.get('errors'))
+        self.assertIsNone(result.get("errors"))
 
-        statuses = [task['status'] for task in result['data']['allTasks']]
-        self.assertEqual(statuses.count('TODO'), 1)
-        self.assertEqual(statuses.count('DOING'), 1)
-        self.assertEqual(statuses.count('DONE'), 1)
+        statuses = [task["status"] for task in result["data"]["allTasks"]]
+        self.assertEqual(statuses.count("TODO"), 1)
+        self.assertEqual(statuses.count("DOING"), 1)
+        self.assertEqual(statuses.count("DONE"), 1)
 
     def test_task_fields_returned_correctly(self):
         """Test all task fields are returned with correct types."""
@@ -224,12 +225,12 @@ class GraphQLSchemaTests(TestCase):
             }
         """
         result = self.client.execute(query)
-        self.assertIsNone(result.get('errors'))
+        self.assertIsNone(result.get("errors"))
 
-        task = result['data']['allTasks'][0]
-        self.assertIsNotNone(task['id'])
-        self.assertIsInstance(task['title'], str)
-        self.assertIsInstance(task['description'], str)
-        self.assertIn(task['status'], ['TODO', 'DOING', 'DONE'])
-        self.assertIsNotNone(task['createdAt'])
-        self.assertIsNotNone(task['updatedAt'])
+        task = result["data"]["allTasks"][0]
+        self.assertIsNotNone(task["id"])
+        self.assertIsInstance(task["title"], str)
+        self.assertIsInstance(task["description"], str)
+        self.assertIn(task["status"], ["TODO", "DOING", "DONE"])
+        self.assertIsNotNone(task["createdAt"])
+        self.assertIsNotNone(task["updatedAt"])

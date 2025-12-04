@@ -22,6 +22,7 @@ TaskPriorityEnum:
 Usage:
     Used in queries and mutations as return types and field definitions.
 """
+
 import graphene
 from graphene_django import DjangoObjectType
 
@@ -31,22 +32,22 @@ from apps.kanban.models import Task
 class TaskStatusEnum(graphene.Enum):
     """GraphQL enum for Task.Status choices with validation."""
 
-    TODO = 'TODO'
-    DOING = 'DOING'
-    WAITING = 'WAITING'
-    DONE = 'DONE'
+    TODO = "TODO"
+    DOING = "DOING"
+    WAITING = "WAITING"
+    DONE = "DONE"
 
 
 class TaskPriorityEnum(graphene.Enum):
     """GraphQL enum for Task.Priority choices."""
 
-    P1 = 'P1'
-    P2 = 'P2'
-    P3 = 'P3'
-    P4 = 'P4'
+    P1 = "P1"
+    P2 = "P2"
+    P3 = "P3"
+    P4 = "P4"
 
 
 class TaskType(DjangoObjectType):
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = "__all__"

@@ -61,7 +61,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // Verify DOING and DONE columns show empty state
-      const dropMessages = screen.getAllByText('Drop tasks here');
+      const dropMessages = screen.getAllByText('Drop here');
       expect(dropMessages).toHaveLength(2); // DOING and DONE are empty
     });
 
@@ -102,7 +102,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // TODO and DONE should be empty
-      const dropMessages = screen.getAllByText('Drop tasks here');
+      const dropMessages = screen.getAllByText('Drop here');
       expect(dropMessages).toHaveLength(2);
     });
   });
@@ -173,7 +173,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // Verify empty columns are present
-      expect(screen.getAllByText('Drop tasks here')).toHaveLength(2);
+      expect(screen.getAllByText('Drop here')).toHaveLength(2);
 
       // Note: Full drag simulation with @dnd-kit requires more complex setup
       // This test verifies the GraphQL mutation is correctly configured
@@ -422,7 +422,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // All three columns should show empty state
-      const dropMessages = screen.getAllByText('Drop tasks here');
+      const dropMessages = screen.getAllByText('Drop here');
       expect(dropMessages).toHaveLength(3);
     });
 
@@ -482,7 +482,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       });
 
       // Before drag: DOING and DONE are empty
-      let dropMessages = screen.getAllByText('Drop tasks here');
+      const dropMessages = screen.getAllByText('Drop here');
       expect(dropMessages.length).toBeGreaterThanOrEqual(2);
     });
   });
@@ -521,7 +521,7 @@ describe('Drag-and-Drop Empty Column Integration', () => {
       expect(doneColumn).toBeInTheDocument();
 
       // Both should have drop zones
-      expect(screen.getAllByText('Drop tasks here')).toHaveLength(2);
+      expect(screen.getAllByText('Drop here')).toHaveLength(2);
     });
   });
 });

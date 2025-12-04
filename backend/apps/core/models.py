@@ -5,6 +5,7 @@ Core Models
 Abstract base models providing common functionality across all apps.
 Follows OpenHEXA pattern for shared model patterns.
 """
+
 from django.db import models
 
 
@@ -27,4 +28,4 @@ class TimeStampedModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-created_at']
+        ordering = ["-created_at"]

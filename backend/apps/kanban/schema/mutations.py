@@ -27,6 +27,7 @@ Note:
     Status uses TaskStatusEnum, Priority uses TaskPriorityEnum for validation.
     Category auto-adds '#' prefix if missing.
 """
+
 import graphene
 
 from apps.kanban.models import Task
@@ -49,9 +50,9 @@ class CreateTask(graphene.Mutation):
         priority_value = priority.value if priority else Task.Priority.P4
 
         # Auto-add # prefix to category if missing
-        category_value = ''
+        category_value = ""
         if category:
-            category_value = category if category.startswith('#') else f'#{category}'
+            category_value = category if category.startswith("#") else f"#{category}"
 
         task = Task.objects.create(
             title=title,
@@ -83,12 +84,12 @@ class UpdateTask(graphene.Mutation):
         if description is not None:
             task.description = description
         if status is not None:
-            task.status = status.value if hasattr(status, 'value') else status
+            task.status = status.value if hasattr(status, "value") else status
         if category is not None:
             # Auto-add # prefix if missing, allow empty string to clear
-            task.category = category if not category or category.startswith('#') else f'#{category}'
+            task.category = category if not category or category.startswith("#") else f"#{category}"
         if priority is not None:
-            task.priority = priority.value if hasattr(priority, 'value') else priority
+            task.priority = priority.value if hasattr(priority, "value") else priority
 
         task.save()
         return UpdateTask(task=task)

@@ -54,7 +54,7 @@ django = ["django"]
 
 [tool.ruff.format]
 # Formatting options
-quote-style = "single"
+quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"

@@ -26,6 +26,7 @@ Security:
 
 Last Updated: 2025-12-01
 """
+
 import apps.kanban.schema
 import graphene
 

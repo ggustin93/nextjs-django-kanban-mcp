@@ -12,7 +12,7 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext } from '@dnd-kit/core';
 import { KanbanColumn } from '@/components/kanban/KanbanColumn';
 import { Column, Task, TaskStatus, TaskPriority } from '@/components/kanban/types';
 
@@ -72,11 +72,11 @@ describe('KanbanColumn Component', () => {
         </DndContext>
       );
 
-      expect(screen.getByText('Drop tasks here')).toBeInTheDocument();
+      expect(screen.getByText('Drop here')).toBeInTheDocument();
     });
 
     it('applies correct droppable ID from column status', () => {
-      const { container } = render(
+      render(
         <DndContext onDragEnd={() => {}}>
           <KanbanColumn
             column={todoColumn}
@@ -88,9 +88,8 @@ describe('KanbanColumn Component', () => {
       );
 
       // Verify the droppable area exists
-      const dropZone = container.querySelector('[data-droppable]');
       // Note: @dnd-kit adds internal data attributes, this verifies component renders
-      expect(screen.getByText('Drop tasks here')).toBeInTheDocument();
+      expect(screen.getByText('Drop here')).toBeInTheDocument();
     });
 
     it('maintains minimum height for empty columns', () => {
@@ -123,7 +122,7 @@ describe('KanbanColumn Component', () => {
       );
 
       expect(screen.getByText('To Do')).toBeInTheDocument();
-      expect(screen.getByText('Drop tasks here')).toBeInTheDocument();
+      expect(screen.getByText('Drop here')).toBeInTheDocument();
 
       rerender(
         <DndContext onDragEnd={() => {}}>
@@ -137,7 +136,7 @@ describe('KanbanColumn Component', () => {
       );
 
       expect(screen.getByText('Doing')).toBeInTheDocument();
-      expect(screen.getByText('Drop tasks here')).toBeInTheDocument();
+      expect(screen.getByText('Drop here')).toBeInTheDocument();
     });
   });
 
@@ -155,7 +154,7 @@ describe('KanbanColumn Component', () => {
       );
 
       expect(screen.getByText('Test Task')).toBeInTheDocument();
-      expect(screen.queryByText('Drop tasks here')).not.toBeInTheDocument();
+      expect(screen.queryByText('Drop here')).not.toBeInTheDocument();
     });
 
     it('shows correct task count in header', () => {
@@ -229,11 +228,11 @@ describe('KanbanColumn Component', () => {
 
       // Verify empty column renders and is ready for drops
       expect(screen.getByText('Doing')).toBeInTheDocument();
-      expect(screen.getByText('Drop tasks here')).toBeInTheDocument();
+      expect(screen.getByText('Drop here')).toBeInTheDocument();
     });
 
     it('provides droppable area with correct status ID', () => {
-      const { container } = render(
+      render(
         <DndContext onDragEnd={() => {}}>
           <KanbanColumn
             column={doneColumn}
@@ -268,7 +267,7 @@ describe('KanbanColumn Component', () => {
     });
 
     it('applies different colors for different columns', () => {
-      const { rerender, container } = render(
+      const { rerender } = render(
         <DndContext onDragEnd={() => {}}>
           <KanbanColumn
             column={todoColumn}
@@ -324,7 +323,7 @@ describe('KanbanColumn Component', () => {
       );
 
       expect(screen.queryByText('Test Task')).not.toBeInTheDocument();
-      expect(screen.getByText('Drop tasks here')).toBeInTheDocument();
+      expect(screen.getByText('Drop here')).toBeInTheDocument();
     });
 
     it('handles rapid task additions and removals', () => {

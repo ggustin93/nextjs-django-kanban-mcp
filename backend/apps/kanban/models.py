@@ -21,6 +21,7 @@ Priority Choices (Eisenhower-inspired, solo-friendly):
     - P3: Quick Win (small tasks to knock out)
     - P4: Backlog (do later)
 """
+
 from django.db import models
 
 from apps.core.models import TimeStampedModel
@@ -28,16 +29,16 @@ from apps.core.models import TimeStampedModel
 
 class Task(TimeStampedModel):
     class Status(models.TextChoices):
-        TODO = 'TODO', 'To Do'
-        DOING = 'DOING', 'In Progress'
-        WAITING = 'WAITING', 'Waiting'
-        DONE = 'DONE', 'Done'
+        TODO = "TODO", "To Do"
+        DOING = "DOING", "In Progress"
+        WAITING = "WAITING", "Waiting"
+        DONE = "DONE", "Done"
 
     class Priority(models.TextChoices):
-        P1 = 'P1', 'P1 - Do First'
-        P2 = 'P2', 'P2 - Schedule'
-        P3 = 'P3', 'P3 - Quick Win'
-        P4 = 'P4', 'P4 - Backlog'
+        P1 = "P1", "P1 - Do First"
+        P2 = "P2", "P2 - Schedule"
+        P3 = "P3", "P3 - Quick Win"
+        P4 = "P4", "P4 - Backlog"
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -48,7 +49,7 @@ class Task(TimeStampedModel):
     )
 
     class Meta:
-        ordering = ['priority', '-created_at']
+        ordering = ["priority", "-created_at"]
 
     def __str__(self):
         return self.title

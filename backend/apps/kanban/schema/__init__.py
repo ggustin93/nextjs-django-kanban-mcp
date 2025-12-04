@@ -14,7 +14,8 @@ Structure:
 Usage:
     Imported by root schema in config/schema.py to compose the complete API.
 """
+
 from .mutations import Mutation
 from .queries import Query
 
-__all__ = ['Query', 'Mutation']
+__all__ = ["Query", "Mutation"]

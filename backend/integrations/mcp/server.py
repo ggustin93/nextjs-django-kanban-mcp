@@ -36,11 +36,12 @@ Environment Variables:
     PORT: HTTP server port (default: 8000)
     HOST: HTTP server host (default: 0.0.0.0)
 """
+
 import os
 import sys
 
 # Setup Django before importing models
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 import django  # noqa: E402
 
@@ -52,8 +53,8 @@ from fastmcp import FastMCP  # noqa: E402
 
 # --- Constants for validation ---
 
-VALID_STATUSES = ['TODO', 'DOING', 'WAITING', 'DONE']
-VALID_PRIORITIES = ['P1', 'P2', 'P3', 'P4']
+VALID_STATUSES = ["TODO", "DOING", "WAITING", "DONE"]
+VALID_PRIORITIES = ["P1", "P2", "P3", "P4"]
 
 # --- Django ORM Async Wrappers ---
 
@@ -91,10 +92,10 @@ def get_all_tasks(
 @sync_to_async
 def create_task_sync(
     title: str,
-    description: str = '',
-    status: str = 'TODO',
-    priority: str = 'P4',
-    category: str = '',
+    description: str = "",
+    status: str = "TODO",
+    priority: str = "P4",
+    category: str = "",
 ) -> Task:
     """
     Create a new task with all fields.
@@ -172,20 +173,20 @@ def task_to_dict(task: Task) -> dict:
         Dictionary with all task fields including priority and category
     """
     return {
-        'id': task.id,
-        'title': task.title,
-        'description': task.description,
-        'status': task.status,
-        'priority': task.priority,
-        'category': task.category,
-        'created_at': task.created_at.isoformat(),
-        'updated_at': task.updated_at.isoformat(),
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "status": task.status,
+        "priority": task.priority,
+        "category": task.category,
+        "created_at": task.created_at.isoformat(),
+        "updated_at": task.updated_at.isoformat(),
     }
 
 
 # --- FastMCP Server Setup ---
 
-mcp = FastMCP('Kanban MCP Server')
+mcp = FastMCP("Kanban MCP Server")
 
 
 @mcp.tool()
@@ -219,14 +220,14 @@ async def list_tasks(
         # Validate status if provided
         if status and status not in VALID_STATUSES:
             return json.dumps(
-                {'error': f'Invalid status: {status}. Must be one of: {", ".join(VALID_STATUSES)}'}
+                {"error": f"Invalid status: {status}. Must be one of: {', '.join(VALID_STATUSES)}"}
             )
 
         # Validate priority if provided
         if priority and priority not in VALID_PRIORITIES:
             return json.dumps(
                 {
-                    'error': f'Invalid priority: {priority}. Must be one of: {", ".join(VALID_PRIORITIES)}'
+                    "error": f"Invalid priority: {priority}. Must be one of: {', '.join(VALID_PRIORITIES)}"
                 }
             )
 
@@ -234,16 +235,16 @@ async def list_tasks(
         result = [task_to_dict(t) for t in tasks]
         return json.dumps(result, indent=2)
     except Exception as e:
-        return json.dumps({'error': str(e)})
+        return json.dumps({"error": str(e)})
 
 
 @mcp.tool()
 async def create_task(
     title: str,
-    description: str = '',
-    status: str = 'TODO',
-    priority: str = 'P4',
-    category: str = '',
+    description: str = "",
+    status: str = "TODO",
+    priority: str = "P4",
+    category: str = "",
 ) -> str:
     """
     Create a new kanban task.
@@ -274,14 +275,14 @@ async def create_task(
         # Validate status
         if status not in VALID_STATUSES:
             return json.dumps(
-                {'error': f'Invalid status: {status}. Must be one of: {", ".join(VALID_STATUSES)}'}
+                {"error": f"Invalid status: {status}. Must be one of: {', '.join(VALID_STATUSES)}"}
             )
 
         # Validate priority
         if priority not in VALID_PRIORITIES:
             return json.dumps(
                 {
-                    'error': f'Invalid priority: {priority}. Must be one of: {", ".join(VALID_PRIORITIES)}'
+                    "error": f"Invalid priority: {priority}. Must be one of: {', '.join(VALID_PRIORITIES)}"
                 }
             )
 
@@ -292,9 +293,9 @@ async def create_task(
             priority=priority,
             category=category,
         )
-        return json.dumps({'success': True, 'task': task_to_dict(task)}, indent=2)
+        return json.dumps({"success": True, "task": task_to_dict(task)}, indent=2)
     except Exception as e:
-        return json.dumps({'error': str(e)})
+        return json.dumps({"error": str(e)})
 
 
 @mcp.tool()
@@ -332,14 +333,14 @@ async def update_task(
         # Validate status if provided
         if status and status not in VALID_STATUSES:
             return json.dumps(
-                {'error': f'Invalid status: {status}. Must be one of: {", ".join(VALID_STATUSES)}'}
+                {"error": f"Invalid status: {status}. Must be one of: {', '.join(VALID_STATUSES)}"}
             )
 
         # Validate priority if provided
         if priority and priority not in VALID_PRIORITIES:
             return json.dumps(
                 {
-                    'error': f'Invalid priority: {priority}. Must be one of: {", ".join(VALID_PRIORITIES)}'
+                    "error": f"Invalid priority: {priority}. Must be one of: {', '.join(VALID_PRIORITIES)}"
                 }
             )
 
@@ -359,11 +360,11 @@ async def update_task(
 
         await save_task(task)
 
-        return json.dumps({'success': True, 'task': task_to_dict(task)}, indent=2)
+        return json.dumps({"success": True, "task": task_to_dict(task)}, indent=2)
     except Task.DoesNotExist:
-        return json.dumps({'error': f'Task with id {id} not found'})
+        return json.dumps({"error": f"Task with id {id} not found"})
     except Exception as e:
-        return json.dumps({'error': str(e)})
+        return json.dumps({"error": str(e)})
 
 
 @mcp.tool()
@@ -387,48 +388,48 @@ async def delete_task(id: int) -> str:
         task_data = task_to_dict(task)
         await delete_task_sync(task)
 
-        return json.dumps({'success': True, 'deleted': task_data}, indent=2)
+        return json.dumps({"success": True, "deleted": task_data}, indent=2)
     except Task.DoesNotExist:
-        return json.dumps({'error': f'Task with id {id} not found'})
+        return json.dumps({"error": f"Task with id {id} not found"})
     except Exception as e:
-        return json.dumps({'error': str(e)})
+        return json.dumps({"error": str(e)})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
 
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Kanban MCP Server')
+    parser = argparse.ArgumentParser(description="Kanban MCP Server")
     parser.add_argument(
-        '--http', action='store_true', help='Run with HTTP transport (default: stdio)'
+        "--http", action="store_true", help="Run with HTTP transport (default: stdio)"
     )
     parser.add_argument(
-        '--port',
+        "--port",
         type=int,
-        default=int(os.environ.get('PORT', 8000)),
-        help='HTTP server port (default: 8000)',
+        default=int(os.environ.get("PORT", 8000)),
+        help="HTTP server port (default: 8000)",
     )
     parser.add_argument(
-        '--host',
-        default=os.environ.get('HOST', '0.0.0.0'),
-        help='HTTP server host (default: 0.0.0.0)',
+        "--host",
+        default=os.environ.get("HOST", "0.0.0.0"),
+        help="HTTP server host (default: 0.0.0.0)",
     )
 
     args = parser.parse_args()
 
     if args.http:
         # Remote access via HTTP
-        print('🚀 Starting Kanban MCP Server (HTTP)')
-        print(f'📍 Endpoint: http://{args.host}:{args.port}/sse')
-        print(f'💚 Health check: http://{args.host}:{args.port}/health')
-        print('\n⚙️  Claude Desktop/Code config:')
+        print("🚀 Starting Kanban MCP Server (HTTP)")
+        print(f"📍 Endpoint: http://{args.host}:{args.port}/sse")
+        print(f"💚 Health check: http://{args.host}:{args.port}/health")
+        print("\n⚙️  Claude Desktop/Code config:")
         print(f'   {{"command": "http://{args.host}:{args.port}/sse"}}')
 
-        mcp.run(transport='sse', host=args.host, port=args.port)
+        mcp.run(transport="sse", host=args.host, port=args.port)
     else:
         # Local access via stdio (default)
-        print('🚀 Starting Kanban MCP Server (stdio)', file=sys.stderr)
-        print('📍 Transport: Standard Input/Output', file=sys.stderr)
-        print('✅ Ready for Claude Desktop/Code', file=sys.stderr)
+        print("🚀 Starting Kanban MCP Server (stdio)", file=sys.stderr)
+        print("📍 Transport: Standard Input/Output", file=sys.stderr)
+        print("✅ Ready for Claude Desktop/Code", file=sys.stderr)
 
-        mcp.run(transport='stdio')
+        mcp.run(transport="stdio")

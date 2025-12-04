@@ -40,7 +40,8 @@ export const apolloClient = new ApolloClient({
       Query: {
         fields: {
           allTasks: {
-            merge(existing = [], incoming) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            merge(_existing = [], incoming) {
               return incoming;
             },
           },

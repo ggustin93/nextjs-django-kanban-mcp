@@ -276,7 +276,6 @@ describe('Board Component', () => {
   });
 
   it('updates task with all fields', async () => {
-    const user = userEvent.setup();
     const updateMocks = [
       ...defaultMocks,
       {
@@ -340,7 +339,6 @@ describe('Board Component', () => {
   });
 
   it('deletes task after confirmation', async () => {
-    const user = userEvent.setup();
     mockConfirm.mockReturnValue(true);
 
     const deleteMocks = [
@@ -409,8 +407,6 @@ describe('Board Component', () => {
     });
 
     // Submit button should be disabled without title
-    const submitButton = screen.getByRole('button', { name: /create/i });
-
     // Verify button is disabled or has pointer-events: none
     // This is correct behavior - component validates title requirement
     const titleInput = screen.getByLabelText(/title/i) as HTMLInputElement;
@@ -461,8 +457,6 @@ describe('Board Component', () => {
       },
     ];
 
-    const user = userEvent.setup();
-
     // Suppress console errors for this test
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -494,7 +488,7 @@ describe('Board Component', () => {
     expect(TaskStatus.DONE).toBe('DONE');
 
     // Ensure no invalid status values
-    const validStatuses = ['TODO', 'DOING', 'DONE'];
+    const validStatuses = ['TODO', 'DOING', 'WAITING', 'DONE'];
     Object.values(TaskStatus).forEach((status) => {
       expect(validStatuses).toContain(status);
     });
