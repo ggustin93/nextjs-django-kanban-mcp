@@ -20,7 +20,7 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
   </tr>
   <tr>
     <td align="center"><a href="docs/screenshots/kanban.png"><img src="docs/screenshots/kanban.png" alt="Kanban Board" width="400"/></a><br/><sub><a href="docs/screenshots/kanban.png">🔍 View full size</a></sub></td>
-    <td align="center"><a href="docs/screenshots/eisenhower.png"><img src="docs/screenshots/eisenhower.png" alt="Eisenhower Matrix" width="400"/></a><br/><sub><a href="docs/screenshots/eisenhower.png">🔍 View full size</a></sub></td>
+    <td align="center"><a href="docs/screenshots/matrix.png"><img src="docs/screenshots/matrix.png" alt="Eisenhower Matrix" width="400"/></a><br/><sub><a href="docs/screenshots/matrix.png">🔍 View full size</a></sub></td>
   </tr>
   <tr>
     <td align="center" colspan="2"><strong>Claude Desktop (MCP Client)</strong></td>
@@ -32,18 +32,24 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 ## Table of Contents
 
-1. [Quick Start](#1-quick-start)
-2. [Features](#2-features)
-3. [Architecture](#3-architecture)
-4. [Tech Stack](#4-tech-stack)
-5. [Project Structure](#5-project-structure)
-6. [Development](#6-development)
-7. [Testing](#7-testing)
-8. [Pre-commit Hooks](#8-pre-commit-hooks)
-9. [Continuous Integration & Deployment](#9-continuous-integration--deployment)
-10. [Deployment](#10-deployment)
-11. [MCP Server Integration](#11-mcp-server-integration)
-12. [License](#12-license)
+- [Kanban MCP — Next.js · Django · GraphQL](#kanban-mcp--nextjs--django--graphql)
+  - [Screenshots](#screenshots)
+  - [Table of Contents](#table-of-contents)
+  - [1. Quick Start](#1-quick-start)
+  - [2. Features](#2-features)
+  - [3. Architecture](#3-architecture)
+  - [4. Tech Stack](#4-tech-stack)
+  - [5. Project Structure](#5-project-structure)
+    - [Backend (Django)](#backend-django)
+    - [Frontend (Next.js)](#frontend-nextjs)
+    - [Root](#root)
+  - [6. Development](#6-development)
+  - [7. Testing](#7-testing)
+  - [8. Pre-commit Hooks](#8-pre-commit-hooks)
+  - [9. Continuous Integration \& Deployment](#9-continuous-integration--deployment)
+  - [10. Deployment](#10-deployment)
+  - [11. MCP Server Integration](#11-mcp-server-integration)
+  - [12. License](#12-license)
 
 ## 1. Quick Start
 
