@@ -119,6 +119,16 @@ else
 fi
 echo ""
 
+# E2E tests (Playwright)
+echo -e "${BLUE}→${NC} Running E2E tests (Playwright)..."
+if npm run test:e2e; then
+    echo -e "${GREEN}✓${NC} E2E tests passed"
+else
+    echo -e "${RED}✗${NC} E2E tests failed"
+    FAILURES=$((FAILURES + 1))
+fi
+echo ""
+
 cd ..
 
 # ============================================================================

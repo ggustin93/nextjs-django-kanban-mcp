@@ -1,22 +1,24 @@
 # Makefile for Next.js + Django Kanban Board
 # Provides convenient shortcuts for common Docker and development commands
 
-.PHONY: help up down rebuild test migrate clean logs shell hooks-install lint
+.PHONY: help up down rebuild test migrate clean logs shell lint precommit check
 
 # Default target
 help:
-	@echo "Next.js + Django Kanban Board - Development Commands"
+	@echo "Kanban Board - Development Commands"
 	@echo ""
-	@echo "  make up              - Start all services"
-	@echo "  make down            - Stop all services"
-	@echo "  make rebuild         - Rebuild and restart services"
-	@echo "  make test            - Run all tests"
-	@echo "  make migrate         - Run migrations"
-	@echo "  make clean           - Remove containers/volumes"
-	@echo "  make logs            - View logs"
-	@echo "  make shell           - Django shell"
-	@echo "  make lint            - Lint and format code"
-	@echo "  make hooks-install   - Install pre-commit hooks"
+	@echo "  make up         Start services"
+	@echo "  make down       Stop services"
+	@echo "  make rebuild    Rebuild containers"
+	@echo "  make test       Run all tests"
+	@echo "  make lint       Auto-fix linting"
+	@echo "  make precommit  Run pre-commit checks"
+	@echo "  make check      Full CI validation"
+	@echo ""
+	@echo "  make migrate    Run migrations"
+	@echo "  make logs       View logs"
+	@echo "  make shell      Django shell"
+	@echo "  make clean      Remove all containers"
 
 # Essential commands
 up:
@@ -34,10 +36,10 @@ rebuild:
 	@echo "Backend: http://localhost:8000, Frontend: http://localhost:3000"
 
 test:
-	@echo "Running backend tests..."
-	docker-compose exec backend python manage.py test
-	@echo "Running frontend tests..."
-	docker-compose exec frontend npm test
+	@echo "Running all tests..."
+	cd backend && python manage.py test
+	cd frontend && npm test -- --passWithNoTests
+	cd frontend && npm run test:e2e
 
 migrate:
 	docker-compose exec backend python manage.py migrate
@@ -53,13 +55,13 @@ logs:
 shell:
 	docker-compose exec backend python manage.py shell
 
-hooks-install:
-	pip install pre-commit
-	pre-commit install
-	@echo "✅ Pre-commit hooks installed"
-
 lint:
-	@echo "Linting and formatting backend..."
+	@echo "Linting and formatting..."
 	cd backend && ruff check --fix . && ruff format .
-	@echo "Linting and formatting frontend..."
-	cd frontend && npm run lint --fix && npx prettier --write "src/**/*.{ts,tsx}"
+	cd frontend && npm run lint --fix
+
+precommit:
+	pre-commit run --all-files
+
+check:
+	./scripts/check-ci.sh

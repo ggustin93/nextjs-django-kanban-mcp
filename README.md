@@ -4,6 +4,13 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 **Stack:** Next.js 15, Django 4.2, TypeScript, Material UI, Apollo Client, Graphene-Django
 
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Status](https://img.shields.io/badge/Status-POC%2FMVP-yellow)](README.md)
+
+> **Note:** This is a Proof of Concept / MVP project showcasing modern full-stack development. Built with assistance from Claude Code.
+
 ## Screenshots
 
 <table>
@@ -27,14 +34,14 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 1. [Quick Start](#1-quick-start)
 2. [Features](#2-features)
-3. [Tech Stack](#3-tech-stack)
-4. [Project Structure](#4-project-structure)
-5. [Testing](#5-testing)
-6. [Pre-commit Hooks](#6-pre-commit-hooks)
-7. [Continuous Integration & Deployment](#7-continuous-integration--deployment)
-8. [Development Commands](#8-development-commands)
-9. [Deployment](#9-deployment)
-10. [Architecture](#10-architecture)
+3. [Architecture](#3-architecture)
+4. [Tech Stack](#4-tech-stack)
+5. [Project Structure](#5-project-structure)
+6. [Development Commands](#6-development-commands)
+7. [Testing](#7-testing)
+8. [Pre-commit Hooks](#8-pre-commit-hooks)
+9. [Continuous Integration & Deployment](#9-continuous-integration--deployment)
+10. [Deployment](#10-deployment)
 11. [MCP Server Integration](#11-mcp-server-integration)
 12. [License](#12-license)
 
@@ -54,7 +61,7 @@ cd frontend && npm install && npm run dev
 
 ## 2. Features
 
-Dual-view task management (Kanban + Eisenhower Matrix) with drag-and-drop, priority system (P1-P4), category tagging, and filtering by priority/status/category.
+Dual-view task management with Kanban board and Eisenhower Matrix, featuring drag-and-drop interface, priority-based workflows, and Claude AI integration via MCP server.
 
 <details>
 <summary><strong>📋 Task Management</strong></summary>
@@ -75,206 +82,15 @@ Dual-view task management (Kanban + Eisenhower Matrix) with drag-and-drop, prior
 - Full-text search across title, description, and category
 </details>
 
-## 3. Tech Stack
+<details>
+<summary><strong>🤖 AI Integration</strong></summary>
 
-**Backend:** Django 4.2, Graphene-Django, SQLite
-**Frontend:** Next.js 15, TypeScript, Apollo Client, Material UI v7, @dnd-kit
-**Infrastructure:** Docker Compose, pre-commit hooks (Ruff, ESLint, Prettier)
+- MCP (Model Context Protocol) server for Claude Desktop integration
+- Natural language task management through Claude AI
+- FastMCP-based implementation with GraphQL coordination
+</details>
 
-## 4. Project Structure
-
-### Backend (Django)
-
-```
-backend/
-├── apps/
-│   ├── core/                  # Shared base models (TimeStampedModel)
-│   └── kanban/                # Kanban feature app
-│       ├── models.py          # Task model
-│       ├── schema/            # GraphQL layer
-│       │   ├── types.py       # TaskType definition
-│       │   ├── queries.py     # allTasks query
-│       │   └── mutations.py   # create/update/delete
-│       ├── tests/             # Model + API tests
-│       └── management/        # seed_tasks command
-├── config/                    # Project configuration
-│   ├── settings.py            # Django settings
-│   ├── urls.py                # URL routing (/graphql)
-│   └── schema.py              # Root GraphQL schema
-├── integrations/mcp/          # MCP server for Claude AI
-├── scripts/                   # Utility scripts
-└── tests/                     # Integration tests
-```
-
-### Frontend (Next.js)
-
-```
-frontend/src/
-├── app/                       # Next.js App Router (layout, pages)
-├── components/
-│   ├── ApolloWrapper.tsx      # Apollo Client provider
-│   └── kanban/                # Kanban feature module
-│       ├── Board.tsx          # Main orchestrator
-│       ├── KanbanColumn.tsx   # Column layout
-│       ├── FilterBar.tsx      # Filters + view toggle
-│       ├── EisenhowerMatrix.tsx
-│       ├── useTaskDialog.ts   # Dialog state hook
-│       ├── types.ts           # Types + constants
-│       ├── index.ts           # Barrel exports
-│       └── Task/              # Task components
-│           ├── TaskCard.tsx
-│           └── TaskDialog.tsx
-├── graphql/                   # Apollo Client layer
-│   ├── client.ts              # Apollo Client setup
-│   ├── queries.ts             # GET_TASKS query
-│   └── mutations.ts           # CREATE/UPDATE/DELETE
-└── theme/                     # Material UI theme
-```
-
-### Root
-
-```
-├── docker-compose.yml         # Services orchestration
-├── Makefile                   # Development shortcuts
-└── .pre-commit-config.yaml    # Code quality hooks
-```
-
-## 5. Testing
-
-### Quick Test Commands
-
-```bash
-# All checks (recommended before pushing)
-./scripts/check-ci.sh
-
-# Individual components
-make test                                      # All tests via Docker
-docker-compose exec backend python manage.py test  # Backend only
-cd frontend && npm test                        # Frontend only
-```
-
-### Run CI Checks Locally
-
-**Before pushing to GitHub**, verify all CI checks will pass:
-
-```bash
-# Automated check (runs all CI validations)
-./scripts/check-ci.sh
-
-# Manual checks
-cd backend
-source venv/bin/activate
-ruff check .                    # Linting
-ruff format --check .           # Format check
-python manage.py test           # Tests
-
-cd ../frontend
-npm run lint                    # ESLint
-npx tsc --noEmit               # TypeScript
-npm test                        # Jest
-
-# Docker validation
-docker-compose config          # Validate docker-compose.yml
-```
-
-### Backend Tests (20 tests)
-- Model tests: Task creation, status transitions, timestamp behavior
-- GraphQL API tests: Queries, mutations, error handling
-- Coverage: 85%+
-
-### Frontend Tests (13+ tests)
-- Component tests: KanbanColumn, TaskCard, TaskDialog
-- Integration tests: Drag-and-drop, filters, view switching
-- Coverage: 80%+
-
-**Coverage Reports:**
-```bash
-# Backend coverage
-cd backend && coverage run --source='.' manage.py test && coverage report
-
-# Frontend coverage
-cd frontend && npm test -- --coverage
-```
-
-## 6. Pre-commit Hooks
-
-```bash
-pip install pre-commit && pre-commit install
-pre-commit run --all-files  # Manual run
-```
-
-Checks: Ruff (Python), ESLint + Prettier (TypeScript), YAML validation
-
-## 7. Continuous Integration & Deployment
-
-Automated quality gates ensure code quality and deployment safety through parallel validation and staged deployment.
-
-```mermaid
-graph LR
-    A[💾 Commit] --> B[🔍 CI Pipeline]
-    B --> C{Quality Gates}
-    C -->|Lint| D[✓ Backend Ruff]
-    C -->|Lint| E[✓ Frontend ESLint]
-    C -->|Test| F[✓ Django Tests]
-    C -->|Test| G[✓ Jest Tests]
-    C -->|Build| H[✓ Docker Images]
-    D --> I[🏗️ Build Artifacts]
-    E --> I
-    F --> I
-    G --> I
-    H --> I
-    I --> J[🚀 Deploy Staging]
-    J --> K[👤 Manual Approval]
-    K --> L[🌐 Production]
-
-    style A fill:#e1f5ff,stroke:#01579b
-    style B fill:#fff9c4,stroke:#f57f17
-    style C fill:#fff3e0,stroke:#e65100
-    style I fill:#e8f5e9,stroke:#2e7d32
-    style J fill:#f3e5f5,stroke:#4a148c
-    style L fill:#c8e6c9,stroke:#1b5e20
-```
-
-**Quality Validations:** Backend/Frontend linting, unit tests, TypeScript checks, Docker builds
-**Deployment:** Staging auto-deploy → Manual production approval with health checks
-
-**Run CI checks locally:**
-```bash
-./scripts/check-ci.sh  # Validates all quality gates before pushing
-```
-
-## 8. Development Commands
-
-```bash
-make up/down         # Start/stop services
-make test/migrate    # Run tests/migrations
-make logs/shell      # View logs/Django shell
-```
-
-**GraphQL API** (http://localhost:8000/graphql):
-- Query: `allTasks { id title status priority category }`
-- Create: `createTask(title: "Task", status: TODO, priority: P1)`
-- Update: `updateTask(id: "1", status: DOING)`
-- Delete: `deleteTask(id: "1")`
-
-## 9. Deployment
-
-**Deployment Features:**
-- Automated CI/CD pipeline (`.github/workflows/`)
-- Docker multi-stage builds with health checks
-- Environment-based configuration (12-factor app)
-
-**Deploy to:**
-- **Cloud**: AWS ECS, GCP Cloud Run, Azure Container Instances
-- **PaaS**: Vercel (frontend) + Render/Railway (backend)
-- **Self-hosted**: Docker Compose with Nginx reverse proxy
-
-```bash
-# Production build
-docker-compose -f docker-compose.prod.yml up --build
-```
-
-## 10. Architecture
+## 3. Architecture
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#e2e8f0', 'lineColor': '#64748b', 'secondaryColor': '#f8fafc', 'tertiaryColor': '#f1f5f9'}}}%%
@@ -342,13 +158,181 @@ graph TB
 
 **Layered architecture:** Presentation (clients) → Application (APIs) → Domain (business logic) → Infrastructure (data). Two interfaces to one backend: Browser via GraphQL with schema composition, Claude via MCP with direct model access.
 
+## 4. Tech Stack
+
+| Category | Technologies |
+|----------|-------------|
+| **Backend** | ![Django](https://img.shields.io/badge/Django-4.2-092E20?logo=django&logoColor=white) ![GraphQL](https://img.shields.io/badge/GraphQL-E10098?logo=graphql&logoColor=white) ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white) |
+| **Frontend** | ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) ![Material UI](https://img.shields.io/badge/Material_UI-v7-007FFF?logo=mui&logoColor=white) |
+| **API Layer** | ![Apollo](https://img.shields.io/badge/Apollo_Client-311C87?logo=apollo-graphql&logoColor=white) ![Graphene](https://img.shields.io/badge/Graphene--Django-E10098?logo=graphql&logoColor=white) |
+| **Infrastructure** | ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) |
+| **AI Integration** | ![MCP](https://img.shields.io/badge/MCP_Server-FastMCP-5A67D8?logo=anthropic&logoColor=white) |
+| **Dev Tools** | ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=black) ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=black) |
+
+## 5. Project Structure
+
+### Backend (Django)
+
+```
+backend/
+├── apps/
+│   ├── core/                  # Shared base models (TimeStampedModel)
+│   └── kanban/                # Kanban feature app
+│       ├── models.py          # Task model
+│       ├── schema/            # GraphQL layer
+│       │   ├── types.py       # TaskType definition
+│       │   ├── queries.py     # allTasks query
+│       │   └── mutations.py   # create/update/delete
+│       ├── tests/             # Model + API tests
+│       └── management/        # seed_tasks command
+├── config/                    # Project configuration
+│   ├── settings.py            # Django settings
+│   ├── urls.py                # URL routing (/graphql)
+│   └── schema.py              # Root GraphQL schema
+├── integrations/mcp/          # MCP server for Claude AI
+├── scripts/                   # Utility scripts
+└── tests/                     # Integration tests
+```
+
+### Frontend (Next.js)
+
+```
+frontend/src/
+├── app/                       # Next.js App Router (layout, pages)
+├── components/
+│   ├── ApolloWrapper.tsx      # Apollo Client provider
+│   └── kanban/                # Kanban feature module
+│       ├── Board.tsx          # Main orchestrator
+│       ├── KanbanColumn.tsx   # Column layout
+│       ├── FilterBar.tsx      # Filters + view toggle
+│       ├── EisenhowerMatrix.tsx
+│       ├── useTaskDialog.ts   # Dialog state hook
+│       ├── types.ts           # Types + constants
+│       ├── index.ts           # Barrel exports
+│       └── Task/              # Task components
+│           ├── TaskCard.tsx
+│           └── TaskDialog.tsx
+├── graphql/                   # Apollo Client layer
+│   ├── client.ts              # Apollo Client setup
+│   ├── queries.ts             # GET_TASKS query
+│   └── mutations.ts           # CREATE/UPDATE/DELETE
+└── theme/                     # Material UI theme
+```
+
+### Root
+
+```
+├── docker-compose.yml         # Services orchestration
+├── Makefile                   # Development shortcuts
+└── .pre-commit-config.yaml    # Code quality hooks
+```
+
+## 6. Development Commands
+
+```bash
+make up/down         # Start/stop services
+make test/migrate    # Run tests/migrations
+make logs/shell      # View logs/Django shell
+```
+
+**GraphQL API** (http://localhost:8000/graphql):
+- Query: `allTasks { id title status priority category }`
+- Create: `createTask(title: "Task", status: TODO, priority: P1)`
+- Update: `updateTask(id: "1", status: DOING)`
+- Delete: `deleteTask(id: "1")`
+
+## 7. Testing
+
+**Testing Trophy** approach — prioritizing integration tests for maximum confidence with minimal maintenance.
+
+| Layer | Tests | Tools |
+|-------|-------|-------|
+| 🎭 E2E | 1 | Playwright |
+| **🧪 Integration** | **37** | **Jest + RTL** |
+| 🔬 Unit | 32 | Django |
+| 📏 Static | — | TypeScript, ESLint, Ruff |
+
+```bash
+make test       # Run all tests (unit + integration + e2e)
+make check      # Full CI validation
+```
+
+## 8. Pre-commit Hooks
+
+Automated code quality checks before each commit.
+
+```bash
+pip install pre-commit && pre-commit install   # Setup (one-time)
+make precommit                                  # Run manually
+make lint                                       # Auto-fix issues
+```
+
+## 9. Continuous Integration & Deployment
+
+Automated quality gates ensure code quality and deployment safety through parallel validation and staged deployment.
+
+```mermaid
+graph LR
+    A[💾 Commit] --> B[🔍 CI Pipeline]
+    B --> C{Quality Gates}
+    C -->|Lint| D[✓ Backend Ruff]
+    C -->|Lint| E[✓ Frontend ESLint]
+    C -->|Test| F[✓ Django Tests]
+    C -->|Test| G[✓ Jest Tests]
+    C -->|E2E| P[✓ Playwright]
+    C -->|Build| H[✓ Docker Images]
+    D --> I[🏗️ Build Artifacts]
+    E --> I
+    F --> I
+    G --> I
+    P --> I
+    H --> I
+    I --> J[🚀 Deploy Staging]
+    J --> K[👤 Manual Approval]
+    K --> L[🌐 Production]
+
+    style A fill:#e1f5ff,stroke:#01579b
+    style B fill:#fff9c4,stroke:#f57f17
+    style C fill:#fff3e0,stroke:#e65100
+    style I fill:#e8f5e9,stroke:#2e7d32
+    style J fill:#f3e5f5,stroke:#4a148c
+    style L fill:#c8e6c9,stroke:#1b5e20
+```
+
+**Quality Validations:** Backend/Frontend linting, unit tests, E2E tests (Playwright), TypeScript checks, Docker builds
+**Deployment:** Staging auto-deploy → Manual production approval with health checks
+
+**Run CI checks locally:**
+```bash
+./scripts/check-ci.sh  # Validates all quality gates before pushing
+```
+
+## 10. Deployment
+
+**Deployment Features:**
+- Automated CI/CD pipeline (`.github/workflows/`)
+- Docker multi-stage builds with health checks
+- Environment-based configuration (12-factor app)
+
+**Deploy to:**
+- **Cloud**: AWS ECS, GCP Cloud Run, Azure Container Instances
+- **PaaS**: Vercel (frontend) + Render/Railway (backend)
+- **Self-hosted**: Docker Compose with Nginx reverse proxy
+
+```bash
+# Production build
+docker-compose -f docker-compose.prod.yml up --build
+```
+
 ## 11. MCP Server Integration
 
 [Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
 
-**Setup:** Configure Claude Desktop with `backend/integrations/mcp/server.py` path  
-**Operations:** List, create, update, delete tasks via natural language  
+**Setup:** Configure Claude Desktop with `backend/integrations/mcp/server.py` path
+**Operations:** List, create, update, delete tasks via natural language
 **Deployment:** Supports stdio (local) and HTTP/SSE (remote) transport
+
+**📚 API Documentation:** [GraphQL Playground](http://localhost:8000/graphql) | [Schema Reference](backend/kanban/graphql/schema.graphql)
 
 See `backend/integrations/mcp/README.md` for configuration details.
 
