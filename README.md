@@ -206,58 +206,41 @@ Checks: Ruff (Python), ESLint + Prettier (TypeScript), YAML validation
 
 ## 7. Continuous Integration & Deployment
 
-### CI Pipeline (.github/workflows/ci.yml)
+Automated quality gates ensure code quality and deployment safety through parallel validation and staged deployment.
 
-**Triggers:** Push to `main`/`develop`, Pull Requests
-**Jobs:** 5 parallel validation jobs
+```mermaid
+graph LR
+    A[💾 Commit] --> B[🔍 CI Pipeline]
+    B --> C{Quality Gates}
+    C -->|Lint| D[✓ Backend Ruff]
+    C -->|Lint| E[✓ Frontend ESLint]
+    C -->|Test| F[✓ Django Tests]
+    C -->|Test| G[✓ Jest Tests]
+    C -->|Build| H[✓ Docker Images]
+    D --> I[🏗️ Build Artifacts]
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J[🚀 Deploy Staging]
+    J --> K[👤 Manual Approval]
+    K --> L[🌐 Production]
 
-1. **Backend Linting** (Ruff): Code style and formatting validation
-2. **Frontend Linting** (ESLint + TypeScript): JavaScript/TypeScript validation
-3. **Backend Tests** (Django): Unit and integration tests
-4. **Frontend Tests** (Jest): Component and integration tests
-5. **Docker Build**: Multi-stage build validation with caching
-
-**Features:**
-- Conditional execution (only run if relevant files changed)
-- Build caching for faster runs
-- Parallel job execution
-- Concurrency control (cancel in-progress runs on new commits)
-
-### CD Pipeline (.github/workflows/deploy.yml)
-
-**Triggers:** CI workflow completion on `main` branch
-**Deployment Strategy:** Staging → Manual Production Approval
-
-**Pipeline Stages:**
-1. **CI Gate**: Verify CI workflow passed before deploying
-2. **Build Production**: Multi-arch Docker images with tagging
-3. **Deploy to Staging**: Automated deployment with smoke tests
-4. **Deploy to Production**: Manual approval required via GitHub Environments
-5. **Rollback**: Automatic rollback on deployment failure
-
-**Production-Ready Features:**
-- Blue-green deployment support
-- Health check verification
-- Automatic rollback on failure
-- Deployment notifications (Slack/Email ready)
-- Environment protection rules
-
-### Local CI Verification
-
-Before pushing code, run the full CI suite locally:
-
-```bash
-./scripts/check-ci.sh  # Runs all CI checks locally
+    style A fill:#e1f5ff,stroke:#01579b
+    style B fill:#fff9c4,stroke:#f57f17
+    style C fill:#fff3e0,stroke:#e65100
+    style I fill:#e8f5e9,stroke:#2e7d32
+    style J fill:#f3e5f5,stroke:#4a148c
+    style L fill:#c8e6c9,stroke:#1b5e20
 ```
 
-This script validates:
-- ✓ Backend linting (Ruff)
-- ✓ Backend formatting (Ruff)
-- ✓ Backend tests (Django)
-- ✓ Frontend linting (ESLint)
-- ✓ Frontend type checking (TypeScript)
-- ✓ Frontend tests (Jest)
-- ✓ Docker configuration (docker-compose)
+**Quality Validations:** Backend/Frontend linting, unit tests, TypeScript checks, Docker builds
+**Deployment:** Staging auto-deploy → Manual production approval with health checks
+
+**Run CI checks locally:**
+```bash
+./scripts/check-ci.sh  # Validates all quality gates before pushing
+```
 
 ## 8. Development Commands
 

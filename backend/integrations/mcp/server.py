@@ -47,9 +47,10 @@ import django  # noqa: E402
 
 django.setup()
 
-from apps.kanban.models import Task  # noqa: E402
 from asgiref.sync import sync_to_async  # noqa: E402
 from fastmcp import FastMCP  # noqa: E402
+
+from apps.kanban.models import Task  # noqa: E402
 
 # --- Constants for validation ---
 

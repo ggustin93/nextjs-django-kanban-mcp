@@ -24,8 +24,9 @@ django.setup()
 
 from django.test import TestCase  # noqa: E402
 
-from apps.kanban.models import Task  # noqa: E402
 from asgiref.sync import async_to_sync  # noqa: E402
+
+from apps.kanban.models import Task  # noqa: E402
 
 # Import async functions from MCP server
 from integrations.mcp.server import (  # noqa: E402
