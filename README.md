@@ -37,7 +37,7 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 3. [Architecture](#3-architecture)
 4. [Tech Stack](#4-tech-stack)
 5. [Project Structure](#5-project-structure)
-6. [Development Commands](#6-development-commands)
+6. [Development](#6-development)
 7. [Testing](#7-testing)
 8. [Pre-commit Hooks](#8-pre-commit-hooks)
 9. [Continuous Integration & Deployment](#9-continuous-integration--deployment)
@@ -227,19 +227,16 @@ frontend/src/
 └── .pre-commit-config.yaml    # Code quality hooks
 ```
 
-## 6. Development Commands
+## 6. Development
 
-```bash
-make up/down         # Start/stop services
-make test/migrate    # Run tests/migrations
-make logs/shell      # View logs/Django shell
-```
+| Command | Description |
+|---------|-------------|
+| `make up` / `make down` | Start/stop Docker services |
+| `make test` | Run all tests (unit + integration + E2E) |
+| `make lint` | Auto-fix linting issues |
+| `make logs` / `make shell` | View logs / Django shell |
 
-**GraphQL API** (http://localhost:8000/graphql):
-- Query: `allTasks { id title status priority category }`
-- Create: `createTask(title: "Task", status: TODO, priority: P1)`
-- Update: `updateTask(id: "1", status: DOING)`
-- Delete: `deleteTask(id: "1")`
+**GraphQL Playground**: http://localhost:8000/graphql — Query, create, update, delete tasks.
 
 ## 7. Testing
 
