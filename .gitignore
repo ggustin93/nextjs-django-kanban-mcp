@@ -129,6 +129,8 @@ coverage/
 # AI
 .serena/
 TODO.md
+CLAUDE.md
+QUICK_REFERENCE.md
 
 .ruff_cache/
 .claude/
