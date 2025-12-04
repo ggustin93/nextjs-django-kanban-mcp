@@ -16,7 +16,7 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider, MockedResponse } from '@apollo/client/testing';
 import { Board } from '@/components/kanban/Board';
 import { GET_TASKS } from '@/graphql/queries';
 import { CREATE_TASK, UPDATE_TASK, DELETE_TASK } from '@/graphql/mutations';
@@ -29,6 +29,8 @@ const mockTasks = [
     title: 'Task 1',
     description: 'Description 1',
     status: 'TODO',
+    priority: 'P1',
+    category: 'Development',
     createdAt: '2024-01-01T00:00:00Z',
     __typename: 'TaskType',
   },
@@ -37,6 +39,8 @@ const mockTasks = [
     title: 'Task 2',
     description: 'Description 2',
     status: 'DOING',
+    priority: 'P2',
+    category: 'Testing',
     createdAt: '2024-01-02T00:00:00Z',
     __typename: 'TaskType',
   },
@@ -45,6 +49,8 @@ const mockTasks = [
     title: 'Task 3',
     description: '',
     status: 'DONE',
+    priority: 'P3',
+    category: 'Documentation',
     createdAt: '2024-01-03T00:00:00Z',
     __typename: 'TaskType',
   },
@@ -72,22 +78,22 @@ describe('Board Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders loading state initially', () => {
-    render(
-      <MockedProvider mocks={defaultMocks}>
+  // Helper to render with proper Apollo setup
+  const renderBoard = (mocks: ReadonlyArray<MockedResponse> = defaultMocks) => {
+    return render(
+      <MockedProvider mocks={mocks}>
         <Board />
       </MockedProvider>
     );
+  };
 
+  it('renders loading state initially', () => {
+    renderBoard();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders all tasks in correct columns after loading', async () => {
-    render(
-      <MockedProvider mocks={defaultMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard();
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -111,11 +117,7 @@ describe('Board Component', () => {
       },
     ];
 
-    render(
-      <MockedProvider mocks={errorMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard(errorMocks);
 
     await waitFor(() => {
       expect(screen.getByText(/Network error/i)).toBeInTheDocument();
@@ -124,12 +126,7 @@ describe('Board Component', () => {
 
   it('opens create dialog when Add Task button is clicked', async () => {
     const user = userEvent.setup();
-
-    render(
-      <MockedProvider mocks={defaultMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard();
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -182,6 +179,8 @@ describe('Board Component', () => {
                 title: 'New Task',
                 description: '',
                 status: 'TODO',
+                priority: 'P1',
+                category: '',
                 createdAt: '2024-01-04T00:00:00Z',
                 __typename: 'TaskType',
               },
@@ -191,11 +190,7 @@ describe('Board Component', () => {
       },
     ];
 
-    render(
-      <MockedProvider mocks={createMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard(createMocks);
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -260,11 +255,7 @@ describe('Board Component', () => {
       },
     ];
 
-    render(
-      <MockedProvider mocks={updateMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard(updateMocks);
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -324,11 +315,7 @@ describe('Board Component', () => {
       },
     ];
 
-    render(
-      <MockedProvider mocks={updateMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard(updateMocks);
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -371,11 +358,7 @@ describe('Board Component', () => {
       },
     ];
 
-    render(
-      <MockedProvider mocks={deleteMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard(deleteMocks);
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -387,12 +370,7 @@ describe('Board Component', () => {
 
   it('validates task title is required', async () => {
     const user = userEvent.setup();
-
-    render(
-      <MockedProvider mocks={defaultMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard();
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -417,11 +395,7 @@ describe('Board Component', () => {
   });
 
   it('displays correct task counts per column', async () => {
-    render(
-      <MockedProvider mocks={defaultMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard();
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -460,11 +434,7 @@ describe('Board Component', () => {
     // Suppress console errors for this test
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(
-      <MockedProvider mocks={errorMocks}>
-        <Board />
-      </MockedProvider>
-    );
+    renderBoard(errorMocks);
 
     await waitFor(() => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();

@@ -94,6 +94,10 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Create data directory for database
+        working-directory: backend
+        run: mkdir -p data
+
       - name: Run migrations
         working-directory: backend
         run: python manage.py migrate --noinput

@@ -25,6 +25,7 @@ MANIFEST
 htmlcov/
 db.sqlite3
 db.sqlite3-journal
+backend/data/db.sqlite3
 
 # Django migrations
 # Uncomment if you want to track migrations

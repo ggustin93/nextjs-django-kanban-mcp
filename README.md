@@ -31,7 +31,7 @@ A modern task management app featuring drag-and-drop Kanban boards, Eisenhower p
 4. [Project Structure](#4-project-structure)
 5. [Testing](#5-testing)
 6. [Pre-commit Hooks](#6-pre-commit-hooks)
-7. [Continuous Integration](#7-continuous-integration)
+7. [Continuous Integration & Deployment](#7-continuous-integration--deployment)
 8. [Development Commands](#8-development-commands)
 9. [Deployment](#9-deployment)
 10. [Architecture](#10-architecture)
@@ -279,91 +279,63 @@ docker-compose -f docker-compose.prod.yml up --build
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#e2e8f0', 'lineColor': '#64748b', 'secondaryColor': '#f8fafc', 'tertiaryColor': '#f1f5f9'}}}%%
 graph TB
     subgraph Presentation["🎨 Presentation Layer"]
-        Browser["🌐 <b>Web Browser</b><br/><i>HTTP Client</i>"]
-        Claude["🤖 <b>Claude Desktop</b><br/><i>MCP Client</i>"]
+        Browser["🌐 <b>Web Browser</b>"]
+        Claude["🤖 <b>Claude Desktop</b>"]
     end
 
     subgraph Application["⚙️ Application Layer (Docker)"]
         subgraph Frontend["Frontend Container"]
-            NextApp["<b>Next.js 15 App</b><br/>App Router · SSR"]
-            Apollo["<b>Apollo Client</b><br/>GraphQL Cache · State"]
-            UI["<b>UI Components</b><br/>Material UI v7 · dnd-kit"]
+            NextApp["<b>Next.js</b><br/>Apollo · Material UI"]
         end
 
         subgraph Backend["Backend Container"]
-            subgraph APIs["API Interfaces"]
-                GraphQL["<b>GraphQL Endpoint</b><br/><i>/graphql</i><br/>Graphene-Django"]
-                MCPServer["<b>MCP Server</b><br/><i>stdio/HTTP+SSE</i><br/>FastMCP"]
-            end
-
-            subgraph Schema["Schema Layer"]
-                RootSchema["<b>Root Schema</b><br/><i>config/schema.py</i><br/>Query + Mutation"]
-                KanbanSchema["<b>Kanban Schema</b><br/><i>apps/kanban/schema/</i><br/>types · queries · mutations"]
-            end
+            GraphQL["<b>GraphQL API</b><br/>Graphene-Django"]
+            MCPServer["<b>MCP Server</b><br/>FastMCP"]
+            RootSchema["<b>Root Schema</b><br/>Query + Mutation"]
         end
     end
 
     subgraph Domain["🧩 Domain Layer"]
-        subgraph Apps["Django Apps (Modular Monolith)"]
-            CoreApp["<b>Core App</b><br/>TimeStampedModel<br/>Shared abstractions"]
-            KanbanApp["<b>Kanban App</b><br/>Task Model<br/>Business logic"]
-        end
+        CoreApp["<b>Core App</b><br/>Shared Base"]
+        KanbanApp["<b>Kanban App</b><br/>Task Model"]
     end
 
     subgraph Infrastructure["🗄️ Infrastructure Layer"]
-        ORM["<b>Django ORM</b><br/>QuerySet API · Migrations"]
-        DB[("<b>SQLite</b><br/>db.sqlite3")]
+        ORM["<b>Django ORM</b>"]
+        DB[("<b>SQLite</b>")]
     end
 
-    %% Client to Frontend
-    Browser -->|"HTTP/HTTPS<br/>React hydration"| NextApp
-    NextApp --> Apollo
-    Apollo --> UI
+    %% Connections
+    Browser -->|"HTTP"| NextApp
+    NextApp -->|"GraphQL"| GraphQL
+    Claude -->|"MCP"| MCPServer
 
-    %% Frontend to Backend
-    Apollo -->|"GraphQL queries<br/>mutations over HTTP"| GraphQL
-
-    %% Claude to Backend
-    Claude -->|"MCP protocol<br/>stdio/HTTP+SSE"| MCPServer
-
-    %% Schema Composition
     GraphQL --> RootSchema
-    RootSchema -.->|"inherits from"| KanbanSchema
-    MCPServer -.->|"direct import"| KanbanApp
-
-    %% Backend to Domain
-    KanbanSchema --> KanbanApp
+    RootSchema -.->|"schema composition"| KanbanApp
+    MCPServer --> KanbanApp
     KanbanApp -.->|"extends"| CoreApp
 
-    %% Domain to Infrastructure
     KanbanApp --> ORM
     CoreApp --> ORM
-    ORM -->|"SQL queries"| DB
+    ORM --> DB
 
     %% Styling
     style Browser fill:#ede9fe,stroke:#8b5cf6,color:#5b21b6,stroke-width:2px
     style Claude fill:#ede9fe,stroke:#8b5cf6,color:#5b21b6,stroke-width:2px
     style NextApp fill:#fef3c7,stroke:#f59e0b,color:#92400e,stroke-width:2px
-    style Apollo fill:#fef3c7,stroke:#f59e0b,color:#92400e
-    style UI fill:#fef3c7,stroke:#f59e0b,color:#92400e
     style GraphQL fill:#d1fae5,stroke:#10b981,color:#065f46,stroke-width:2px
     style MCPServer fill:#d1fae5,stroke:#10b981,color:#065f46,stroke-width:2px
     style RootSchema fill:#d1fae5,stroke:#10b981,color:#065f46
-    style KanbanSchema fill:#d1fae5,stroke:#10b981,color:#065f46
     style CoreApp fill:#fecaca,stroke:#ef4444,color:#991b1b
     style KanbanApp fill:#fecaca,stroke:#ef4444,color:#991b1b,stroke-width:2px
     style ORM fill:#dbeafe,stroke:#3b82f6,color:#1e40af,stroke-width:2px
     style DB fill:#dbeafe,stroke:#3b82f6,color:#1e40af,stroke-width:2px
 
-    %% Container styling
     style Presentation fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
     style Application fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
-    style Frontend fill:#fffbeb,stroke:#fbbf24,stroke-width:1px,stroke-dasharray: 5 5
-    style Backend fill:#ecfdf5,stroke:#34d399,stroke-width:1px,stroke-dasharray: 5 5
-    style APIs fill:#f0fdf4,stroke:#22c55e,stroke-width:1px
-    style Schema fill:#f0fdf4,stroke:#22c55e,stroke-width:1px
+    style Frontend fill:#fffbeb,stroke:#f59e0b,stroke-dasharray:5 5
+    style Backend fill:#ecfdf5,stroke:#10b981,stroke-dasharray:5 5
     style Domain fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
-    style Apps fill:#fef2f2,stroke:#f87171,stroke-width:1px,stroke-dasharray: 5 5
     style Infrastructure fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
 ```
 
