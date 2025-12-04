@@ -275,69 +275,20 @@ make logs/shell      # View logs/Django shell
 
 ## 9. Deployment
 
-### Automated Deployment Pipeline
+**Production-Ready Features:**
+- Automated CI/CD pipeline (`.github/workflows/`)
+- Docker multi-stage builds with health checks
+- Environment-based configuration (12-factor app)
 
-The project includes a production-ready CD pipeline (`.github/workflows/deploy.yml`):
+**Deploy to:**
+- **Cloud**: AWS ECS, GCP Cloud Run, Azure Container Instances
+- **PaaS**: Vercel (frontend) + Render/Railway (backend)
+- **Self-hosted**: Docker Compose with Nginx reverse proxy
 
-**Deployment Flow:**
-
-```text
-CI Pass → Build Images → Deploy Staging → Smoke Tests → Manual Approval → Production
+```bash
+# Production build
+docker-compose -f docker-compose.prod.yml up --build
 ```
-
-**GitHub Environments Setup:**
-
-1. Create `staging` and `production` environments in repository settings
-2. Configure production environment with required reviewers
-3. Add deployment secrets (container registry, cloud provider credentials)
-
-### Deployment Options
-
-#### Option 1: Docker-based (Recommended)
-
-- Build multi-arch images via GitHub Actions
-- Deploy to any Docker-compatible platform (AWS ECS, GCP Cloud Run, Azure Container Instances)
-- Environment variables via secrets management
-
-#### Option 2: Platform-as-a-Service
-
-- **Frontend**: Vercel (automatic Next.js optimization)
-- **Backend**: Render/Railway (automatic Django deployment)
-- **Database**: Managed PostgreSQL (AWS RDS, Supabase)
-
-#### Option 3: Self-hosted VPS
-
-- Docker Compose on Ubuntu/Debian server
-- Nginx reverse proxy with SSL (Let's Encrypt)
-- Systemd service for automatic restarts
-
-### Production Checklist
-
-#### Backend
-
-- [ ] Migrate from SQLite to PostgreSQL
-- [ ] Configure Gunicorn/uWSGI WSGI server
-- [ ] Set `DEBUG=False` and configure `ALLOWED_HOSTS`
-- [ ] Configure CORS for production frontend domain
-- [ ] Set up static file serving (WhiteNoise or CDN)
-- [ ] Configure logging and error monitoring (Sentry)
-- [ ] Enable HTTPS and security headers
-
-#### Frontend
-
-- [ ] Set production API endpoint (`NEXT_PUBLIC_API_URL`)
-- [ ] Configure environment variables via platform
-- [ ] Enable production optimizations (build cache, image optimization)
-- [ ] Set up CDN for static assets
-- [ ] Configure monitoring (Vercel Analytics, Google Analytics)
-
-#### Infrastructure
-
-- [ ] Database backups (daily snapshots)
-- [ ] SSL certificates (automatic renewal)
-- [ ] Health check endpoints (`/health`, `/ready`)
-- [ ] Application monitoring (uptime, performance)
-- [ ] CI/CD secrets (container registry, deployment keys)
 
 ## 10. Architecture
 
