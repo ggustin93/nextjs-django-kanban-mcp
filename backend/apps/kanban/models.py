@@ -53,3 +53,14 @@ class Task(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    # === MÉTHODES MÉTIER ===
+
+    def normalize_category(self):
+        """Ensure category starts with # if not empty."""
+        if self.category and not self.category.startswith("#"):
+            self.category = f"#{self.category}"
+
+    def save(self, *args, **kwargs):
+        self.normalize_category()
+        super().save(*args, **kwargs)

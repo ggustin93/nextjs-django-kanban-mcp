@@ -45,20 +45,11 @@ class CreateTask(graphene.Mutation):
     task = graphene.Field(TaskType)
 
     def mutate(self, info, title, status=None, category=None, priority=None):
-        # Convert GraphQL enums to Django model choice values
-        status_value = status.value if status else Task.Status.TODO
-        priority_value = priority.value if priority else Task.Priority.P4
-
-        # Auto-add # prefix to category if missing
-        category_value = ""
-        if category:
-            category_value = category if category.startswith("#") else f"#{category}"
-
         task = Task.objects.create(
             title=title,
-            status=status_value,
-            category=category_value,
-            priority=priority_value,
+            status=status.value if status else Task.Status.TODO,
+            category=category or "",  # normalize_category() called in save()
+            priority=priority.value if priority else Task.Priority.P4,
         )
         return CreateTask(task=task)
 
@@ -86,8 +77,7 @@ class UpdateTask(graphene.Mutation):
         if status is not None:
             task.status = status.value if hasattr(status, "value") else status
         if category is not None:
-            # Auto-add # prefix if missing, allow empty string to clear
-            task.category = category if not category or category.startswith("#") else f"#{category}"
+            task.category = category  # normalize_category() called in save()
         if priority is not None:
             task.priority = priority.value if hasattr(priority, "value") else priority
 
