@@ -47,7 +47,6 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
   - [7. Testing](#7-testing)
   - [8. Pre-commit Hooks](#8-pre-commit-hooks)
   - [9. Continuous Integration \& Deployment](#9-continuous-integration--deployment)
-  - [10. Deployment](#10-deployment)
   - [11. MCP Server Integration](#11-mcp-server-integration)
   - [12. License](#12-license)
 
@@ -83,6 +82,7 @@ Dual-view task management with Kanban board and Eisenhower Matrix, featuring dra
 - Status workflow: TODO → DOING → WAITING → DONE
 - Category tagging with # prefix (#frontend, #backend, etc.)
 - Drag-and-drop between columns and priority quadrants
+- Task checklists with progress tracking
 </details>
 
 <details>
@@ -210,24 +210,19 @@ backend/
 
 ```
 frontend/src/
-├── app/                       # Next.js App Router (layout, pages)
+├── app/                       # Next.js App Router
 ├── components/
-│   ├── ApolloWrapper.tsx      # Apollo Client provider
+│   ├── common/                # Shared components
 │   └── kanban/                # Kanban feature module
-│       ├── Board.tsx          # Main orchestrator
-│       ├── KanbanColumn.tsx   # Column layout
-│       ├── FilterBar.tsx      # Filters + view toggle
+│       ├── Board.tsx          # Orchestrator
+│       ├── KanbanColumn.tsx
+│       ├── FilterBar.tsx
 │       ├── EisenhowerMatrix.tsx
-│       ├── useTaskDialog.ts   # Dialog state hook
 │       ├── types.ts           # Types + constants
-│       ├── index.ts           # Barrel exports
-│       └── Task/              # Task components
-│           ├── TaskCard.tsx
-│           └── TaskDialog.tsx
+│       ├── Task/              # Task components
+│       ├── Checklist/         # Checklist components
+│       └── hooks/             # Custom hooks
 ├── graphql/                   # Apollo Client layer
-│   ├── client.ts              # Apollo Client setup
-│   ├── queries.ts             # GET_TASKS query
-│   └── mutations.ts           # CREATE/UPDATE/DELETE
 └── theme/                     # Material UI theme
 ```
 
@@ -257,12 +252,12 @@ frontend/src/
 
 **Testing Trophy** approach — prioritizing integration tests for maximum confidence with minimal maintenance.
 
-| Layer | Tests | Tools |
-|-------|-------|-------|
-| 🎭 E2E | 1 | Playwright |
-| **🧪 Integration** | **37** | **Jest + RTL** |
-| 🔬 Unit | 32 | Django |
-| 📏 Static | — | TypeScript, ESLint, Ruff |
+| **Layer** | **Tests** | **Tools** | **Description** |
+|-----------|-----------|-----------|-----------------|
+| 🎭 E2E | 1 | Playwright | Full user workflows through real browser automation |
+| **🧪 Integration** | **37** | **Jest + RTL** | **Component behavior with React hooks, context, and APIs** |
+| 🔬 Unit | 32 | Django | Individual functions and model logic isolation |
+| 📏 Static | — | TypeScript, ESLint, Ruff | Type checking, linting, and code quality analysis |
 
 ```bash
 make test       # Run all tests (unit + integration + e2e)
@@ -281,38 +276,64 @@ make lint                                       # Auto-fix issues
 
 ## 9. Continuous Integration & Deployment
 
-Automated quality gates ensure code quality and deployment safety through parallel validation and staged deployment.
+Automated CI/CD pipeline with parallel execution, Docker containerization, and deployment simulation.
 
 ```mermaid
-graph LR
-    A[💾 Commit] --> B[🔍 CI Pipeline]
-    B --> C{Quality Gates}
-    C -->|Lint| D[✓ Backend Ruff]
-    C -->|Lint| E[✓ Frontend ESLint]
-    C -->|Test| F[✓ Django Tests]
-    C -->|Test| G[✓ Jest Tests]
-    C -->|E2E| P[✓ Playwright]
-    C -->|Build| H[✓ Docker Images]
-    D --> I[🏗️ Build Artifacts]
-    E --> I
-    F --> I
-    G --> I
-    P --> I
-    H --> I
-    I --> J[🚀 Deploy Staging]
-    J --> K[👤 Manual Approval]
-    K --> L[🌐 Production]
+flowchart LR
+  A[Push] --> B[CI]
 
-    style A fill:#e1f5ff,stroke:#01579b
-    style B fill:#fff9c4,stroke:#f57f17
-    style C fill:#fff3e0,stroke:#e65100
-    style I fill:#e8f5e9,stroke:#2e7d32
-    style J fill:#f3e5f5,stroke:#4a148c
-    style L fill:#c8e6c9,stroke:#1b5e20
+  subgraph CI[CI Pipeline]
+    direction TB
+    C[Lint]
+    D[Test]
+    E[Build]
+  end
+
+  %% CI steps run in parallel
+  B --> C
+  B --> D
+  B --> E
+
+  %% Gate comes after CI steps
+  C --> F{Pass?}
+  D --> F
+  E --> F
+
+  F -->|Yes| G[Build Docker Images]
+  G --> H[Push to GHCR]
+  H --> I[Deploy to Staging]
+  I --> J[Deploy to Production]
+  F -->|No| X[Fail]
+
+  %% Styles
+  style A fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+  style F fill:#fff3e0,stroke:#e65100,color:#bf360c
+  style G fill:#fffde7,stroke:#f9a825,color:#f57f17
+  style H fill:#ede7f6,stroke:#5e35b1,color:#4527a0
+  style I fill:#e1f5fe,stroke:#0277bd,color:#01579b
+  style J fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+  style X fill:#ffebee,stroke:#c62828,color:#b71c1c
 ```
 
-**Quality Validations:** Backend/Frontend linting, unit tests, E2E tests (Playwright), TypeScript checks, Docker builds
-**Deployment:** Staging auto-deploy → Manual production approval with health checks
+> **Two-Workflow Architecture:** `ci.yml` runs on every push (Lint → Test → Build → Docker validation). `deploy.yml` triggers automatically when CI passes on `main` branch (Build images → Push to GHCR → Staging → Production with manual approval).
+
+**Pipeline Stages:**
+
+| Stage | Jobs | Tools |
+|-------|------|-------|
+| **Lint** | Backend (Python) + Frontend (TypeScript) | Ruff, Black, isort, ESLint, Prettier |
+| **Test** | Backend (Django) + Frontend (Jest) | pytest, Jest, React Testing Library |
+| **Build** | Django checks + Next.js production build | django-admin, next build |
+| **Docker** | Multi-stage builds (Backend + Frontend) | Docker Buildx, GHCR |
+| **Deploy** | Smoke tests with docker-compose | Health checks, GraphQL validation |
+
+**Features:**
+- ✅ Parallel CI execution for fast feedback
+- ✅ Docker containerization with GitHub Container Registry
+- ✅ Automated smoke tests validate critical paths
+- ✅ Fail-fast strategy with clear error reporting
+
+See `.github/workflows/ci-cd.yml` for full configuration.
 
 ## 10. Deployment
 

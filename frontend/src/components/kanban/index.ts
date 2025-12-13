@@ -1,6 +1,5 @@
 /**
  * Kanban module exports
- * Barrel file for clean imports
  */
 
 // Types
@@ -11,10 +10,13 @@ export { Board } from './Board';
 export { KanbanColumn } from './KanbanColumn';
 export { FilterBar } from './FilterBar';
 export { EisenhowerMatrix } from './EisenhowerMatrix';
+export { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
-// Task
-export { TaskCard } from './Task/TaskCard';
-export { TaskDialog } from './Task/TaskDialog';
+// Task (via barrel)
+export * from './Task';
 
-// Hooks
-export { useTaskDialog } from './useTaskDialog';
+// Checklist (via barrel)
+export * from './Checklist';
+
+// Hooks (via barrel)
+export * from './hooks';

@@ -16,6 +16,20 @@ export enum TaskPriority {
   P4 = 'P4',
 }
 
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  completed: boolean;
+  position: number;
+}
+
+export interface Checklist {
+  id: string;
+  title: string;
+  progress: number;
+  items: ChecklistItem[];
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -23,7 +37,9 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   category: string;
+  order: number;
   createdAt: string;
+  checklists?: Checklist[];
 }
 
 export interface Column {
@@ -157,6 +173,27 @@ export const EISENHOWER_QUADRANTS: EisenhowerQuadrantConfig[] = [
 
 // View type
 export type ViewType = 'kanban' | 'eisenhower';
+
+// GraphQL query/mutation types
+export interface GetTasksData {
+  allTasks: Task[];
+}
+
+export interface CreateTaskData {
+  createTask: { task: Task };
+}
+
+export interface UpdateTaskData {
+  updateTask: { task: Task };
+}
+
+export interface DeleteTaskData {
+  deleteTask: { success: boolean };
+}
+
+export interface CreateChecklistData {
+  createChecklist: { checklist: Checklist };
+}
 
 // Filter state
 export interface FilterState {

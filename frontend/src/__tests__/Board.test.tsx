@@ -16,7 +16,8 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MockedProvider, MockedResponse } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
+import type { MockedResponse } from '@apollo/client/testing';
 import { Board } from '@/components/kanban/Board';
 import { GET_TASKS } from '@/graphql/queries';
 import { CREATE_TASK, UPDATE_TASK, DELETE_TASK } from '@/graphql/mutations';

@@ -15,9 +15,16 @@ interface KanbanColumnProps {
   tasks: Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
+  onUpdateDescription?: (id: string, description: string) => void;
 }
 
-export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: KanbanColumnProps) {
+export function KanbanColumn({
+  column,
+  tasks,
+  onEditTask,
+  onDeleteTask,
+  onUpdateDescription,
+}: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.status,
   });
@@ -61,10 +68,15 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
           spacing={1.5}
           sx={{
             minHeight: 200,
-            transition: 'background-color 0.2s',
+            transition: 'all 0.2s ease-out',
             bgcolor: isOver ? 'action.hover' : 'transparent',
             borderRadius: 2,
             p: 1,
+            // Subtle drop zone indicator when hovering
+            border: '2px solid',
+            borderColor: isOver ? column.color : 'transparent',
+            transform: isOver ? 'scale(1.01)' : 'scale(1)',
+            boxShadow: isOver ? `0 0 0 2px ${column.color}22` : 'none',
           }}
         >
           {tasks.map((task) => (
@@ -74,6 +86,7 @@ export function KanbanColumn({ column, tasks, onEditTask, onDeleteTask }: Kanban
               column={column}
               onEdit={onEditTask}
               onDelete={onDeleteTask}
+              onUpdateDescription={onUpdateDescription}
             />
           ))}
 

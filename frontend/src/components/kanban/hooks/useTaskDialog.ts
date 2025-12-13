@@ -1,9 +1,8 @@
 /**
- * useTaskDialog Hook - Manage task dialog state
- * Single Responsibility: Handle dialog open/close and form state management
+ * useTaskDialog - Manages create/edit dialog state for tasks
  */
 import { useState } from 'react';
-import { Task, TaskFormData, TaskStatus, TaskPriority } from './types';
+import { Task, TaskFormData, TaskStatus, TaskPriority } from '../types';
 
 const INITIAL_FORM_DATA: TaskFormData = {
   title: '',

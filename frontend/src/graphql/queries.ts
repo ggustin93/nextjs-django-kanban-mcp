@@ -12,8 +12,20 @@ export const GET_TASKS = gql`
       status
       priority
       category
+      order
       createdAt
       updatedAt
+      checklists {
+        id
+        title
+        progress
+        items {
+          id
+          text
+          completed
+          position
+        }
+      }
     }
   }
 `;

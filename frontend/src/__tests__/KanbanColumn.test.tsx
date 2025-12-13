@@ -11,7 +11,8 @@
  *   npm test -- KanbanColumn.test.tsx
  */
 
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from './test-utils';
 import { DndContext } from '@dnd-kit/core';
 import { KanbanColumn } from '@/components/kanban/KanbanColumn';
 import { Column, Task, TaskStatus, TaskPriority } from '@/components/kanban/types';
@@ -25,6 +26,7 @@ const mockTasks: Task[] = [
     status: 'TODO' as TaskStatus,
     priority: TaskPriority.P2,
     category: '#work',
+    order: 0,
     createdAt: '2024-01-01T00:00:00Z',
   },
 ];
@@ -186,6 +188,7 @@ describe('KanbanColumn Component', () => {
           status: 'TODO' as TaskStatus,
           priority: TaskPriority.P3,
           category: '#personal',
+          order: 1,
           createdAt: '2024-01-02T00:00:00Z',
         },
         {
@@ -195,6 +198,7 @@ describe('KanbanColumn Component', () => {
           status: 'TODO' as TaskStatus,
           priority: TaskPriority.P4,
           category: '',
+          order: 2,
           createdAt: '2024-01-03T00:00:00Z',
         },
       ];
