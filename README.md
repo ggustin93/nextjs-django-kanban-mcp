@@ -46,9 +46,11 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
   - [6. Development](#6-development)
   - [7. Testing](#7-testing)
   - [8. Pre-commit Hooks](#8-pre-commit-hooks)
-  - [9. Continuous Integration \& Deployment](#9-continuous-integration--deployment)
-  - [11. MCP Server Integration](#11-mcp-server-integration)
-  - [12. License](#12-license)
+  - [9. Git Workflow](#9-git-workflow)
+  - [10. Continuous Integration \& Deployment](#10-continuous-integration--deployment)
+  - [11. Deployment](#11-deployment)
+  - [12. MCP Server Integration](#12-mcp-server-integration)
+  - [13. License](#13-license)
 
 ## 1. Quick Start
 
@@ -274,7 +276,31 @@ make precommit                                  # Run manually
 make lint                                       # Auto-fix issues
 ```
 
-## 9. Continuous Integration & Deployment
+## 9. Git Workflow
+
+Feature branch workflow with Pull Request validation before merging to main.
+
+```mermaid
+gitGraph
+    commit id: "main"
+    branch feature/xyz
+    commit id: "feat: add X"
+    commit id: "fix: adjust Y"
+    checkout main
+    merge feature/xyz id: "PR #1 ✓" tag: "CI passed"
+```
+
+| Step | Command | Purpose |
+|------|---------|---------|
+| 1. Branch | `git checkout -b feature/xyz` | Isolate work from main |
+| 2. Commit | `git commit -m "feat: ..."` | Small, atomic commits |
+| 3. Push | `git push -u origin feature/xyz` | Backup + share |
+| 4. PR | `gh pr create` | Trigger CI + code review |
+| 5. Merge | Via GitHub UI | Only after CI passes ✓ |
+
+**Why PRs?** CI runs on PRs (not feature branches). Code review + tests must pass before merge.
+
+## 10. Continuous Integration & Deployment
 
 Automated CI/CD pipeline with parallel execution, Docker containerization, and deployment simulation.
 
@@ -335,7 +361,7 @@ flowchart LR
 
 See `.github/workflows/ci-cd.yml` for full configuration.
 
-## 10. Deployment
+## 11. Deployment
 
 **Deployment Features:**
 - Automated CI/CD pipeline (`.github/workflows/`)
@@ -352,7 +378,7 @@ See `.github/workflows/ci-cd.yml` for full configuration.
 docker-compose -f docker-compose.prod.yml up --build
 ```
 
-## 11. MCP Server Integration
+## 12. MCP Server Integration
 
 [Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
 
@@ -364,6 +390,6 @@ docker-compose -f docker-compose.prod.yml up --build
 
 See `backend/integrations/mcp/README.md` for configuration details.
 
-## 12. License
+## 13. License
 
 MIT License
