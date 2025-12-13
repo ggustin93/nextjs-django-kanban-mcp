@@ -37,19 +37,19 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
   - [Table of Contents](#table-of-contents)
   - [1. Quick Start](#1-quick-start)
   - [2. Features](#2-features)
-  - [3. Architecture](#3-architecture)
-  - [4. Tech Stack](#4-tech-stack)
-  - [5. Project Structure](#5-project-structure)
+  - [3. MCP Server (Claude AI)](#3-mcp-server-claude-ai)
+  - [4. Architecture](#4-architecture)
+  - [5. Tech Stack](#5-tech-stack)
+  - [6. Project Structure](#6-project-structure)
     - [Backend (Django)](#backend-django)
     - [Frontend (Next.js)](#frontend-nextjs)
     - [Root](#root)
-  - [6. Development](#6-development)
-  - [7. Testing](#7-testing)
-  - [8. Pre-commit Hooks](#8-pre-commit-hooks)
-  - [9. Git Workflow](#9-git-workflow)
-  - [10. Continuous Integration \& Deployment](#10-continuous-integration--deployment)
-  - [11. Deployment](#11-deployment)
-  - [12. MCP Server Integration](#12-mcp-server-integration)
+  - [7. Development](#7-development)
+  - [8. Testing](#8-testing)
+  - [9. Pre-commit Hooks](#9-pre-commit-hooks)
+  - [10. Git Workflow](#10-git-workflow)
+  - [11. Continuous Integration \& Deployment](#11-continuous-integration--deployment)
+  - [12. Deployment](#12-deployment)
   - [13. License](#13-license)
 
 ## 1. Quick Start
@@ -104,7 +104,21 @@ Dual-view task management with Kanban board and Eisenhower Matrix, featuring dra
 - FastMCP-based implementation with GraphQL coordination
 </details>
 
-## 3. Architecture
+## 3. MCP Server (Claude AI)
+
+[Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
+
+| Feature | Description |
+|---------|-------------|
+| **Natural Language** | Create, update, delete tasks via conversation |
+| **GraphQL Backend** | Same API as the web frontend |
+| **Local/Remote** | Supports stdio (local) and HTTP/SSE (remote) |
+
+**Quick Setup:** Add `backend/integrations/mcp/server.py` to Claude Desktop config.
+
+See [`backend/integrations/mcp/README.md`](backend/integrations/mcp/README.md) for full setup guide.
+
+## 4. Architecture
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#e2e8f0', 'lineColor': '#64748b', 'secondaryColor': '#f8fafc', 'tertiaryColor': '#f1f5f9'}}}%%
@@ -172,7 +186,7 @@ graph TB
 
 **Layered architecture:** Presentation (clients) → Application (APIs) → Domain (business logic) → Infrastructure (data). Two interfaces to one backend: Browser via GraphQL with schema composition, Claude via MCP with direct model access.
 
-## 4. Tech Stack
+## 5. Tech Stack
 
 | Category | Technologies |
 |----------|-------------|
@@ -183,7 +197,7 @@ graph TB
 | **AI Integration** | ![MCP](https://img.shields.io/badge/MCP_Server-FastMCP-5A67D8?logo=anthropic&logoColor=white) |
 | **Dev Tools** | ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=black) ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=black) |
 
-## 5. Project Structure
+## 6. Project Structure
 
 ### Backend (Django)
 
@@ -236,7 +250,7 @@ frontend/src/
 └── .pre-commit-config.yaml    # Code quality hooks
 ```
 
-## 6. Development
+## 7. Development
 
 | Command | Description |
 |---------|-------------|
@@ -250,7 +264,7 @@ frontend/src/
 
 > **Windows**: Use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) or `choco install make`
 
-## 7. Testing
+## 8. Testing
 
 **Testing Trophy** approach — prioritizing integration tests for maximum confidence with minimal maintenance.
 
@@ -266,7 +280,7 @@ make test       # Run all tests (unit + integration + e2e)
 make check      # Full CI validation
 ```
 
-## 8. Pre-commit Hooks
+## 9. Pre-commit Hooks
 
 Automated code quality checks before each commit.
 
@@ -276,7 +290,7 @@ make precommit                                  # Run manually
 make lint                                       # Auto-fix issues
 ```
 
-## 9. Git Workflow
+## 10. Git Workflow
 
 Feature branch workflow with **Squash Merge** for a clean, readable history.
 
@@ -311,7 +325,7 @@ gitGraph
 
 > **Result:** `main` shows one commit per feature — easy to read, review, and revert.
 
-## 10. Continuous Integration & Deployment
+## 11. Continuous Integration & Deployment
 
 Automated CI/CD pipeline with parallel execution, Docker containerization, and deployment simulation.
 
@@ -372,7 +386,7 @@ flowchart LR
 
 See `.github/workflows/ci-cd.yml` for full configuration.
 
-## 11. Deployment
+## 12. Deployment
 
 **Deployment Features:**
 - Automated CI/CD pipeline (`.github/workflows/`)
@@ -388,18 +402,6 @@ See `.github/workflows/ci-cd.yml` for full configuration.
 # Production build
 docker-compose -f docker-compose.prod.yml up --build
 ```
-
-## 12. MCP Server Integration
-
-[Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
-
-**Setup:** Configure Claude Desktop with `backend/integrations/mcp/server.py` path
-**Operations:** List, create, update, delete tasks via natural language
-**Deployment:** Supports stdio (local) and HTTP/SSE (remote) transport
-
-**📚 API Documentation:** [GraphQL Playground](http://localhost:8000/graphql) | [Schema Reference](backend/kanban/graphql/schema.graphql)
-
-See `backend/integrations/mcp/README.md` for configuration details.
 
 ## 13. License
 
