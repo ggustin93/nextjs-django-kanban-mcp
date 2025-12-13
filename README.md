@@ -278,27 +278,38 @@ make lint                                       # Auto-fix issues
 
 ## 9. Git Workflow
 
-Feature branch workflow with Pull Request validation before merging to main.
+Feature branch workflow with **Squash Merge** for a clean, readable history.
 
 ```mermaid
 gitGraph
     commit id: "main"
     branch feature/xyz
-    commit id: "feat: add X"
-    commit id: "fix: adjust Y"
+    commit id: "wip: draft"
+    commit id: "wip: tests"
+    commit id: "fix: typo"
     checkout main
-    merge feature/xyz id: "PR #1 ✓" tag: "CI passed"
+    commit id: "feat: add X" tag: "Squashed ✓"
 ```
+
+**Why Squash Merge?** Multiple dev commits → 1 clean commit on main.
+
+| Your branch | → | main |
+|-------------|---|------|
+| `wip: draft` | | |
+| `wip: tests` | **Squash** | `feat: add feature X` |
+| `fix: typo` | | *(1 commit = 1 feature)* |
+
+**Workflow:**
 
 | Step | Command | Purpose |
 |------|---------|---------|
-| 1. Branch | `git checkout -b feature/xyz` | Isolate work from main |
-| 2. Commit | `git commit -m "feat: ..."` | Small, atomic commits |
-| 3. Push | `git push -u origin feature/xyz` | Backup + share |
-| 4. PR | `gh pr create` | Trigger CI + code review |
-| 5. Merge | Via GitHub UI | Only after CI passes ✓ |
+| 1. Branch | `git checkout -b feature/xyz` | Isolate work |
+| 2. Commit | `git commit -m "wip: ..."` | Work freely |
+| 3. Push | `git push -u origin feature/xyz` | Create PR |
+| 4. CI | *Automatic* | Tests must pass |
+| 5. Merge | **Squash and merge** | Clean history |
 
-**Why PRs?** CI runs on PRs (not feature branches). Code review + tests must pass before merge.
+> **Result:** `main` shows one commit per feature — easy to read, review, and revert.
 
 ## 10. Continuous Integration & Deployment
 
