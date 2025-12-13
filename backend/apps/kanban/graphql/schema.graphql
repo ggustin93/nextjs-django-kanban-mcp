@@ -10,6 +10,16 @@ type Query {
   allTasks: [TaskType]
 }
 
+"""
+GraphQL Type for Task
+=====================
+
+Extended to include checklists relationship.
+
+Performance:
+    - Uses prefetch_related for checklists and their items
+    - Prevents N+1 queries when loading task with checklists
+"""
 type TaskType {
   id: ID!
   createdAt: DateTime!
@@ -19,6 +29,8 @@ type TaskType {
   status: KanbanTaskStatusChoices!
   category: String!
   priority: KanbanTaskPriorityChoices!
+  order: Int!
+  checklists: [ChecklistType!]!
 }
 
 """
@@ -59,6 +71,52 @@ enum KanbanTaskPriorityChoices {
 }
 
 """
+GraphQL Type for Checklist
+===========================
+
+Fields:
+    - id, title, task
+    - items: Related ChecklistItems (ordered by position)
+    - progress: Calculated completion percentage (0-100)
+    - createdAt, updatedAt
+
+Performance:
+    - Uses prefetch_related for items to avoid N+1 queries
+    - Progress field is computed from database counts
+"""
+type ChecklistType {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  task: TaskType!
+  items: [ChecklistItemType!]!
+  progress: Int
+}
+
+"""
+GraphQL Type for ChecklistItem
+===============================
+
+Fields:
+    - id, text, completed, position
+    - checklist: Parent checklist reference
+    - createdAt, updatedAt
+
+Performance:
+    - Uses select_related for checklist to avoid N+1 queries
+"""
+type ChecklistItemType {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  text: String!
+  completed: Boolean!
+  position: Int!
+  checklist: ChecklistType!
+}
+
+"""
 Root Mutation for GraphQL API - combines all write operations.
 
 Inherits: apps.kanban.schema.Mutation (createTask)
@@ -67,13 +125,43 @@ Security: All mutations must validate inputs and check permissions
 Future: Add new app Mutation classes to inheritance list
 """
 type Mutation {
-  createTask(category: String, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String!): CreateTask
-  updateTask(category: String, description: String, id: ID!, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String): UpdateTask
+  """Create a new task with validation."""
+  createTask(category: String, order: Int, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String!): CreateTask
+
+  """Update an existing task with validation."""
+  updateTask(category: String, description: String, id: ID!, order: Int, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String): UpdateTask
+
+  """Delete a task by ID."""
   deleteTask(id: ID!): DeleteTask
+
+  """Create a new checklist for a task."""
+  createChecklist(taskId: ID!, title: String!): CreateChecklist
+
+  """Delete a checklist and all its items (CASCADE)."""
+  deleteChecklist(checklistId: ID!): DeleteChecklist
+
+  """
+  Add a new item to a checklist. Auto-calculates position if not provided.
+  """
+  addChecklistItem(checklistId: ID!, position: Int, text: String!): AddChecklistItem
+
+  """Toggle the completed state of a checklist item."""
+  toggleChecklistItem(itemId: ID!): ToggleChecklistItem
+
+  """Update text and/or completed state of a checklist item."""
+  updateChecklistItem(completed: Boolean, itemId: ID!, text: String): UpdateChecklistItem
+
+  """Delete a checklist item."""
+  deleteChecklistItem(itemId: ID!): DeleteChecklistItem
+
+  """Reorder all items in a checklist atomically using bulk_update."""
+  reorderChecklistItems(checklistId: ID!, itemIds: [ID]!): ReorderChecklistItems
 }
 
+"""Create a new task with validation."""
 type CreateTask {
   task: TaskType
+  errors: [String]
 }
 
 """GraphQL enum for Task.Priority choices."""
@@ -92,10 +180,62 @@ enum TaskStatusEnum {
   DONE
 }
 
+"""Update an existing task with validation."""
 type UpdateTask {
   task: TaskType
+  errors: [String]
 }
 
+"""Delete a task by ID."""
 type DeleteTask {
   success: Boolean
+  deletedId: ID
+  errors: [String]
+}
+
+"""Create a new checklist for a task."""
+type CreateChecklist {
+  checklist: ChecklistType
+  errors: [String]
+}
+
+"""Delete a checklist and all its items (CASCADE)."""
+type DeleteChecklist {
+  success: Boolean
+  deletedId: ID
+  errors: [String]
+}
+
+"""
+Add a new item to a checklist. Auto-calculates position if not provided.
+"""
+type AddChecklistItem {
+  item: ChecklistItemType
+  errors: [String]
+}
+
+"""Toggle the completed state of a checklist item."""
+type ToggleChecklistItem {
+  item: ChecklistItemType
+  errors: [String]
+}
+
+"""Update text and/or completed state of a checklist item."""
+type UpdateChecklistItem {
+  item: ChecklistItemType
+  errors: [String]
+}
+
+"""Delete a checklist item."""
+type DeleteChecklistItem {
+  success: Boolean
+  deletedId: ID
+  errors: [String]
+}
+
+"""Reorder all items in a checklist atomically using bulk_update."""
+type ReorderChecklistItems {
+  items: [ChecklistItemType]
+  checklist: ChecklistType
+  errors: [String]
 }

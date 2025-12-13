@@ -1,0 +1,409 @@
+# ==================================================
+# Checklist GraphQL Examples
+# ==================================================
+# Purpose: Sample GraphQL queries and mutations for checklist feature
+# Usage: Copy/paste into GraphiQL at http://localhost:8000/graphql/
+# ==================================================
+
+# --------------------------------------------------
+# QUERIES
+# --------------------------------------------------
+
+# Query: Get all tasks with their checklists and items
+query GetAllTasksWithChecklists {
+  allTasks {
+    id
+    title
+    status
+    checklists {
+      id
+      title
+      progress
+      items {
+        id
+        text
+        completed
+        position
+        createdAt
+      }
+    }
+  }
+}
+
+# Query: Get single task with optimized checklist loading
+query GetTaskWithChecklists($taskId: ID!) {
+  task(id: $taskId) {
+    id
+    title
+    description
+    status
+    priority
+    checklists {
+      id
+      title
+      progress
+      createdAt
+      items {
+        id
+        text
+        completed
+        position
+      }
+    }
+  }
+}
+
+# Variables for above query:
+# {
+#   "taskId": "1"
+# }
+
+# --------------------------------------------------
+# MUTATIONS: Checklist Operations
+# --------------------------------------------------
+
+# Mutation: Create a new checklist
+mutation CreateChecklist($taskId: ID!, $title: String!) {
+  createChecklist(taskId: $taskId, title: $title) {
+    checklist {
+      id
+      title
+      task {
+        id
+        title
+      }
+      progress
+      items {
+        id
+      }
+      createdAt
+    }
+  }
+}
+
+# Variables:
+# {
+#   "taskId": "1",
+#   "title": "Pre-Launch Checklist"
+# }
+
+# Mutation: Delete a checklist
+mutation DeleteChecklist($checklistId: ID!) {
+  deleteChecklist(checklistId: $checklistId) {
+    success
+    deletedId
+  }
+}
+
+# Variables:
+# {
+#   "checklistId": "1"
+# }
+
+# --------------------------------------------------
+# MUTATIONS: ChecklistItem Operations
+# --------------------------------------------------
+
+# Mutation: Add item to checklist (position auto-calculated)
+mutation AddChecklistItem($checklistId: ID!, $text: String!) {
+  addChecklistItem(checklistId: $checklistId, text: $text) {
+    item {
+      id
+      text
+      completed
+      position
+      checklist {
+        id
+        title
+        progress
+      }
+    }
+  }
+}
+
+# Variables:
+# {
+#   "checklistId": "1",
+#   "text": "Test on staging environment"
+# }
+
+# Mutation: Add item with specific position
+mutation AddChecklistItemAtPosition(
+  $checklistId: ID!
+  $text: String!
+  $position: Int!
+) {
+  addChecklistItem(
+    checklistId: $checklistId
+    text: $text
+    position: $position
+  ) {
+    item {
+      id
+      text
+      position
+      checklist {
+        id
+        items {
+          id
+          text
+          position
+        }
+      }
+    }
+  }
+}
+
+# Variables:
+# {
+#   "checklistId": "1",
+#   "text": "Run security audit",
+#   "position": 0
+# }
+
+# Mutation: Toggle item completed state
+mutation ToggleChecklistItem($itemId: ID!) {
+  toggleChecklistItem(itemId: $itemId) {
+    item {
+      id
+      text
+      completed
+      checklist {
+        id
+        progress
+      }
+    }
+  }
+}
+
+# Variables:
+# {
+#   "itemId": "5"
+# }
+
+# Mutation: Update item text and completion state
+mutation UpdateChecklistItem(
+  $itemId: ID!
+  $text: String
+  $completed: Boolean
+) {
+  updateChecklistItem(
+    itemId: $itemId
+    text: $text
+    completed: $completed
+  ) {
+    item {
+      id
+      text
+      completed
+      updatedAt
+    }
+  }
+}
+
+# Variables (text update):
+# {
+#   "itemId": "5",
+#   "text": "Updated item text"
+# }
+
+# Variables (completion update):
+# {
+#   "itemId": "5",
+#   "completed": true
+# }
+
+# Variables (both):
+# {
+#   "itemId": "5",
+#   "text": "Deploy to production",
+#   "completed": false
+# }
+
+# Mutation: Delete checklist item
+mutation DeleteChecklistItem($itemId: ID!) {
+  deleteChecklistItem(itemId: $itemId) {
+    success
+    deletedId
+  }
+}
+
+# Variables:
+# {
+#   "itemId": "5"
+# }
+
+# Mutation: Reorder checklist items
+mutation ReorderChecklistItems($checklistId: ID!, $itemIds: [ID!]!) {
+  reorderChecklistItems(checklistId: $checklistId, itemIds: $itemIds) {
+    items {
+      id
+      text
+      position
+    }
+    checklist {
+      id
+      progress
+    }
+  }
+}
+
+# Variables:
+# {
+#   "checklistId": "1",
+#   "itemIds": ["3", "1", "2", "4"]
+# }
+
+# --------------------------------------------------
+# COMPLEX WORKFLOWS
+# --------------------------------------------------
+
+# Workflow: Create complete checklist with items
+mutation CreateCompleteChecklist(
+  $taskId: ID!
+  $checklistTitle: String!
+) {
+  # Step 1: Create checklist
+  checklist: createChecklist(taskId: $taskId, title: $checklistTitle) {
+    checklist {
+      id
+      title
+    }
+  }
+}
+
+# Then call AddChecklistItem multiple times with the returned checklist ID
+
+# Variables:
+# {
+#   "taskId": "1",
+#   "checklistTitle": "Development Setup"
+# }
+
+# Workflow: Complete a checklist item and update progress
+mutation CompleteItemAndRefresh($itemId: ID!) {
+  toggleChecklistItem(itemId: $itemId) {
+    item {
+      id
+      text
+      completed
+      checklist {
+        id
+        title
+        progress
+        items {
+          id
+          completed
+        }
+      }
+    }
+  }
+}
+
+# Variables:
+# {
+#   "itemId": "5"
+# }
+
+# --------------------------------------------------
+# PERFORMANCE TESTING QUERIES
+# --------------------------------------------------
+
+# Query: Test N+1 prevention (should execute only 3 queries)
+query TestNPlusOnePrevention {
+  allTasks {
+    id
+    title
+    checklists {
+      id
+      title
+      items {
+        id
+        text
+      }
+    }
+  }
+}
+
+# Query: Get checklist with progress calculation
+query GetChecklistProgress($checklistId: ID!) {
+  # Note: You'll need to add this query to queries.py if not present
+  checklist(id: $checklistId) {
+    id
+    title
+    progress
+    items {
+      id
+      completed
+    }
+  }
+}
+
+# Variables:
+# {
+#   "checklistId": "1"
+# }
+
+# --------------------------------------------------
+# FRONTEND INTEGRATION EXAMPLES
+# --------------------------------------------------
+
+# Example: Apollo Client mutation with optimistic response
+# mutation ToggleItemOptimistic($itemId: ID!) {
+#   toggleChecklistItem(itemId: $itemId) {
+#     item {
+#       id
+#       completed
+#       checklist {
+#         id
+#         progress
+#       }
+#     }
+#   }
+# }
+
+# Example: Refetch queries after mutation
+# mutation AddItemWithRefetch($checklistId: ID!, $text: String!) {
+#   addChecklistItem(checklistId: $checklistId, text: $text) {
+#     item {
+#       id
+#       text
+#       position
+#     }
+#   }
+# }
+# # Refetch: ["GetTaskWithChecklists"]
+
+# --------------------------------------------------
+# ERROR HANDLING EXAMPLES
+# --------------------------------------------------
+
+# Example: Invalid checklist ID (will throw error)
+# mutation {
+#   addChecklistItem(checklistId: "999", text: "This will fail") {
+#     item {
+#       id
+#     }
+#   }
+# }
+
+# Example: Reorder with invalid item IDs (will throw error)
+# mutation {
+#   reorderChecklistItems(
+#     checklistId: "1",
+#     itemIds: ["1", "2", "999"]
+#   ) {
+#     items {
+#       id
+#     }
+#   }
+# }
+
+# --------------------------------------------------
+# NOTES
+# --------------------------------------------------
+# 1. All mutations return the updated object for optimistic UI updates
+# 2. Progress is calculated on-the-fly (no caching)
+# 3. Reordering uses atomic transactions for consistency
+# 4. Toggle mutation is most efficient for checkbox clicks
+# 5. Position auto-calculation prevents gaps in item ordering
