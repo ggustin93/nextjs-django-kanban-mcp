@@ -22,18 +22,18 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useState } from 'react';
-import { TaskPriority, TaskStatus, PRIORITY_CONFIG, COLUMNS, ViewType } from './types';
+import { TaskPriorityEnum, TaskStatusEnum, PRIORITY_CONFIG, COLUMNS, ViewType } from './types';
 
 interface FilterBarProps {
-  priorities: TaskPriority[];
+  priorities: TaskPriorityEnum[];
   categories: string[];
-  statuses: TaskStatus[];
+  statuses: TaskStatusEnum[];
   searchText: string;
   availableCategories: string[];
   viewType: ViewType;
-  onPrioritiesChange: (priorities: TaskPriority[]) => void;
+  onPrioritiesChange: (priorities: TaskPriorityEnum[]) => void;
   onCategoriesChange: (categories: string[]) => void;
-  onStatusesChange: (statuses: TaskStatus[]) => void;
+  onStatusesChange: (statuses: TaskStatusEnum[]) => void;
   onSearchChange: (search: string) => void;
   onViewChange: (view: ViewType) => void;
   onClearFilters: () => void;
@@ -55,7 +55,7 @@ export function FilterBar({
 }: FilterBarProps) {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  const togglePriority = (priority: TaskPriority) => {
+  const togglePriority = (priority: TaskPriorityEnum) => {
     if (priorities.includes(priority)) {
       onPrioritiesChange(priorities.filter((p) => p !== priority));
     } else {
@@ -71,7 +71,7 @@ export function FilterBar({
     }
   };
 
-  const toggleStatus = (status: TaskStatus) => {
+  const toggleStatus = (status: TaskStatusEnum) => {
     if (statuses.includes(status)) {
       onStatusesChange(statuses.filter((s) => s !== status));
     } else {
@@ -146,14 +146,14 @@ export function FilterBar({
           <Chip
             key={priority}
             label={config.shortLabel}
-            onClick={() => togglePriority(priority as TaskPriority)}
-            color={priorities.includes(priority as TaskPriority) ? config.color : 'default'}
-            variant={priorities.includes(priority as TaskPriority) ? 'filled' : 'outlined'}
+            onClick={() => togglePriority(priority as TaskPriorityEnum)}
+            color={priorities.includes(priority as TaskPriorityEnum) ? config.color : 'default'}
+            variant={priorities.includes(priority as TaskPriorityEnum) ? 'filled' : 'outlined'}
             size="small"
             sx={{
               height: 24,
               fontSize: '0.7rem',
-              fontWeight: priorities.includes(priority as TaskPriority) ? 600 : 400,
+              fontWeight: priorities.includes(priority as TaskPriorityEnum) ? 600 : 400,
               minWidth: 36,
               '& .MuiChip-label': { px: 0.75 },
             }}

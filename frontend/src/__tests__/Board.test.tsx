@@ -20,7 +20,7 @@ import { MockedProvider, MockedResponse } from '@apollo/client/testing';
 import { Board } from '@/components/kanban/Board';
 import { GET_TASKS } from '@/graphql/queries';
 import { CREATE_TASK, UPDATE_TASK, DELETE_TASK } from '@/graphql/mutations';
-import { TaskStatus } from '@/components/kanban/types';
+import { TaskStatusEnum } from '@/components/kanban/types';
 
 // Mock data with __typename for Apollo Client v3.14+
 const mockTasks = [
@@ -469,14 +469,14 @@ describe('Board Component', () => {
   });
 
   it('validates status enum values are correct', () => {
-    // Verify TaskStatus enum matches backend expectations
-    expect(TaskStatus.TODO).toBe('TODO');
-    expect(TaskStatus.DOING).toBe('DOING');
-    expect(TaskStatus.DONE).toBe('DONE');
+    // Verify TaskStatusEnum enum matches backend expectations
+    expect(TaskStatusEnum.Todo).toBe('TODO');
+    expect(TaskStatusEnum.Doing).toBe('DOING');
+    expect(TaskStatusEnum.Done).toBe('DONE');
 
     // Ensure no invalid status values
     const validStatuses = ['TODO', 'DOING', 'WAITING', 'DONE'];
-    Object.values(TaskStatus).forEach((status) => {
+    Object.values(TaskStatusEnum).forEach((status) => {
       expect(validStatuses).toContain(status);
     });
   });

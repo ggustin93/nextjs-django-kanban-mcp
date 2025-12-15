@@ -24,7 +24,7 @@ import {
   Task,
   EISENHOWER_QUADRANTS,
   EisenhowerQuadrantConfig,
-  TaskPriority,
+  TaskPriorityEnum,
   COLUMNS,
   getPriorityColor,
 } from './types';
@@ -34,7 +34,7 @@ interface EisenhowerMatrixProps {
   tasks: Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
-  onUpdateTask: (id: string, priority: TaskPriority) => void; // NEW: Handle priority change
+  onUpdateTask: (id: string, priority: TaskPriorityEnum) => void;
 }
 
 function EisenhowerQuadrant({
