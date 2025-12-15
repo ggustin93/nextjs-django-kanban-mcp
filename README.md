@@ -34,18 +34,18 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 | # | Section | Description |
 |:-:|---------|-------------|
-| 1 | [Quick Start](#1-quick-start) | Get running in minutes |
-| 2 | [Features](#2-features) | Task management capabilities |
-| 3 | [MCP Server](#3-mcp-server-integration) | Claude AI integration |
-| 4 | [Architecture](#4-architecture) | System design overview |
-| 5 | [Tech Stack](#5-tech-stack) | Technologies used |
-| 6 | [Project Structure](#6-project-structure) | Codebase organization |
-| 7 | [Development](#7-development) | Dev commands & workflow |
-| 8 | [Testing](#8-testing) | Test strategy & commands |
-| 9 | [Pre-commit Hooks](#9-pre-commit-hooks) | Code quality automation |
-| 10 | [CI/CD](#10-continuous-integration--deployment) | Pipeline & deployment |
-| 11 | [Deployment](#11-deployment) | Production setup |
-| 12 | [License](#12-license) | MIT License |
+| 1 | [Quick Start](#1-quick-start) | Docker setup and service ports |
+| 2 | [Features](#2-features) | Kanban, Eisenhower Matrix, filtering |
+| 3 | [MCP Server](#3-mcp-server-integration) | MCP protocol integration for AI clients |
+| 4 | [Architecture](#4-architecture) | Layered architecture and data flow |
+| 5 | [Tech Stack](#5-tech-stack) | Backend, frontend, tooling |
+| 6 | [Project Structure](#6-project-structure) | Directory layout and modules |
+| 7 | [Development](#7-development) | Local setup and workflows |
+| 8 | [Testing](#8-testing) | Unit, integration, E2E coverage |
+| 9 | [Pre-commit Hooks](#9-pre-commit-hooks) | Automated quality checks |
+| 10 | [CI/CD](#10-continuous-integration--deployment) | Validation and deployment pipeline |
+| 11 | [Deployment](#11-deployment) | Container orchestration options |
+| 12 | [License](#12-license) | MIT |
 
 ## 1. Quick Start
 
