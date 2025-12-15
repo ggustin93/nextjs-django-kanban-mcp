@@ -32,9 +32,7 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 ## Table of Contents
 
-- [Kanban MCP — Next.js · Django · GraphQL](#kanban-mcp--nextjs--django--graphql)
   - [Screenshots](#screenshots)
-  - [Table of Contents](#table-of-contents)
   - [1. Quick Start](#1-quick-start)
   - [2. Features](#2-features)
   - [3. MCP Server Integration](#3-mcp-server-integration)
