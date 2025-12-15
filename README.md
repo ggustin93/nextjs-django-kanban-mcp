@@ -2,7 +2,7 @@
 
 A task management app featuring drag-and-drop Kanban boards, Eisenhower priority matrix, GraphQL API, and MCP server for Claude AI integration.
 
-**Stack:** Next.js 15, Django 4.2, TypeScript, Material UI, Apollo Client, Graphene-Django
+**Stack:** Next.js 15, Django 4.2, TypeScript, Material UI, Apollo Client, Ariadne (GraphQL)
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -118,7 +118,7 @@ graph TB
         end
 
         subgraph Backend["Backend Container"]
-            GraphQL["<b>GraphQL API</b><br/>Graphene-Django"]
+            GraphQL["<b>GraphQL API</b><br/>Ariadne"]
             MCPServer["<b>MCP Server</b><br/>FastMCP"]
             RootSchema["<b>Root Schema</b><br/>Query + Mutation"]
         end
@@ -176,7 +176,7 @@ graph TB
 |----------|-------------|
 | **Backend** | ![Django](https://img.shields.io/badge/Django-4.2-092E20?logo=django&logoColor=white) ![GraphQL](https://img.shields.io/badge/GraphQL-E10098?logo=graphql&logoColor=white) ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white) |
 | **Frontend** | ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) ![Material UI](https://img.shields.io/badge/Material_UI-v7-007FFF?logo=mui&logoColor=white) |
-| **API Layer** | ![Apollo](https://img.shields.io/badge/Apollo_Client-311C87?logo=apollo-graphql&logoColor=white) ![Graphene](https://img.shields.io/badge/Graphene--Django-E10098?logo=graphql&logoColor=white) |
+| **API Layer** | ![Apollo](https://img.shields.io/badge/Apollo_Client-311C87?logo=apollo-graphql&logoColor=white) ![Ariadne](https://img.shields.io/badge/Ariadne-E10098?logo=graphql&logoColor=white) ![Codegen](https://img.shields.io/badge/GraphQL_Codegen-E10098?logo=graphql&logoColor=white) |
 | **Infrastructure** | ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) |
 | **AI Integration** | ![MCP](https://img.shields.io/badge/MCP_Server-FastMCP-5A67D8?logo=anthropic&logoColor=white) |
 | **Dev Tools** | ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=black) ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=black) |
@@ -191,10 +191,11 @@ backend/
 │   ├── core/                  # Shared base models (TimeStampedModel)
 │   └── kanban/                # Kanban feature app
 │       ├── models.py          # Task model
-│       ├── schema/            # GraphQL layer
-│       │   ├── types.py       # TaskType definition
-│       │   ├── queries.py     # allTasks query
-│       │   └── mutations.py   # create/update/delete
+│       ├── graphql/           # Ariadne GraphQL (schema-first)
+│       │   ├── schema.graphql # SDL schema (source of truth)
+│       │   ├── types.py       # Scalar + enum bindings
+│       │   ├── queries.py     # allTasks resolver
+│       │   └── mutations.py   # CRUD resolvers
 │       ├── tests/             # Model + API tests
 │       └── management/        # seed_tasks command
 ├── config/                    # Project configuration
@@ -225,6 +226,7 @@ frontend/src/
 │           ├── TaskCard.tsx
 │           └── TaskDialog.tsx
 ├── graphql/                   # Apollo Client layer
+│   ├── generated.ts           # Auto-generated types (GraphQL Codegen)
 │   ├── client.ts              # Apollo Client setup
 │   ├── queries.ts             # GET_TASKS query
 │   └── mutations.ts           # CREATE/UPDATE/DELETE
@@ -247,6 +249,7 @@ frontend/src/
 | `make up` / `make down` | Start/stop Docker services |
 | `make test` | Run all tests (unit + integration + E2E) |
 | `make lint` | Auto-fix linting issues |
+| `make codegen` | Regenerate TypeScript types from GraphQL schema |
 | `make logs` / `make shell` | View logs / Django shell |
 
 **GraphQL Playground**: http://localhost:8000/graphql — Query, create, update, delete tasks.
