@@ -32,22 +32,20 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 ## Table of Contents
 
-  - [Screenshots](#screenshots)
-  - [1. Quick Start](#1-quick-start)
-  - [2. Features](#2-features)
-  - [3. MCP Server Integration](#3-mcp-server-integration)
-  - [4. Architecture](#4-architecture)
-  - [5. Tech Stack](#5-tech-stack)
-  - [6. Project Structure](#6-project-structure)
-    - [Backend (Django)](#backend-django)
-    - [Frontend (Next.js)](#frontend-nextjs)
-    - [Root](#root)
-  - [7. Development](#7-development)
-  - [8. Testing](#8-testing)
-  - [9. Pre-commit Hooks](#9-pre-commit-hooks)
-  - [10. Continuous Integration \& Deployment](#10-continuous-integration--deployment)
-  - [11. Deployment](#11-deployment)
-  - [12. License](#12-license)
+| # | Section | Description |
+|:-:|---------|-------------|
+| 1 | [Quick Start](#1-quick-start) | Get running in minutes |
+| 2 | [Features](#2-features) | Task management capabilities |
+| 3 | [MCP Server](#3-mcp-server-integration) | Claude AI integration |
+| 4 | [Architecture](#4-architecture) | System design overview |
+| 5 | [Tech Stack](#5-tech-stack) | Technologies used |
+| 6 | [Project Structure](#6-project-structure) | Codebase organization |
+| 7 | [Development](#7-development) | Dev commands & workflow |
+| 8 | [Testing](#8-testing) | Test strategy & commands |
+| 9 | [Pre-commit Hooks](#9-pre-commit-hooks) | Code quality automation |
+| 10 | [CI/CD](#10-continuous-integration--deployment) | Pipeline & deployment |
+| 11 | [Deployment](#11-deployment) | Production setup |
+| 12 | [License](#12-license) | MIT License |
 
 ## 1. Quick Start
 
