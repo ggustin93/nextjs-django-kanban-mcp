@@ -32,10 +32,6 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 ## Table of Contents
 
-| # | Section | Description |
-|:-:|---------|-------------|
-## Table of Contents
-
 | #  | Section |
 |----|---------|
 | 1  | [Quick Start](#1-quick-start) |
