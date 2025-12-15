@@ -14,10 +14,11 @@
 import { render, screen } from '@testing-library/react';
 import { DndContext } from '@dnd-kit/core';
 import { KanbanColumn } from '@/components/kanban/KanbanColumn';
-import { Column, Task, TaskStatusEnum, TaskPriorityEnum } from '@/components/kanban/types';
+import { TaskType, TaskStatusEnum, TaskPriorityEnum } from '@/components/kanban/types';
+import { Column } from '@/components/kanban/config';
 
 // Mock task data
-const mockTasks: Task[] = [
+const mockTasks: TaskType[] = [
   {
     id: '1',
     title: 'Test Task',
@@ -178,7 +179,7 @@ describe('KanbanColumn Component', () => {
     });
 
     it('updates count when multiple tasks present', () => {
-      const multipleTasks: Task[] = [
+      const multipleTasks: TaskType[] = [
         ...mockTasks,
         {
           id: '2',

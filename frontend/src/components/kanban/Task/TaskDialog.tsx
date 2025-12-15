@@ -18,7 +18,8 @@ import {
   MenuItem,
   InputAdornment,
 } from '@mui/material';
-import { TaskFormData, TaskStatusEnum, TaskPriorityEnum, COLUMNS, PRIORITY_CONFIG } from '../types';
+import { TaskFormData, TaskStatusEnum, TaskPriorityEnum } from '../types';
+import { COLUMNS, PRIORITY_CONFIG } from '../config';
 
 interface TaskDialogProps {
   open: boolean;

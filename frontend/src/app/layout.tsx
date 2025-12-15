@@ -6,7 +6,7 @@ import { DM_Sans } from 'next/font/google';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { ApolloWrapper } from '@/components/ApolloWrapper';
+import { ApolloWrapper } from '@/graphql/ApolloWrapper';
 import { theme } from '@/theme/theme';
 
 const dmSans = DM_Sans({

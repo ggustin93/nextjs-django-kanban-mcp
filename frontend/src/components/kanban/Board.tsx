@@ -40,16 +40,9 @@ import { KanbanColumn } from './KanbanColumn';
 import { TaskDialog } from './Task/TaskDialog';
 import { FilterBar } from './FilterBar';
 import { EisenhowerMatrix } from './EisenhowerMatrix';
-import { useTaskDialog } from './useTaskDialog';
-import {
-  TaskType,
-  TaskStatusEnum,
-  TaskPriorityEnum,
-  COLUMNS,
-  PRIORITY_ORDER,
-  ViewType,
-  FilterState,
-} from './types';
+import { useTaskDialog } from './hooks';
+import { TaskType, TaskStatusEnum, TaskPriorityEnum, ViewType, FilterState } from './types';
+import { COLUMNS, PRIORITY_ORDER } from './config';
 
 const REFETCH_QUERIES = [{ query: GetTasksDocument }];
 

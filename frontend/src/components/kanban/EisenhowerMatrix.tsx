@@ -20,19 +20,18 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
+import { TaskType, TaskPriorityEnum } from './types';
 import {
-  Task,
   EISENHOWER_QUADRANTS,
   EisenhowerQuadrantConfig,
-  TaskPriorityEnum,
   COLUMNS,
   getPriorityColor,
-} from './types';
+} from './config';
 import { TaskCard } from './Task/TaskCard';
 
 interface EisenhowerMatrixProps {
-  tasks: Task[];
-  onEditTask: (task: Task) => void;
+  tasks: TaskType[];
+  onEditTask: (task: TaskType) => void;
   onDeleteTask: (id: string) => void;
   onUpdateTask: (id: string, priority: TaskPriorityEnum) => void;
 }
@@ -44,8 +43,8 @@ function EisenhowerQuadrant({
   onDeleteTask,
 }: {
   quadrantConfig: EisenhowerQuadrantConfig;
-  tasks: Task[];
-  onEditTask: (task: Task) => void;
+  tasks: TaskType[];
+  onEditTask: (task: TaskType) => void;
   onDeleteTask: (id: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
@@ -180,7 +179,7 @@ export function EisenhowerMatrix({
   onDeleteTask,
   onUpdateTask,
 }: EisenhowerMatrixProps) {
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [activeTask, setActiveTask] = useState<TaskType | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -198,7 +197,7 @@ export function EisenhowerMatrix({
       acc[quadrant.quadrant] = tasks.filter((task) => task.priority === quadrant.priority);
       return acc;
     },
-    {} as Record<string, Task[]>
+    {} as Record<string, TaskType[]>
   );
 
   const handleDragStart = (event: DragStartEvent) => {

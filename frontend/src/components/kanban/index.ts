@@ -6,6 +6,9 @@
 // Types
 export * from './types';
 
+// Config
+export * from './config';
+
 // Components
 export { Board } from './Board';
 export { KanbanColumn } from './KanbanColumn';
@@ -17,4 +20,4 @@ export { TaskCard } from './Task/TaskCard';
 export { TaskDialog } from './Task/TaskDialog';
 
 // Hooks
-export { useTaskDialog } from './useTaskDialog';
+export { useTaskDialog } from './hooks';

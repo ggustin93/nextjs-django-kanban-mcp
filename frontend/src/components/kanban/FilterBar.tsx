@@ -22,7 +22,8 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useState } from 'react';
-import { TaskPriorityEnum, TaskStatusEnum, PRIORITY_CONFIG, COLUMNS, ViewType } from './types';
+import { TaskPriorityEnum, TaskStatusEnum, ViewType } from './types';
+import { PRIORITY_CONFIG, COLUMNS } from './config';
 
 interface FilterBarProps {
   priorities: TaskPriorityEnum[];

@@ -3,7 +3,7 @@
  * Single Responsibility: Handle dialog open/close and form state management
  */
 import { useState } from 'react';
-import { Task, TaskFormData, TaskStatusEnum, TaskPriorityEnum } from './types';
+import { TaskType, TaskFormData, TaskStatusEnum, TaskPriorityEnum } from '../types';
 
 const INITIAL_FORM_DATA: TaskFormData = {
   title: '',
@@ -15,7 +15,7 @@ const INITIAL_FORM_DATA: TaskFormData = {
 
 export function useTaskDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<TaskType | null>(null);
   const [formData, setFormData] = useState<TaskFormData>(INITIAL_FORM_DATA);
 
   const openForCreate = () => {
@@ -24,7 +24,7 @@ export function useTaskDialog() {
     setIsOpen(true);
   };
 
-  const openForEdit = (task: Task) => {
+  const openForEdit = (task: TaskType) => {
     setEditingTask(task);
     setFormData({
       title: task.title,
