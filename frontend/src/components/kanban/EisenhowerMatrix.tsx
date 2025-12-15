@@ -16,7 +16,7 @@ import {
   DragOverlay,
   DragStartEvent,
 } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
@@ -34,7 +34,9 @@ interface EisenhowerMatrixProps {
   tasks: Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
-  onUpdateTask: (id: string, priority: TaskPriority) => void; // NEW: Handle priority change
+  onUpdateTask: (id: string, priority: TaskPriority) => void;
+  onReorderTasks: (reorderedTasks: { id: string; order: number }[]) => void;
+  onUpdateDescription?: (id: string, description: string) => void;
 }
 
 function EisenhowerQuadrant({
@@ -42,11 +44,13 @@ function EisenhowerQuadrant({
   tasks,
   onEditTask,
   onDeleteTask,
+  onUpdateDescription,
 }: {
   quadrantConfig: EisenhowerQuadrantConfig;
   tasks: Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
+  onUpdateDescription?: (id: string, description: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: quadrantConfig.quadrant,
@@ -145,6 +149,7 @@ function EisenhowerQuadrant({
                 column={column}
                 onEdit={onEditTask}
                 onDelete={onDeleteTask}
+                onUpdateDescription={onUpdateDescription}
                 showStatusBadge={true}
                 layout="horizontal"
               />
@@ -179,6 +184,8 @@ export function EisenhowerMatrix({
   onEditTask,
   onDeleteTask,
   onUpdateTask,
+  onReorderTasks,
+  onUpdateDescription,
 }: EisenhowerMatrixProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -193,12 +200,15 @@ export function EisenhowerMatrix({
     })
   );
 
-  const tasksByQuadrant = EISENHOWER_QUADRANTS.reduce(
+  // Group tasks by priority (P1, P2, P3, P4) for quadrant display
+  const tasksByPriority = EISENHOWER_QUADRANTS.reduce(
     (acc, quadrant) => {
-      acc[quadrant.quadrant] = tasks.filter((task) => task.priority === quadrant.priority);
+      acc[quadrant.priority] = tasks
+        .filter((task) => task.priority === quadrant.priority)
+        .sort((a, b) => a.order - b.order);
       return acc;
     },
-    {} as Record<string, Task[]>
+    {} as Record<TaskPriority, Task[]>
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -214,8 +224,10 @@ export function EisenhowerMatrix({
     if (!over || active.id === over.id) return;
 
     const taskId = active.id as string;
+    const draggedTask = tasks.find((t) => t.id === taskId);
+    if (!draggedTask) return;
 
-    // Check if dropped on a quadrant
+    // Check if dropped on a quadrant directly
     const targetQuadrant = EISENHOWER_QUADRANTS.find((q) => q.quadrant === over.id);
     if (targetQuadrant) {
       onUpdateTask(taskId, targetQuadrant.priority);
@@ -225,7 +237,28 @@ export function EisenhowerMatrix({
     // Check if dropped on another task
     const targetTask = tasks.find((task) => task.id === over.id);
     if (targetTask) {
-      onUpdateTask(taskId, targetTask.priority);
+      const isSameQuadrant = draggedTask.priority === targetTask.priority;
+
+      if (isSameQuadrant) {
+        // Reorder within same quadrant
+        const quadrantTasks = tasksByPriority[draggedTask.priority] || [];
+        const oldIndex = quadrantTasks.findIndex((t: Task) => t.id === taskId);
+        const newIndex = quadrantTasks.findIndex((t: Task) => t.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+          const reorderedTasks = arrayMove(quadrantTasks, oldIndex, newIndex) as Task[];
+          const updates = reorderedTasks
+            .map((task: Task, index: number) => ({ id: task.id, order: index }))
+            .filter((update, index) => reorderedTasks[index].order !== index);
+
+          if (updates.length > 0) {
+            onReorderTasks(updates);
+          }
+        }
+      } else {
+        // Move to different quadrant
+        onUpdateTask(taskId, targetTask.priority);
+      }
     }
   };
 
@@ -252,9 +285,10 @@ export function EisenhowerMatrix({
             <EisenhowerQuadrant
               key={quadrant.quadrant}
               quadrantConfig={quadrant}
-              tasks={tasksByQuadrant[quadrant.quadrant] || []}
+              tasks={tasksByPriority[quadrant.priority] || []}
               onEditTask={onEditTask}
               onDeleteTask={onDeleteTask}
+              onUpdateDescription={onUpdateDescription}
             />
           ))}
         </Box>

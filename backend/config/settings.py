@@ -32,8 +32,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# CORS for Next.js frontend
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+# CORS for Next.js frontend (configurable via environment for production)
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "accept",

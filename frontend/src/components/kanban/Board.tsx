@@ -15,121 +15,56 @@ import {
   CardContent,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useQuery, useMutation } from '@apollo/client/react/hooks';
+import { useQuery } from '@apollo/client/react';
 import { GET_TASKS } from '@/graphql/queries';
-import { CREATE_TASK, UPDATE_TASK, DELETE_TASK } from '@/graphql/mutations';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-} from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useState, useMemo } from 'react';
+import { useTaskMutations } from './hooks/useTaskMutations';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
+import { useState, useMemo, useEffect } from 'react';
 import { KanbanColumn } from './KanbanColumn';
 import { TaskDialog } from './Task/TaskDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { FilterBar } from './FilterBar';
 import { EisenhowerMatrix } from './EisenhowerMatrix';
-import { useTaskDialog } from './useTaskDialog';
+import { useTaskDialog } from './hooks/useTaskDialog';
+import { useDragAndDrop } from './hooks/useDragAndDrop';
+import { useTaskFilters } from './hooks/useTaskFilters';
 import {
   Task,
   TaskStatus,
   COLUMNS,
   PRIORITY_ORDER,
   ViewType,
-  FilterState,
   TaskPriority,
+  GetTasksData,
 } from './types';
 
-const REFETCH_QUERIES = [{ query: GET_TASKS }];
-
 export function Board() {
+  // Track hydration state to prevent SSR/client mismatch
+  // Server renders loading UI, client must match on first render
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const dialog = useTaskDialog();
-  const { data, loading, error } = useQuery(GET_TASKS);
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const { data, loading, error } = useQuery<GetTasksData>(GET_TASKS);
   const [viewType, setViewType] = useState<ViewType>('kanban');
-  const [filters, setFilters] = useState<FilterState>({
-    priorities: [],
-    categories: [],
-    statuses: [],
-    searchText: '',
-  });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<{ id: string; title: string } | null>(null);
 
-  const [createTask, { loading: creating }] = useMutation(CREATE_TASK, {
-    refetchQueries: REFETCH_QUERIES,
-  });
+  // Centralized filter state and logic
+  const { filters, setFilters, availableCategories, filteredTasks, handleClearFilters } =
+    useTaskFilters(data?.allTasks || []);
 
-  const [updateTask, { loading: updating }] = useMutation(UPDATE_TASK, {
-    refetchQueries: REFETCH_QUERIES,
-  });
+  const { createTask, updateTask, deleteTask, creating, updating, createOptimisticUpdate } =
+    useTaskMutations();
 
-  const [deleteTask] = useMutation(DELETE_TASK, {
-    refetchQueries: REFETCH_QUERIES,
-  });
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+  // Drag-and-drop coordination
+  const { sensors, activeTask, handleDragStart, handleDragEnd } = useDragAndDrop(
+    data?.allTasks || [],
+    updateTask
   );
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const allTasks = data?.allTasks || [];
-    const task = allTasks.find((t: Task) => t.id === active.id);
-    setActiveTask(task || null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveTask(null);
-
-    if (!over || active.id === over.id) return;
-
-    const taskId = active.id as string;
-    const allTasks = data?.allTasks || [];
-
-    // Find the task that was dropped on to determine the target column
-    const targetTask = allTasks.find((task: Task) => task.id === over.id);
-
-    // If dropped on a task, use that task's status; otherwise check if dropped on column itself
-    let newStatus: TaskStatus | undefined;
-    if (targetTask) {
-      newStatus = targetTask.status;
-    } else if (Object.values(TaskStatus).includes(over.id as TaskStatus)) {
-      newStatus = over.id as TaskStatus;
-    }
-
-    if (!newStatus) return;
-
-    const draggedTask = allTasks.find((task: Task) => task.id === taskId);
-    if (!draggedTask) return;
-
-    // Optimistic update - update UI immediately
-    updateTask({
-      variables: { id: taskId, status: newStatus },
-      optimisticResponse: {
-        updateTask: {
-          __typename: 'UpdateTask',
-          task: {
-            ...draggedTask,
-            status: newStatus,
-            __typename: 'TaskType',
-          },
-        },
-      },
-    });
-  };
 
   const handleSubmit = async () => {
     if (!dialog.formData.title.trim()) return;
@@ -158,10 +93,26 @@ export function Board() {
     dialog.close();
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this task?')) {
-      await deleteTask({ variables: { id } });
-    }
+  const handleDelete = (id: string) => {
+    const allTasks = data?.allTasks || [];
+    const task = allTasks.find((t: Task) => t.id === id);
+    if (!task) return;
+
+    setTaskToDelete({ id, title: task.title });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!taskToDelete) return;
+
+    await deleteTask({ variables: { id: taskToDelete.id } });
+    setDeleteDialogOpen(false);
+    setTaskToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setTaskToDelete(null);
   };
 
   const handleUpdateTaskPriority = async (id: string, priority: TaskPriority) => {
@@ -171,62 +122,47 @@ export function Board() {
 
     await updateTask({
       variables: { id, priority },
-      optimisticResponse: {
-        updateTask: {
-          __typename: 'UpdateTask',
-          task: {
-            ...task,
-            priority,
-            __typename: 'TaskType',
-          },
-        },
-      },
+      optimisticResponse: createOptimisticUpdate(task, { priority }),
     });
   };
 
-  // Extract unique categories from all tasks (MUST be before conditional returns)
-  const availableCategories = useMemo(() => {
-    const categories = new Set<string>();
-    (data?.allTasks || []).forEach((task: Task) => {
-      if (task.category) categories.add(task.category);
+  const handleReorderTasks = async (reorderedTasks: { id: string; order: number }[]) => {
+    const allTasks = data?.allTasks || [];
+
+    // Use Promise.allSettled to prevent partial failure cascades
+    // If one update fails, others still complete (better UX than all-or-nothing)
+    const updatePromises = reorderedTasks
+      .map(({ id, order }) => {
+        const task = allTasks.find((t: Task) => t.id === id);
+        if (!task || task.order === order) return null;
+
+        return updateTask({
+          variables: { id, order },
+          optimisticResponse: createOptimisticUpdate(task, { order }),
+        });
+      })
+      .filter(Boolean);
+
+    const results = await Promise.allSettled(updatePromises);
+
+    // Log failures for debugging (production would use proper error tracking)
+    const failures = results.filter((r) => r.status === 'rejected');
+    if (failures.length > 0) {
+      console.error('Task reorder failures:', failures);
+    }
+  };
+
+  // Update task description (used for checkbox toggling)
+  const handleUpdateTaskDescription = async (id: string, description: string) => {
+    const allTasks = data?.allTasks || [];
+    const task = allTasks.find((t: Task) => t.id === id);
+    if (!task) return;
+
+    await updateTask({
+      variables: { id, description },
+      optimisticResponse: createOptimisticUpdate(task, { description }),
     });
-    return Array.from(categories).sort();
-  }, [data]);
-
-  // Filter tasks based on filter state (MUST be before conditional returns)
-  const filteredTasks = useMemo(() => {
-    let tasks = data?.allTasks || [];
-
-    // Priority filter
-    if (filters.priorities.length > 0) {
-      tasks = tasks.filter((task: Task) => filters.priorities.includes(task.priority));
-    }
-
-    // Category filter
-    if (filters.categories.length > 0) {
-      tasks = tasks.filter((task: Task) =>
-        task.category ? filters.categories.includes(task.category) : false
-      );
-    }
-
-    // Status filter (for Eisenhower view)
-    if (filters.statuses.length > 0) {
-      tasks = tasks.filter((task: Task) => filters.statuses.includes(task.status));
-    }
-
-    // Search filter
-    if (filters.searchText.trim()) {
-      const search = filters.searchText.toLowerCase();
-      tasks = tasks.filter(
-        (task: Task) =>
-          task.title.toLowerCase().includes(search) ||
-          task.description?.toLowerCase().includes(search) ||
-          task.category?.toLowerCase().includes(search)
-      );
-    }
-
-    return tasks;
-  }, [data, filters]);
+  };
 
   const tasksByStatus = useMemo(
     () =>
@@ -234,7 +170,14 @@ export function Board() {
         (acc, column) => {
           acc[column.status] = filteredTasks
             .filter((task: Task) => task.status === column.status)
-            .sort((a: Task, b: Task) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+            .sort((a: Task, b: Task) => {
+              // First sort by priority
+              if (PRIORITY_ORDER[a.priority] !== PRIORITY_ORDER[b.priority]) {
+                return PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
+              }
+              // Then by order within same priority
+              return a.order - b.order;
+            });
           return acc;
         },
         {} as Record<TaskStatus, Task[]>
@@ -242,11 +185,9 @@ export function Board() {
     [filteredTasks]
   );
 
-  const handleClearFilters = () => {
-    setFilters({ priorities: [], categories: [], statuses: [], searchText: '' });
-  };
-
-  if (loading) {
+  // Show loading spinner until hydration is complete and data is loaded
+  // This ensures SSR output matches initial client render (both show spinner)
+  if (!isMounted || loading) {
     return (
       <Box
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}
@@ -348,15 +289,12 @@ export function Board() {
           onEditTask={dialog.openForEdit}
           onDeleteTask={handleDelete}
           onUpdateTask={handleUpdateTaskPriority}
+          onReorderTasks={handleReorderTasks}
+          onUpdateDescription={handleUpdateTaskDescription}
         />
       ) : (
         /* Kanban Columns with Drag-and-Drop */
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
             {COLUMNS.map((column) => (
               <KanbanColumn
@@ -365,23 +303,25 @@ export function Board() {
                 tasks={tasksByStatus[column.status]}
                 onEditTask={dialog.openForEdit}
                 onDeleteTask={handleDelete}
+                onUpdateDescription={handleUpdateTaskDescription}
               />
             ))}
           </Box>
           <DragOverlay
             dropAnimation={{
-              duration: 300,
+              duration: 250,
               easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
             }}
           >
             {activeTask ? (
               <Card
                 sx={{
-                  borderLeft: 3,
+                  borderLeft: 4,
                   borderColor: COLUMNS.find((c) => c.status === activeTask.status)?.color,
                   opacity: 0.9,
-                  transform: 'rotate(5deg)',
-                  boxShadow: 4,
+                  boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
+                  cursor: 'grabbing',
+                  pointerEvents: 'none',
                 }}
               >
                 <CardContent sx={{ p: 1.5 }}>
@@ -409,6 +349,14 @@ export function Board() {
         onClose={dialog.close}
         onSubmit={handleSubmit}
         onFormChange={dialog.updateFormData}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        taskTitle={taskToDelete?.title || ''}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
       />
     </Box>
   );

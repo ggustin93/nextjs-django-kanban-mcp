@@ -15,7 +15,7 @@
  */
 
 import { render, screen, waitFor } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import { Board } from '@/components/kanban/Board';
 import { GET_TASKS } from '@/graphql/queries';
 import { UPDATE_TASK } from '@/graphql/mutations';

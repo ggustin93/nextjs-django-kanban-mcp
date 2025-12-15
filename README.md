@@ -37,19 +37,20 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
   - [Table of Contents](#table-of-contents)
   - [1. Quick Start](#1-quick-start)
   - [2. Features](#2-features)
-  - [3. Architecture](#3-architecture)
-  - [4. Tech Stack](#4-tech-stack)
-  - [5. Project Structure](#5-project-structure)
+  - [3. MCP Server (Claude AI)](#3-mcp-server-claude-ai)
+  - [4. Architecture](#4-architecture)
+  - [5. Tech Stack](#5-tech-stack)
+  - [6. Project Structure](#6-project-structure)
     - [Backend (Django)](#backend-django)
     - [Frontend (Next.js)](#frontend-nextjs)
     - [Root](#root)
-  - [6. Development](#6-development)
-  - [7. Testing](#7-testing)
-  - [8. Pre-commit Hooks](#8-pre-commit-hooks)
-  - [9. Continuous Integration \& Deployment](#9-continuous-integration--deployment)
-  - [10. Deployment](#10-deployment)
-  - [11. MCP Server Integration](#11-mcp-server-integration)
-  - [12. License](#12-license)
+  - [7. Development](#7-development)
+  - [8. Testing](#8-testing)
+  - [9. Pre-commit Hooks](#9-pre-commit-hooks)
+  - [10. Git Workflow](#10-git-workflow)
+  - [11. Continuous Integration \& Deployment](#11-continuous-integration--deployment)
+  - [12. Deployment](#12-deployment)
+  - [13. License](#13-license)
 
 ## 1. Quick Start
 
@@ -83,6 +84,7 @@ Dual-view task management with Kanban board and Eisenhower Matrix, featuring dra
 - Status workflow: TODO → DOING → WAITING → DONE
 - Category tagging with # prefix (#frontend, #backend, etc.)
 - Drag-and-drop between columns and priority quadrants
+- Task checklists with progress tracking
 </details>
 
 <details>
@@ -102,7 +104,21 @@ Dual-view task management with Kanban board and Eisenhower Matrix, featuring dra
 - FastMCP-based implementation with GraphQL coordination
 </details>
 
-## 3. Architecture
+## 3. MCP Server (Claude AI)
+
+[Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
+
+| Feature | Description |
+|---------|-------------|
+| **Natural Language** | Create, update, delete tasks via conversation |
+| **GraphQL Backend** | Same API as the web frontend |
+| **Local/Remote** | Supports stdio (local) and HTTP/SSE (remote) |
+
+**Quick Setup:** Add `backend/integrations/mcp/server.py` to Claude Desktop config.
+
+See [`backend/integrations/mcp/README.md`](backend/integrations/mcp/README.md) for full setup guide.
+
+## 4. Architecture
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#e2e8f0', 'lineColor': '#64748b', 'secondaryColor': '#f8fafc', 'tertiaryColor': '#f1f5f9'}}}%%
@@ -170,7 +186,7 @@ graph TB
 
 **Layered architecture:** Presentation (clients) → Application (APIs) → Domain (business logic) → Infrastructure (data). Two interfaces to one backend: Browser via GraphQL with schema composition, Claude via MCP with direct model access.
 
-## 4. Tech Stack
+## 5. Tech Stack
 
 | Category | Technologies |
 |----------|-------------|
@@ -181,7 +197,7 @@ graph TB
 | **AI Integration** | ![MCP](https://img.shields.io/badge/MCP_Server-FastMCP-5A67D8?logo=anthropic&logoColor=white) |
 | **Dev Tools** | ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=black) ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=black) |
 
-## 5. Project Structure
+## 6. Project Structure
 
 ### Backend (Django)
 
@@ -210,24 +226,19 @@ backend/
 
 ```
 frontend/src/
-├── app/                       # Next.js App Router (layout, pages)
+├── app/                       # Next.js App Router
 ├── components/
-│   ├── ApolloWrapper.tsx      # Apollo Client provider
+│   ├── common/                # Shared components
 │   └── kanban/                # Kanban feature module
-│       ├── Board.tsx          # Main orchestrator
-│       ├── KanbanColumn.tsx   # Column layout
-│       ├── FilterBar.tsx      # Filters + view toggle
+│       ├── Board.tsx          # Orchestrator
+│       ├── KanbanColumn.tsx
+│       ├── FilterBar.tsx
 │       ├── EisenhowerMatrix.tsx
-│       ├── useTaskDialog.ts   # Dialog state hook
 │       ├── types.ts           # Types + constants
-│       ├── index.ts           # Barrel exports
-│       └── Task/              # Task components
-│           ├── TaskCard.tsx
-│           └── TaskDialog.tsx
+│       ├── Task/              # Task components
+│       ├── Checklist/         # Checklist components
+│       └── hooks/             # Custom hooks
 ├── graphql/                   # Apollo Client layer
-│   ├── client.ts              # Apollo Client setup
-│   ├── queries.ts             # GET_TASKS query
-│   └── mutations.ts           # CREATE/UPDATE/DELETE
 └── theme/                     # Material UI theme
 ```
 
@@ -239,7 +250,7 @@ frontend/src/
 └── .pre-commit-config.yaml    # Code quality hooks
 ```
 
-## 6. Development
+## 7. Development
 
 | Command | Description |
 |---------|-------------|
@@ -253,23 +264,23 @@ frontend/src/
 
 > **Windows**: Use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) or `choco install make`
 
-## 7. Testing
+## 8. Testing
 
 **Testing Trophy** approach — prioritizing integration tests for maximum confidence with minimal maintenance.
 
-| Layer | Tests | Tools |
-|-------|-------|-------|
-| 🎭 E2E | 1 | Playwright |
-| **🧪 Integration** | **37** | **Jest + RTL** |
-| 🔬 Unit | 32 | Django |
-| 📏 Static | — | TypeScript, ESLint, Ruff |
+| **Layer** | **Tests** | **Tools** | **Description** |
+|-----------|-----------|-----------|-----------------|
+| 🎭 E2E | 1 | Playwright | Full user workflows through real browser automation |
+| **🧪 Integration** | **37** | **Jest + RTL** | **Component behavior with React hooks, context, and APIs** |
+| 🔬 Unit | 32 | Django | Individual functions and model logic isolation |
+| 📏 Static | — | TypeScript, ESLint, Ruff | Type checking, linting, and code quality analysis |
 
 ```bash
 make test       # Run all tests (unit + integration + e2e)
 make check      # Full CI validation
 ```
 
-## 8. Pre-commit Hooks
+## 9. Pre-commit Hooks
 
 Automated code quality checks before each commit.
 
@@ -279,42 +290,103 @@ make precommit                                  # Run manually
 make lint                                       # Auto-fix issues
 ```
 
-## 9. Continuous Integration & Deployment
+## 10. Git Workflow
 
-Automated quality gates ensure code quality and deployment safety through parallel validation and staged deployment.
+Feature branch workflow with **Squash Merge** for a clean, readable history.
 
 ```mermaid
-graph LR
-    A[💾 Commit] --> B[🔍 CI Pipeline]
-    B --> C{Quality Gates}
-    C -->|Lint| D[✓ Backend Ruff]
-    C -->|Lint| E[✓ Frontend ESLint]
-    C -->|Test| F[✓ Django Tests]
-    C -->|Test| G[✓ Jest Tests]
-    C -->|E2E| P[✓ Playwright]
-    C -->|Build| H[✓ Docker Images]
-    D --> I[🏗️ Build Artifacts]
-    E --> I
-    F --> I
-    G --> I
-    P --> I
-    H --> I
-    I --> J[🚀 Deploy Staging]
-    J --> K[👤 Manual Approval]
-    K --> L[🌐 Production]
-
-    style A fill:#e1f5ff,stroke:#01579b
-    style B fill:#fff9c4,stroke:#f57f17
-    style C fill:#fff3e0,stroke:#e65100
-    style I fill:#e8f5e9,stroke:#2e7d32
-    style J fill:#f3e5f5,stroke:#4a148c
-    style L fill:#c8e6c9,stroke:#1b5e20
+gitGraph
+    commit id: "main"
+    branch feature/xyz
+    commit id: "wip: draft"
+    commit id: "wip: tests"
+    commit id: "fix: typo"
+    checkout main
+    commit id: "feat: add X" tag: "Squashed ✓"
 ```
 
-**Quality Validations:** Backend/Frontend linting, unit tests, E2E tests (Playwright), TypeScript checks, Docker builds
-**Deployment:** Staging auto-deploy → Manual production approval with health checks
+**Why Squash Merge?** Multiple dev commits → 1 clean commit on main.
 
-## 10. Deployment
+| Your branch | → | main |
+|-------------|---|------|
+| `wip: draft` | | |
+| `wip: tests` | **Squash** | `feat: add feature X` |
+| `fix: typo` | | *(1 commit = 1 feature)* |
+
+**Workflow:**
+
+| Step | Command | Purpose |
+|------|---------|---------|
+| 1. Branch | `git checkout -b feature/xyz` | Isolate work |
+| 2. Commit | `git commit -m "wip: ..."` | Work freely |
+| 3. Push | `git push -u origin feature/xyz` | Create PR |
+| 4. CI | *Automatic* | Tests must pass |
+| 5. Merge | **Squash and merge** | Clean history |
+
+> **Result:** `main` shows one commit per feature — easy to read, review, and revert.
+
+## 11. Continuous Integration & Deployment
+
+Automated CI/CD pipeline with parallel execution, Docker containerization, and deployment simulation.
+
+```mermaid
+flowchart LR
+  A[Push] --> B[CI]
+
+  subgraph CI[CI Pipeline]
+    direction TB
+    C[Lint]
+    D[Test]
+    E[Build]
+  end
+
+  %% CI steps run in parallel
+  B --> C
+  B --> D
+  B --> E
+
+  %% Gate comes after CI steps
+  C --> F{Pass?}
+  D --> F
+  E --> F
+
+  F -->|Yes| G[Build Docker Images]
+  G --> H[Push to GHCR]
+  H --> I[Deploy to Staging]
+  I --> J[Deploy to Production]
+  F -->|No| X[Fail]
+
+  %% Styles
+  style A fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+  style F fill:#fff3e0,stroke:#e65100,color:#bf360c
+  style G fill:#fffde7,stroke:#f9a825,color:#f57f17
+  style H fill:#ede7f6,stroke:#5e35b1,color:#4527a0
+  style I fill:#e1f5fe,stroke:#0277bd,color:#01579b
+  style J fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+  style X fill:#ffebee,stroke:#c62828,color:#b71c1c
+```
+
+> **Two-Workflow Architecture:** `ci.yml` runs on every push (Lint → Test → Build → Docker validation). `deploy.yml` triggers automatically when CI passes on `main` branch (Build images → Push to GHCR → Staging → Production with manual approval).
+
+**Pipeline Stages:**
+
+| Stage | Jobs | Tools |
+|-------|------|-------|
+| **Lint** | Backend (Python) + Frontend (TypeScript) | Ruff, Black, isort, ESLint, Prettier |
+| **Test** | Backend (Django) + Frontend (Jest) | pytest, Jest, React Testing Library |
+| **Build** | Django checks + Next.js production build | django-admin, next build |
+| **Docker** | Multi-stage builds (Backend + Frontend) | Docker Buildx, GHCR |
+| **Deploy** | Smoke tests with docker-compose | Health checks, GraphQL validation |
+
+**Features:**
+- ✅ Parallel CI execution for fast feedback
+- ✅ Docker containerization with GitHub Container Registry
+- ✅ Automated smoke tests validate critical paths
+- ✅ Fail-fast strategy with clear error reporting
+
+See `.github/workflows/ci-cd.yml` for full configuration.
+
+## 12. Deployment
 
 **Deployment Features:**
 - Automated CI/CD pipeline (`.github/workflows/`)
@@ -331,18 +403,6 @@ graph LR
 docker-compose -f docker-compose.prod.yml up --build
 ```
 
-## 11. MCP Server Integration
-
-[Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
-
-**Setup:** Configure Claude Desktop with `backend/integrations/mcp/server.py` path
-**Operations:** List, create, update, delete tasks via natural language
-**Deployment:** Supports stdio (local) and HTTP/SSE (remote) transport
-
-**📚 API Documentation:** [GraphQL Playground](http://localhost:8000/graphql) | [Schema Reference](backend/kanban/graphql/schema.graphql)
-
-See `backend/integrations/mcp/README.md` for configuration details.
-
-## 12. License
+## 13. License
 
 MIT License

@@ -17,6 +17,9 @@ Usage:
             createdAt
         }
     }
+
+Note:
+    Uses TaskType.get_queryset() for N+1 query prevention via prefetch_related.
 """
 
 import graphene
@@ -30,4 +33,5 @@ class Query(graphene.ObjectType):
     all_tasks = graphene.List(TaskType)
 
     def resolve_all_tasks(self, info):
-        return Task.objects.all().order_by("-created_at")
+        # Use TaskType.get_queryset for optimized prefetching (N+1 prevention)
+        return TaskType.get_queryset(Task.objects.all(), info).order_by("-created_at")
