@@ -104,15 +104,27 @@ Dual-view task management with Kanban board and Eisenhower Matrix, featuring dra
 
 ## 3. MCP Server Integration
 
-[Model Context Protocol](https://modelcontextprotocol.io/) server for task management through Claude AI.
+Manage tasks via any [MCP-compatible client](https://modelcontextprotocol.io/) (Claude Desktop, Cursor, etc.).
 
-**Setup:** Configure Claude Desktop with `backend/integrations/mcp/server.py` path
-**Operations:** List, create, update, delete tasks via natural language
-**Deployment:** Supports stdio (local) and HTTP/SSE (remote) transport
+**Tools:** `list_tasks` · `create_task` · `update_task` · `delete_task`
 
-**📚 API Documentation:** [GraphQL Playground](http://localhost:8000/graphql) | [Schema Reference](backend/kanban/graphql/schema.graphql)
+<details>
+<summary>Claude Desktop config example</summary>
 
-See `backend/integrations/mcp/README.md` for configuration details.
+```json
+{
+  "mcpServers": {
+    "kanban": {
+      "command": "python",
+      "args": ["-m", "integrations.mcp.server"],
+      "cwd": "/absolute/path/to/backend"
+    }
+  }
+}
+```
+</details>
+
+See [`backend/integrations/mcp/README.md`](backend/integrations/mcp/README.md) for HTTP deployment options.
 
 ## 4. Architecture
 
@@ -225,23 +237,20 @@ backend/
 frontend/src/
 ├── app/                       # Next.js App Router (layout, pages)
 ├── components/
-│   ├── ApolloWrapper.tsx      # Apollo Client provider
 │   └── kanban/                # Kanban feature module
+│       ├── config/            # Column & priority configs
+│       ├── hooks/             # Custom hooks (useTaskDialog)
+│       ├── Task/              # TaskCard, TaskDialog
 │       ├── Board.tsx          # Main orchestrator
-│       ├── KanbanColumn.tsx   # Column layout
+│       ├── KanbanColumn.tsx   # Column with drag-drop
 │       ├── FilterBar.tsx      # Filters + view toggle
 │       ├── EisenhowerMatrix.tsx
-│       ├── useTaskDialog.ts   # Dialog state hook
-│       ├── types.ts           # Types + constants
-│       ├── index.ts           # Barrel exports
-│       └── Task/              # Task components
-│           ├── TaskCard.tsx
-│           └── TaskDialog.tsx
+│       └── types.ts           # Shared types & enums
 ├── graphql/                   # Apollo Client layer
-│   ├── generated.ts           # Auto-generated types (GraphQL Codegen)
-│   ├── client.ts              # Apollo Client setup
-│   ├── queries.ts             # GET_TASKS query
-│   └── mutations.ts           # CREATE/UPDATE/DELETE
+│   ├── ApolloWrapper.tsx      # Apollo Client provider
+│   ├── generated.ts           # Auto-generated types (Codegen)
+│   ├── queries.ts             # GraphQL queries
+│   └── mutations.ts           # GraphQL mutations
 └── theme/                     # Material UI theme
 ```
 
