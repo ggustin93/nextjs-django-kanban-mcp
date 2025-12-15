@@ -19,7 +19,7 @@ import { useQuery } from '@apollo/client/react';
 import { GET_TASKS } from '@/graphql/queries';
 import { useTaskMutations } from './hooks/useTaskMutations';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { KanbanColumn } from './KanbanColumn';
 import { TaskDialog } from './Task/TaskDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
@@ -39,6 +39,14 @@ import {
 } from './types';
 
 export function Board() {
+  // Track hydration state to prevent SSR/client mismatch
+  // Server renders loading UI, client must match on first render
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const dialog = useTaskDialog();
   const { data, loading, error } = useQuery<GetTasksData>(GET_TASKS);
   const [viewType, setViewType] = useState<ViewType>('kanban');
@@ -177,7 +185,9 @@ export function Board() {
     [filteredTasks]
   );
 
-  if (loading) {
+  // Show loading spinner until hydration is complete and data is loaded
+  // This ensures SSR output matches initial client render (both show spinner)
+  if (!isMounted || loading) {
     return (
       <Box
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}

@@ -2,7 +2,7 @@
 Backend Applications
 ====================
 
-Django apps following OpenHEXA modular monolith pattern.
+Django apps following modular monolith pattern.
 
 Apps:
     - core: Shared models, mixins, and utilities
