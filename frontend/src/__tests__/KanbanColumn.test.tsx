@@ -14,25 +14,27 @@
 import { render, screen } from '@testing-library/react';
 import { DndContext } from '@dnd-kit/core';
 import { KanbanColumn } from '@/components/kanban/KanbanColumn';
-import { Column, Task, TaskStatus, TaskPriority } from '@/components/kanban/types';
+import { TaskType, TaskStatusEnum, TaskPriorityEnum } from '@/components/kanban/types';
+import { Column } from '@/components/kanban/config';
 
 // Mock task data
-const mockTasks: Task[] = [
+const mockTasks: TaskType[] = [
   {
     id: '1',
     title: 'Test Task',
     description: 'Test Description',
-    status: 'TODO' as TaskStatus,
-    priority: TaskPriority.P2,
+    status: TaskStatusEnum.Todo,
+    priority: TaskPriorityEnum.P2,
     category: '#work',
     createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   },
 ];
 
 // Column configurations
 const todoColumn: Column = {
   title: 'To Do',
-  status: 'TODO' as TaskStatus,
+  status: TaskStatusEnum.Todo,
   color: '#1976d2',
   bgColor: '#e3f2fd',
   chipColor: 'info',
@@ -40,7 +42,7 @@ const todoColumn: Column = {
 
 const doingColumn: Column = {
   title: 'Doing',
-  status: 'DOING' as TaskStatus,
+  status: TaskStatusEnum.Doing,
   color: '#ed6c02',
   bgColor: '#fff4e5',
   chipColor: 'warning',
@@ -48,7 +50,7 @@ const doingColumn: Column = {
 
 const doneColumn: Column = {
   title: 'Done',
-  status: 'DONE' as TaskStatus,
+  status: TaskStatusEnum.Done,
   color: '#2e7d32',
   bgColor: '#f1f8e9',
   chipColor: 'success',
@@ -177,25 +179,27 @@ describe('KanbanColumn Component', () => {
     });
 
     it('updates count when multiple tasks present', () => {
-      const multipleTasks: Task[] = [
+      const multipleTasks: TaskType[] = [
         ...mockTasks,
         {
           id: '2',
           title: 'Task 2',
           description: '',
-          status: 'TODO' as TaskStatus,
-          priority: TaskPriority.P3,
+          status: TaskStatusEnum.Todo,
+          priority: TaskPriorityEnum.P3,
           category: '#personal',
           createdAt: '2024-01-02T00:00:00Z',
+          updatedAt: '2024-01-02T00:00:00Z',
         },
         {
           id: '3',
           title: 'Task 3',
           description: '',
-          status: 'TODO' as TaskStatus,
-          priority: TaskPriority.P4,
+          status: TaskStatusEnum.Todo,
+          priority: TaskPriorityEnum.P4,
           category: '',
           createdAt: '2024-01-03T00:00:00Z',
+          updatedAt: '2024-01-03T00:00:00Z',
         },
       ];
 

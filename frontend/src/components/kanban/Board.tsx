@@ -1,6 +1,7 @@
 /**
  * Board Component - Kanban board orchestrator
  * Single Responsibility: Coordinate data fetching, mutations, and sub-components
+ * Uses GraphQL Codegen generated hooks for type-safety
  */
 'use client';
 
@@ -15,9 +16,13 @@ import {
   CardContent,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useQuery, useMutation } from '@apollo/client/react/hooks';
-import { GET_TASKS } from '@/graphql/queries';
-import { CREATE_TASK, UPDATE_TASK, DELETE_TASK } from '@/graphql/mutations';
+import {
+  useGetTasksQuery,
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
+  GetTasksDocument,
+} from '@/graphql/generated';
 import {
   DndContext,
   closestCenter,
@@ -35,23 +40,16 @@ import { KanbanColumn } from './KanbanColumn';
 import { TaskDialog } from './Task/TaskDialog';
 import { FilterBar } from './FilterBar';
 import { EisenhowerMatrix } from './EisenhowerMatrix';
-import { useTaskDialog } from './useTaskDialog';
-import {
-  Task,
-  TaskStatus,
-  COLUMNS,
-  PRIORITY_ORDER,
-  ViewType,
-  FilterState,
-  TaskPriority,
-} from './types';
+import { useTaskDialog } from './hooks';
+import { TaskType, TaskStatusEnum, TaskPriorityEnum, ViewType, FilterState } from './types';
+import { COLUMNS, PRIORITY_ORDER } from './config';
 
-const REFETCH_QUERIES = [{ query: GET_TASKS }];
+const REFETCH_QUERIES = [{ query: GetTasksDocument }];
 
 export function Board() {
   const dialog = useTaskDialog();
-  const { data, loading, error } = useQuery(GET_TASKS);
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const { data, loading, error } = useGetTasksQuery();
+  const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [viewType, setViewType] = useState<ViewType>('kanban');
   const [filters, setFilters] = useState<FilterState>({
     priorities: [],
@@ -60,15 +58,15 @@ export function Board() {
     searchText: '',
   });
 
-  const [createTask, { loading: creating }] = useMutation(CREATE_TASK, {
+  const [createTask, { loading: creating }] = useCreateTaskMutation({
     refetchQueries: REFETCH_QUERIES,
   });
 
-  const [updateTask, { loading: updating }] = useMutation(UPDATE_TASK, {
+  const [updateTask, { loading: updating }] = useUpdateTaskMutation({
     refetchQueries: REFETCH_QUERIES,
   });
 
-  const [deleteTask] = useMutation(DELETE_TASK, {
+  const [deleteTask] = useDeleteTaskMutation({
     refetchQueries: REFETCH_QUERIES,
   });
 
@@ -86,7 +84,7 @@ export function Board() {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const allTasks = data?.allTasks || [];
-    const task = allTasks.find((t: Task) => t.id === active.id);
+    const task = allTasks.find((t: TaskType) => t.id === active.id);
     setActiveTask(task || null);
   };
 
@@ -100,19 +98,19 @@ export function Board() {
     const allTasks = data?.allTasks || [];
 
     // Find the task that was dropped on to determine the target column
-    const targetTask = allTasks.find((task: Task) => task.id === over.id);
+    const targetTask = allTasks.find((task: TaskType) => task.id === over.id);
 
     // If dropped on a task, use that task's status; otherwise check if dropped on column itself
-    let newStatus: TaskStatus | undefined;
+    let newStatus: TaskStatusEnum | undefined;
     if (targetTask) {
       newStatus = targetTask.status;
-    } else if (Object.values(TaskStatus).includes(over.id as TaskStatus)) {
-      newStatus = over.id as TaskStatus;
+    } else if (Object.values(TaskStatusEnum).includes(over.id as TaskStatusEnum)) {
+      newStatus = over.id as TaskStatusEnum;
     }
 
     if (!newStatus) return;
 
-    const draggedTask = allTasks.find((task: Task) => task.id === taskId);
+    const draggedTask = allTasks.find((task: TaskType) => task.id === taskId);
     if (!draggedTask) return;
 
     // Optimistic update - update UI immediately
@@ -120,7 +118,7 @@ export function Board() {
       variables: { id: taskId, status: newStatus },
       optimisticResponse: {
         updateTask: {
-          __typename: 'UpdateTask',
+          __typename: 'UpdateTaskPayload',
           task: {
             ...draggedTask,
             status: newStatus,
@@ -164,16 +162,16 @@ export function Board() {
     }
   };
 
-  const handleUpdateTaskPriority = async (id: string, priority: TaskPriority) => {
+  const handleUpdateTaskPriority = async (id: string, priority: TaskPriorityEnum) => {
     const allTasks = data?.allTasks || [];
-    const task = allTasks.find((t: Task) => t.id === id);
+    const task = allTasks.find((t: TaskType) => t.id === id);
     if (!task) return;
 
     await updateTask({
       variables: { id, priority },
       optimisticResponse: {
         updateTask: {
-          __typename: 'UpdateTask',
+          __typename: 'UpdateTaskPayload',
           task: {
             ...task,
             priority,
@@ -187,7 +185,7 @@ export function Board() {
   // Extract unique categories from all tasks (MUST be before conditional returns)
   const availableCategories = useMemo(() => {
     const categories = new Set<string>();
-    (data?.allTasks || []).forEach((task: Task) => {
+    (data?.allTasks || []).forEach((task: TaskType) => {
       if (task.category) categories.add(task.category);
     });
     return Array.from(categories).sort();
@@ -199,26 +197,26 @@ export function Board() {
 
     // Priority filter
     if (filters.priorities.length > 0) {
-      tasks = tasks.filter((task: Task) => filters.priorities.includes(task.priority));
+      tasks = tasks.filter((task: TaskType) => filters.priorities.includes(task.priority));
     }
 
     // Category filter
     if (filters.categories.length > 0) {
-      tasks = tasks.filter((task: Task) =>
+      tasks = tasks.filter((task: TaskType) =>
         task.category ? filters.categories.includes(task.category) : false
       );
     }
 
     // Status filter (for Eisenhower view)
     if (filters.statuses.length > 0) {
-      tasks = tasks.filter((task: Task) => filters.statuses.includes(task.status));
+      tasks = tasks.filter((task: TaskType) => filters.statuses.includes(task.status));
     }
 
     // Search filter
     if (filters.searchText.trim()) {
       const search = filters.searchText.toLowerCase();
       tasks = tasks.filter(
-        (task: Task) =>
+        (task: TaskType) =>
           task.title.toLowerCase().includes(search) ||
           task.description?.toLowerCase().includes(search) ||
           task.category?.toLowerCase().includes(search)
@@ -233,11 +231,13 @@ export function Board() {
       COLUMNS.reduce(
         (acc, column) => {
           acc[column.status] = filteredTasks
-            .filter((task: Task) => task.status === column.status)
-            .sort((a: Task, b: Task) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+            .filter((task: TaskType) => task.status === column.status)
+            .sort(
+              (a: TaskType, b: TaskType) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
+            );
           return acc;
         },
-        {} as Record<TaskStatus, Task[]>
+        {} as Record<TaskStatusEnum, TaskType[]>
       ),
     [filteredTasks]
   );

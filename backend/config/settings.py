@@ -17,7 +17,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(","
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",  # Required for GraphiQL assets
-    "graphene_django",
+    "ariadne_django",
     "corsheaders",
     # Project apps
     "apps.core",
@@ -46,9 +46,6 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
-
-# GraphQL schema
-GRAPHENE = {"SCHEMA": "config.schema.schema"}
 
 ROOT_URLCONF = "config.urls"
 

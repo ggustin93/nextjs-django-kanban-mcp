@@ -1,7 +1,7 @@
 # Makefile for Next.js + Django Kanban Board
 # Provides convenient shortcuts for common Docker and development commands
 
-.PHONY: help setup up down rebuild test migrate clean logs shell lint precommit check
+.PHONY: help setup up down rebuild test migrate clean logs shell lint precommit check codegen
 
 # Default target
 help:
@@ -14,6 +14,7 @@ help:
 	@echo "  make check      Full CI validation"
 	@echo ""
 	@echo "  make lint       Auto-fix linting"
+	@echo "  make codegen    Regenerate GraphQL types"
 	@echo "  make precommit  Run pre-commit hooks"
 	@echo "  make migrate    Run migrations"
 	@echo "  make logs       View logs"
@@ -68,6 +69,9 @@ lint:
 	@echo "Linting and formatting..."
 	cd backend && ruff check --fix . && ruff format .
 	cd frontend && npm run lint --fix
+
+codegen:
+	cd frontend && npm run codegen
 
 precommit:
 	pre-commit run --all-files

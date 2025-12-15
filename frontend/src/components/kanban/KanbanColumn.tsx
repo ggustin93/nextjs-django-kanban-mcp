@@ -8,12 +8,13 @@ import { Box, Typography, Stack } from '@mui/material';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { TaskCard } from './Task/TaskCard';
-import { Task, Column } from './types';
+import { TaskType } from './types';
+import { Column } from './config';
 
 interface KanbanColumnProps {
   column: Column;
-  tasks: Task[];
-  onEditTask: (task: Task) => void;
+  tasks: TaskType[];
+  onEditTask: (task: TaskType) => void;
   onDeleteTask: (id: string) => void;
 }
 

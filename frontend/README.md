@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kanban Frontend
 
-## Getting Started
+Next.js 15 frontend with Apollo Client, Material-UI, and TypeScript.
 
-First, run the development server:
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **GraphQL**: Apollo Client + GraphQL Codegen
+- **UI**: Material-UI 7
+- **Drag & Drop**: dnd-kit
+- **Testing**: Jest + Playwright
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run codegen   # Generate types from backend schema
+npm run dev       # Start dev server at http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Backend must be running at `http://localhost:8000/graphql/`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev          # Development server
+npm run build        # Production build
+npm run codegen      # Generate TypeScript types from GraphQL
+npm test             # Unit tests (35 tests)
+npm run test:e2e     # Playwright E2E tests
+npm run lint         # ESLint
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/                      # Next.js App Router
+│   ├── layout.tsx            # Root layout with providers
+│   └── page.tsx              # Home page
+├── components/
+│   └── kanban/               # Kanban board feature
+│       ├── config/           # Column & priority configs
+│       ├── hooks/            # Custom hooks (useTaskDialog)
+│       ├── Task/             # Task components
+│       ├── Board.tsx         # Main orchestrator
+│       ├── KanbanColumn.tsx  # Column with drag-drop
+│       ├── FilterBar.tsx     # Filters & view toggle
+│       ├── EisenhowerMatrix.tsx
+│       └── types.ts          # Shared types & enums
+├── graphql/
+│   ├── ApolloWrapper.tsx     # Apollo Client provider
+│   ├── generated.ts          # Auto-generated types
+│   ├── queries.ts            # GraphQL queries
+│   └── mutations.ts          # GraphQL mutations
+├── theme/
+│   └── theme.ts              # MUI theme config
+└── __tests__/                # Unit tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## GraphQL Workflow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Types are auto-generated from the backend schema:
 
-## Deploy on Vercel
+```bash
+npm run codegen      # Regenerate after schema changes
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Generated types live in `src/graphql/generated.ts`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Architecture
+
+**Component Responsibilities:**
+
+- `Board.tsx` - Orchestrates data fetching, mutations, drag-drop coordination
+- `KanbanColumn.tsx` - Renders column with droppable zone
+- `TaskCard.tsx` - Individual task with priority badge
+- `useTaskDialog` - Dialog state management hook
+
+**Design Principles:**
+
+- SOLID: Single responsibility per component
+- DRY: Shared types in `types.ts`, configs in `config/`
+- KISS: Minimal abstraction, flat structure where practical

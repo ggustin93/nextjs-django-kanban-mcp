@@ -1,4 +1,5 @@
 Django>=4.2,<5.0
-graphene-django>=3.1.0
+ariadne>=0.23.0
+ariadne-django>=0.3.0
 django-cors-headers>=4.3.0
 fastmcp>=0.2.0

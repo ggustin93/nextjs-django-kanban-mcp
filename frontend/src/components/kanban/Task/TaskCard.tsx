@@ -9,12 +9,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task, Column, PRIORITY_CONFIG, getPriorityColor } from '../types';
+import { TaskType } from '../types';
+import { Column, PRIORITY_CONFIG, getPriorityColor } from '../config';
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskType;
   column: Column;
-  onEdit: (task: Task) => void;
+  onEdit: (task: TaskType) => void;
   onDelete: (id: string) => void;
   showStatusBadge?: boolean; // NEW: Show status instead of priority
   layout?: 'vertical' | 'horizontal'; // NEW: Layout mode for Eisenhower optimization

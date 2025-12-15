@@ -19,7 +19,7 @@ import { MockedProvider } from '@apollo/client/testing';
 import { Board } from '@/components/kanban/Board';
 import { GET_TASKS } from '@/graphql/queries';
 import { UPDATE_TASK } from '@/graphql/mutations';
-import { TaskStatus } from '@/components/kanban/types';
+import { TaskStatusEnum } from '@/components/kanban/types';
 
 describe('Drag-and-Drop Empty Column Integration', () => {
   // Scenario: All tasks in TODO, DOING and DONE columns are empty
@@ -292,13 +292,13 @@ describe('Drag-and-Drop Empty Column Integration', () => {
         expect(screen.getByText('Task in TODO')).toBeInTheDocument();
       });
 
-      // Verify all three column status values are valid TaskStatus enums
-      expect(Object.values(TaskStatus)).toContain('TODO');
-      expect(Object.values(TaskStatus)).toContain('DOING');
-      expect(Object.values(TaskStatus)).toContain('DONE');
+      // Verify all three column status values are valid TaskStatusEnum enums
+      expect(Object.values(TaskStatusEnum)).toContain('TODO');
+      expect(Object.values(TaskStatusEnum)).toContain('DOING');
+      expect(Object.values(TaskStatusEnum)).toContain('DONE');
 
       // This validates the logic in Board.tsx:92-94
-      // else if (Object.values(TaskStatus).includes(over.id as TaskStatus))
+      // else if (Object.values(TaskStatusEnum).includes(over.id as TaskStatusEnum))
     });
 
     it('validates status before updating task', async () => {
@@ -325,9 +325,9 @@ describe('Drag-and-Drop Empty Column Integration', () => {
         expect(screen.getByText('Task in TODO')).toBeInTheDocument();
       });
 
-      // Verify TaskStatus enum contains only valid values
+      // Verify TaskStatusEnum enum contains only valid values
       const validStatuses = ['TODO', 'DOING', 'WAITING', 'DONE'];
-      Object.values(TaskStatus).forEach((status) => {
+      Object.values(TaskStatusEnum).forEach((status) => {
         expect(validStatuses).toContain(status);
       });
     });

@@ -18,7 +18,8 @@ import {
   MenuItem,
   InputAdornment,
 } from '@mui/material';
-import { TaskFormData, TaskStatus, TaskPriority, COLUMNS, PRIORITY_CONFIG } from '../types';
+import { TaskFormData, TaskStatusEnum, TaskPriorityEnum } from '../types';
+import { COLUMNS, PRIORITY_CONFIG } from '../config';
 
 interface TaskDialogProps {
   open: boolean;
@@ -76,7 +77,7 @@ export function TaskDialog({
               <Select
                 value={formData.priority}
                 label="Priority"
-                onChange={(e) => onFormChange({ priority: e.target.value as TaskPriority })}
+                onChange={(e) => onFormChange({ priority: e.target.value as TaskPriorityEnum })}
               >
                 {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
                   <MenuItem key={key} value={key}>
@@ -104,7 +105,7 @@ export function TaskDialog({
             <Select
               value={formData.status}
               label="Status"
-              onChange={(e) => onFormChange({ status: e.target.value as TaskStatus })}
+              onChange={(e) => onFormChange({ status: e.target.value as TaskStatusEnum })}
             >
               {COLUMNS.map((col) => (
                 <MenuItem key={col.status} value={col.status}>
