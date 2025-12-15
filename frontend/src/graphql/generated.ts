@@ -595,7 +595,7 @@ export function useGetTasksLazyQuery(
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<GetTasksQueryData, GetTasksQueryVariables>(GetTasksDocument, options);
 }
-// @ts-ignore
+// @ts-expect-error TypeScript may not recognize this overload
 export function useGetTasksSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<GetTasksQueryData, GetTasksQueryVariables>
 ): Apollo.UseSuspenseQueryResult<GetTasksQueryData, GetTasksQueryVariables>;
