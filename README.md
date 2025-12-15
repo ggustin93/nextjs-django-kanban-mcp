@@ -34,18 +34,22 @@ A task management app featuring drag-and-drop Kanban boards, Eisenhower priority
 
 | # | Section | Description |
 |:-:|---------|-------------|
-| 1 | [Quick Start](#1-quick-start) | Docker setup and service ports |
-| 2 | [Features](#2-features) | Kanban, Eisenhower Matrix, filtering |
-| 3 | [MCP Server](#3-mcp-server-integration) | MCP protocol integration for AI clients |
-| 4 | [Architecture](#4-architecture) | Layered architecture and data flow |
-| 5 | [Tech Stack](#5-tech-stack) | Backend, frontend, tooling |
-| 6 | [Project Structure](#6-project-structure) | Directory layout and modules |
-| 7 | [Development](#7-development) | Local setup and workflows |
-| 8 | [Testing](#8-testing) | Unit, integration, E2E coverage |
-| 9 | [Pre-commit Hooks](#9-pre-commit-hooks) | Automated quality checks |
-| 10 | [CI/CD](#10-continuous-integration--deployment) | Validation and deployment pipeline |
-| 11 | [Deployment](#11-deployment) | Container orchestration options |
-| 12 | [License](#12-license) | MIT |
+## Table of Contents
+
+| #  | Section |
+|----|---------|
+| 1  | [Quick Start](#1-quick-start) |
+| 2  | [Features](#2-features) |
+| 3  | [MCP Server](#3-mcp-server-integration) |
+| 4  | [Architecture](#4-architecture) |
+| 5  | [Tech Stack](#5-tech-stack) |
+| 6  | [Project Structure](#6-project-structure) |
+| 7  | [Development](#7-development) |
+| 8  | [Testing](#8-testing) |
+| 9  | [Pre-commit Hooks](#9-pre-commit-hooks) |
+| 10 | [CI/CD](#10-continuous-integration--deployment) |
+| 11 | [Deployment](#11-deployment) |
+| 12 | [License](#12-license) |
 
 ## 1. Quick Start
 
