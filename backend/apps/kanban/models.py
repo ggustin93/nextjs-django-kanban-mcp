@@ -47,6 +47,7 @@ class Task(TimeStampedModel):
     priority = models.CharField(
         max_length=2, choices=Priority.choices, default=Priority.P4, db_index=True
     )
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ["priority", "-created_at"]

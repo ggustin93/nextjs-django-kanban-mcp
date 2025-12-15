@@ -1,90 +1,10 @@
-"""
-Root Query for GraphQL API - combines all read operations.
+# Ariadne GraphQL Schema for Kanban Board
+# Schema-first approach - this SDL file is the source of truth
 
-Inherits: apps.kanban.schema.Query (allTasks)
-Returns: All tasks ordered by creation date (newest first)
-
-Future: Add new app Query classes to inheritance list
-"""
-type Query {
-  allTasks: [TaskType]
-}
-
-type TaskType {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  title: String!
-  description: String!
-  status: KanbanTaskStatusChoices!
-  category: String!
-  priority: KanbanTaskPriorityChoices!
-}
-
-"""
-The `DateTime` scalar type represents a DateTime
-value as specified by
-[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
-"""
 scalar DateTime
 
-"""An enumeration."""
-enum KanbanTaskStatusChoices {
-  """To Do"""
-  TODO
+# --- Enums matching Django TextChoices ---
 
-  """In Progress"""
-  DOING
-
-  """Waiting"""
-  WAITING
-
-  """Done"""
-  DONE
-}
-
-"""An enumeration."""
-enum KanbanTaskPriorityChoices {
-  """P1 - Do First"""
-  P1
-
-  """P2 - Schedule"""
-  P2
-
-  """P3 - Quick Win"""
-  P3
-
-  """P4 - Backlog"""
-  P4
-}
-
-"""
-Root Mutation for GraphQL API - combines all write operations.
-
-Inherits: apps.kanban.schema.Mutation (createTask)
-
-Security: All mutations must validate inputs and check permissions
-Future: Add new app Mutation classes to inheritance list
-"""
-type Mutation {
-  createTask(category: String, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String!): CreateTask
-  updateTask(category: String, description: String, id: ID!, priority: TaskPriorityEnum, status: TaskStatusEnum, title: String): UpdateTask
-  deleteTask(id: ID!): DeleteTask
-}
-
-type CreateTask {
-  task: TaskType
-}
-
-"""GraphQL enum for Task.Priority choices."""
-enum TaskPriorityEnum {
-  P1
-  P2
-  P3
-  P4
-}
-
-"""GraphQL enum for Task.Status choices with validation."""
 enum TaskStatusEnum {
   TODO
   DOING
@@ -92,10 +12,72 @@ enum TaskStatusEnum {
   DONE
 }
 
-type UpdateTask {
-  task: TaskType
+enum TaskPriorityEnum {
+  P1
+  P2
+  P3
+  P4
 }
 
-type DeleteTask {
+# --- Core Types ---
+
+type TaskType {
+  id: ID!
+  title: String!
+  description: String!
+  status: TaskStatusEnum!
+  category: String!
+  priority: TaskPriorityEnum!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# --- Query ---
+
+type Query {
+  allTasks: [TaskType!]!
+}
+
+# --- Mutation Payloads ---
+
+type TaskError {
+  field: String
+  message: String!
+}
+
+type CreateTaskPayload {
+  task: TaskType
+  errors: [TaskError!]
+}
+
+type UpdateTaskPayload {
+  task: TaskType
+  errors: [TaskError!]
+}
+
+type DeleteTaskPayload {
   success: Boolean
+  errors: [TaskError!]
+}
+
+# --- Mutations ---
+
+type Mutation {
+  createTask(
+    title: String!
+    status: TaskStatusEnum
+    category: String
+    priority: TaskPriorityEnum
+  ): CreateTaskPayload
+
+  updateTask(
+    id: ID!
+    title: String
+    description: String
+    status: TaskStatusEnum
+    category: String
+    priority: TaskPriorityEnum
+  ): UpdateTaskPayload
+
+  deleteTask(id: ID!): DeleteTaskPayload
 }

@@ -3,9 +3,11 @@
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 
-from graphene_django.views import GraphQLView
+from ariadne_django.views import GraphQLView
+
+from .schema import schema
 
 urlpatterns = [
     # Disable CSRF for the API endpoint (Standard for GraphQL APIs)
-    path("graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    path("graphql/", csrf_exempt(GraphQLView.as_view(schema=schema))),
 ]
